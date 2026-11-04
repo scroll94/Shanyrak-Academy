@@ -5,167 +5,186 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Шаңырақ Code</title>
 <meta name="description" content="Онлайн-школа для подростков 14–18 лет: программирование и ИИ, математика, создание игр. Первый урок бесплатный.">
-<meta name="theme-color" content="#f3f5f9">
+<meta name="theme-color" content="#191919">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rubik:wght@500;600;700&family=Golos+Text:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Tektur:wght@600;800;900&family=Golos+Text:wght@400;500;600&family=Press+Start+2P&display=swap">
 <style>
-/* Светлая студия: белые поверхности, почти чёрный текст, у каждого направления свой цвет.
-   Золото только у 3D-шаңырақа, он главный предмет страницы. */
+/* Школа, одетая как запуск видеоигры: угольный фон, плоские панели чистых цветов, у каждого класса свой цвет.
+   Золото только у 3D-шаңырақа. Жёлтый — кнопка «Старт». */
 :root {
-  color-scheme: light;
-  --bg: #f3f5f9;
-  --surface: #ffffff;
-  --ink: #0f1524;
-  --muted: #586073;
-  --line: #e1e5ee;
-  --blue: #3346f5;
-  --blue-ink: #ffffff;
-  --teal: #0a7272;
-  --coral: #c63a1e;
-  --plate: #e6eaf3;
-  --font-display: "Rubik", system-ui, sans-serif;
+  color-scheme: dark;
+  --bg: #191919;
+  --surface: #242424;
+  --ink: #ffffff;
+  --muted: #b4b4b4;
+  --red: #d71e1e;
+  --blue: #1e4bd7;
+  --teal: #0c7866;
+  --yellow: #ffe927;
+  --black: #111111;
+  --font-display: "Tektur", "Arial Black", system-ui, sans-serif;
   --font-body: "Golos Text", "Segoe UI", system-ui, sans-serif;
-  --gutter: clamp(16px, 4vw, 48px);
-  --radius: 24px;
-  --max: 1200px;
+  --font-pixel: "Press Start 2P", "Courier New", monospace;
+  --step-small: clamp(0.8125rem, 0.79rem + 0.1vw, 0.875rem);
+  --step-body: clamp(1.0625rem, 1rem + 0.25vw, 1.1875rem);
+  --step-lead: clamp(1.25rem, 1.1rem + 0.7vw, 1.625rem);
+  --step-head: clamp(2rem, 1.3rem + 3.2vw, 4rem);
+  --m: clamp(16px, 3vw, 44px);
+  --radius: 14px;
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
 }
 *, *::before, *::after { box-sizing: border-box; }
 [hidden] { display: none !important; }
-html { scroll-padding-top: 88px; }
-body { margin: 0; background: var(--bg); color: var(--ink); font: 400 1.0625rem/1.6 var(--font-body); -webkit-font-smoothing: antialiased; overflow-x: clip; }
+html { scroll-padding-top: 80px; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 400 var(--step-body)/1.55 var(--font-body); -webkit-font-smoothing: antialiased; overflow-x: clip; }
 img, svg, video, canvas { display: block; max-width: 100%; }
+button, input, select { font: inherit; }
 a { color: inherit; }
 h1, h2, h3 { margin: 0; font-family: var(--font-display); text-wrap: balance; }
 p { margin: 0; }
-::selection { background: var(--blue); color: #fff; }
-:focus-visible { outline: 3px solid var(--blue); outline-offset: 3px; border-radius: 6px; }
-.wrap { max-width: var(--max); margin-inline: auto; padding-inline: var(--gutter); }
+::selection { background: var(--yellow); color: var(--black); }
+:focus-visible { outline: 3px solid var(--yellow); outline-offset: 3px; border-radius: 4px; }
 .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.pixel { font-family: var(--font-pixel); font-size: var(--step-small); line-height: 1.6; letter-spacing: 0; text-transform: uppercase; }
+.ln { display: block; overflow: clip; padding-top: .06em; }
+.ln > span { display: block; }
 
-/* кнопки: одна форма на всю страницу */
-.btn { display: inline-flex; align-items: center; justify-content: center; gap: .55rem; min-height: 54px; padding: 0 1.5rem; border: 0; border-radius: 14px; background: var(--blue); color: var(--blue-ink); font: 600 1rem/1.1 var(--font-body); text-decoration: none; cursor: pointer; }
-.btn:hover { background: #2234d8; }
-.btn:active { transform: scale(.98); }
-.btn--line { background: transparent; color: var(--ink); box-shadow: inset 0 0 0 1.5px var(--line); }
-.btn--line:hover { background: var(--surface); }
-.btn svg { width: 20px; height: 20px; flex: none; }
+/* одна форма кнопки на всю страницу: жёлтая плитка, как кнопка на джойстике */
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: .6rem; min-height: 56px; padding: 0 1.5rem; border: 0; border-radius: var(--radius); background: var(--yellow); color: var(--black); font: 800 1.05rem/1 var(--font-display); letter-spacing: .02em; text-transform: uppercase; text-decoration: none; cursor: pointer; transition: transform 160ms var(--ease-out), background-color 160ms ease; }
+.btn:active { transform: scale(0.97); }
+@media (hover: hover) and (pointer: fine) { .btn:hover { background: #fff36b; } }
+.btn svg { width: 22px; height: 22px; flex: none; }
 
-/* шапка */
-.top { position: sticky; top: 0; z-index: 20; background: color-mix(in srgb, var(--bg) 92%, transparent); border-bottom: 1px solid var(--line); }
-.top-in { display: flex; align-items: center; gap: 2rem; height: 72px; }
-.logo { display: inline-flex; align-items: center; gap: .6rem; font: 700 1.1rem/1 var(--font-display); text-decoration: none; letter-spacing: -.01em; white-space: nowrap; }
-@media (max-width: 400px) { .logo { font-size: 1rem; } .top .btn { padding: 0 .9rem; font-size: .9rem; } }
-.logo svg { width: 30px; height: 30px; color: var(--blue); }
-.menu { display: flex; gap: 1.8rem; margin: 0 0 0 auto; padding: 0; list-style: none; }
-.menu a { color: var(--muted); text-decoration: none; font-weight: 500; }
-.menu a:hover { color: var(--ink); }
-.top .btn { min-height: 44px; padding: 0 1.1rem; font-size: .95rem; white-space: nowrap; }
-@media (max-width: 860px) { .menu { display: none; } .top .btn { margin-left: auto; } }
-
-/* первый экран */
-.hero { padding-block: clamp(40px, 6vw, 80px) clamp(56px, 8vw, 110px); }
-.hero-in { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); align-items: center; gap: clamp(24px, 4vw, 64px); }
-.hero h1 { font-size: clamp(2.6rem, 6vw, 5.4rem); line-height: .98; letter-spacing: -.035em; font-weight: 700; }
-.hero h1 span { color: var(--blue); }
-.hero-lead { margin-top: 1.6rem; max-width: 34rem; font-size: clamp(1.1rem, 1.5vw, 1.3rem); color: var(--muted); }
-.hero-cta { display: flex; flex-wrap: wrap; gap: .8rem; margin-top: 2.2rem; }
-.facts { display: grid; grid-template-columns: repeat(3, auto); justify-content: start; gap: 2.4rem; margin: 2.8rem 0 0; padding: 0; list-style: none; }
-.facts b { display: block; font: 700 1.8rem/1 var(--font-display); letter-spacing: -.02em; }
-.facts span { display: block; margin-top: .45rem; font-size: .95rem; color: var(--muted); }
-.hero-art { position: relative; aspect-ratio: 1; width: 100%; max-width: 560px; justify-self: center; }
-.hero-art::before { content: ""; position: absolute; inset: 7%; border-radius: 50%; background: var(--plate); }
-.hero-art canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
-.hero-art .art-fallback { position: absolute; inset: 22%; width: 56%; height: 56%; color: #c99a3a; }
-.hero-art.has-3d .art-fallback { display: none; }
-@media (max-width: 900px) {
-  .hero-in { grid-template-columns: minmax(0, 1fr); }
-  .hero-art { order: -1; max-width: 380px; }
-  .facts { gap: 1.6rem; }
+/* ---------- 1. Первый экран: плакат игры ---------- */
+.hero { position: relative; height: 100svh; min-height: 640px; background: var(--red); overflow: clip; }
+.hero::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 18%; background: var(--black); }
+.hero-bar { position: absolute; inset: 0 0 auto; z-index: 4; display: flex; align-items: center; gap: 1.6rem; padding: 20px var(--m); }
+.wordmark { display: inline-flex; align-items: center; gap: .6rem; font: 800 1.15rem/1 var(--font-display); text-decoration: none; text-transform: uppercase; letter-spacing: .02em; }
+.wordmark svg { width: 30px; height: 30px; color: var(--yellow); }
+.hero-bar ul { display: flex; gap: 1.6rem; margin: 0 0 0 auto; padding: 0; list-style: none; }
+.hero-bar a:not(.wordmark) { text-decoration: none; font-weight: 600; }
+.hero-bar ul a { text-underline-offset: 6px; text-decoration-thickness: 2px; }
+.hero-bar ul a:hover { text-decoration: underline; }
+.hero h1 { position: absolute; z-index: 2; left: var(--m); top: 16%; margin: 0; font-size: clamp(80px, 12vw, 190px); line-height: .84; font-weight: 900; letter-spacing: -.01em; text-transform: uppercase; }
+.hero-key { position: absolute; z-index: 3; right: 5vw; bottom: 3%; width: min(40vw, 74svh); aspect-ratio: 1; }
+.hero-key canvas { width: 100%; height: 100%; }
+.hero-key .key-fallback { position: absolute; inset: 18%; color: #e8b64a; }
+.hero-key.has-3d .key-fallback { display: none; }
+.hero-band { position: absolute; z-index: 4; left: 0; right: 0; bottom: 0; height: 18%; display: flex; align-items: center; justify-content: space-between; gap: 1.5rem; padding: 0 var(--m); }
+.hero-band p { max-width: 44ch; font-size: var(--step-body); line-height: 1.45; }
+.hero-band .hud { color: var(--yellow); margin-top: .4rem; }
+@media (max-width: 760px) {
+  .hero { display: flex; flex-direction: column; height: auto; min-height: 100svh; padding-bottom: 0; }
+  .hero h1 { order: 1; }
+  .hero-band { order: 2; }
+  .hero-key { order: 3; }
+  .hero::after { display: none; }
+  .hero-bar ul { display: none; }
+  .hero h1 { position: relative; left: auto; top: auto; padding: 96px var(--m) 0; font-size: 19vw; }
+  .hero-key { position: relative; right: auto; bottom: auto; width: 78%; margin: 8px auto 12px; }
+  .hero-band { position: relative; height: auto; flex-direction: column; align-items: stretch; padding: 18px var(--m) 4px; }
+  .hero-band .btn { width: 100%; }
+  .hero-band .hud { color: #fff; }
 }
 
-/* направления */
-.dirs { padding-block: clamp(64px, 9vw, 120px); background: var(--surface); }
-.dirs-head { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 2rem; align-items: center; min-height: 260px; }
-.dirs-head h2 { font-size: clamp(2rem, 4.2vw, 3.6rem); line-height: 1.02; letter-spacing: -.03em; }
-.dirs-head p { margin-top: 1.1rem; max-width: 30rem; color: var(--muted); font-size: 1.12rem; }
-.dirs-3d { width: 100%; height: 300px; }
-@media (max-width: 1060px) { .dirs-head { grid-template-columns: minmax(0, 1fr); min-height: 0; } .dirs-3d { display: none; } }
-.cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; margin-top: 3rem; }
-@media (max-width: 1000px) { .cards { grid-template-columns: minmax(0, 1fr); max-width: 620px; } }
-.card { --c: var(--blue); display: flex; flex-direction: column; padding: 14px 14px 24px; border-radius: var(--radius); background: var(--bg); }
-.card--teal { --c: var(--teal); }
-.card--coral { --c: var(--coral); }
-.card-media { aspect-ratio: 16 / 10; border-radius: 16px; overflow: hidden; background: var(--surface); }
+/* ---------- 2. Выбор класса: живая вещь ---------- */
+.classes { padding: 18vh var(--m); }
+.cls-grid { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: clamp(24px, 4vw, 64px); align-items: start; max-width: 1400px; margin-inline: auto; }
+.cls-list { margin: 0; padding: 0; list-style: none; }
+.cls-head { font: 900 clamp(40px, 5.2vw, 84px)/1 var(--font-display); text-transform: uppercase; color: var(--muted); }
+.cls-item { margin-top: .35em; }
+.cls-btn { display: block; width: 100%; padding: 0; border: 0; background: none; color: var(--muted); text-align: left; cursor: pointer; }
+.cls-btn .name { display: block; font: 900 clamp(40px, 5.2vw, 84px)/1 var(--font-display); text-transform: uppercase; transition: color 200ms ease; }
+.cls-btn .desc { display: block; max-width: 34rem; margin-top: .5rem; font-size: var(--step-body); color: var(--muted); }
+.cls-btn[aria-pressed="true"] .name { color: var(--c); }
+.cls-btn[aria-pressed="true"] .desc { color: var(--ink); }
+@media (hover: hover) and (pointer: fine) { .cls-btn:hover .name { color: var(--ink); } .cls-btn[aria-pressed="true"]:hover .name { color: var(--c); } }
+.cls-btn .name::before { content: "▸ "; display: inline-block; width: 0; overflow: hidden; vertical-align: top; transition: width 220ms var(--ease-out); }
+.cls-btn[aria-pressed="true"] .name::before { width: .9em; }
+
+.card { position: sticky; top: 32px; padding: 18px; border-radius: 22px; background: var(--c); color: var(--ink); transition: background-color 300ms ease; }
+.card-emblem { height: 200px; margin: -6px -6px 6px; }
+.card-media { aspect-ratio: 16 / 10; border-radius: 12px; overflow: hidden; background: var(--black); }
 .card-media video { width: 100%; height: 100%; object-fit: cover; }
-.card-body { display: flex; flex: 1; flex-direction: column; padding: 22px 12px 0; }
-.card-tag { display: inline-flex; align-items: center; gap: .5rem; font-weight: 600; font-size: .95rem; color: var(--c); }
-.card-tag::before { content: ""; width: 10px; height: 10px; border-radius: 50%; background: var(--c); }
-.card h3 { margin-top: .6rem; font-size: clamp(1.45rem, 2vw, 1.8rem); line-height: 1.1; letter-spacing: -.02em; }
-.card-text { margin-top: .8rem; color: var(--muted); }
-.card ul { display: grid; gap: .55rem; margin: 1.2rem 0 0; padding: 0; list-style: none; }
-.card li { position: relative; padding-left: 1.6rem; }
-.card li::before { content: ""; position: absolute; left: 0; top: .42em; width: 14px; height: 14px; border-radius: 4px; background: color-mix(in srgb, var(--c) 18%, transparent); box-shadow: inset 0 0 0 2px var(--c); }
-.card-project { margin-top: 1.3rem; padding: 1rem 1.1rem; border-radius: 14px; background: color-mix(in srgb, var(--c) 9%, var(--surface)); }
-.card-project b { display: block; font-size: .9rem; color: var(--c); }
-.card-project span { display: block; margin-top: .25rem; }
-.card .btn { margin-top: auto; background: var(--c); }
-.card .card-project + .btn { margin-top: 1.4rem; }
-.card .btn:hover { background: color-mix(in srgb, var(--c) 85%, #000); }
-
-/* юрта: сцена собирается при прокрутке */
-.yurt { background: var(--bg); }
-.yr-stage { position: relative; height: 100svh; min-height: 620px; overflow: hidden; }
-.yr-stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
-.yr-copy { position: relative; z-index: 1; display: flex; flex-direction: column; justify-content: center; height: 100%; max-width: var(--max); margin-inline: auto; padding-inline: var(--gutter); pointer-events: none; }
-.yr-copy > * { max-width: 27rem; }
-.yr-copy h2 { font-size: clamp(2rem, 4vw, 3.4rem); line-height: 1.02; letter-spacing: -.03em; }
-.yr-lead { margin-top: 1rem; color: var(--muted); }
-.yr-steps { display: grid; gap: .6rem; margin: 1.8rem 0 0; padding: 0; list-style: none; }
-.yr-step { display: grid; grid-template-columns: 40px minmax(0, 1fr); column-gap: .9rem; align-items: center; padding: .7rem .9rem; border-radius: 14px; background: var(--surface); color: var(--muted); transition: background-color .3s, color .3s; }
-.yr-step i { grid-row: span 2; display: grid; place-items: center; width: 40px; height: 40px; border-radius: 50%; background: var(--bg); font: 700 1rem/1 var(--font-display); font-style: normal; color: var(--muted); }
-.yr-step b { font: 600 1.05rem/1.2 var(--font-display); color: var(--ink); }
-.yr-step span { font-size: .92rem; line-height: 1.4; }
-.yr-step.is-on i { background: var(--blue); color: #fff; }
-@media (max-width: 899px) {
-  .yr-copy { justify-content: flex-end; padding-bottom: 28px; }
-  .yr-lead { display: none; }
-  .yr-steps { grid-template-columns: 1fr 1fr; gap: .5rem; }
-  .yr-step { grid-template-columns: 32px minmax(0, 1fr); padding: .55rem .6rem; }
-  .yr-step i { width: 32px; height: 32px; font-size: .85rem; }
-  .yr-step span { display: none; }
+.card h3 { margin-top: 18px; font-size: var(--step-head); line-height: .95; font-weight: 900; text-transform: uppercase; }
+.stats { display: grid; gap: .55rem; margin: 18px 0 0; padding: 0; list-style: none; }
+.stats li { display: grid; grid-template-columns: 8.5rem minmax(0, 1fr); align-items: center; gap: .8rem; font-weight: 600; }
+.bar { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; }
+.bar i { height: 12px; border-radius: 3px; background: rgb(255 255 255 / .25); }
+.bar i.on { background: var(--yellow); }
+.card-project { margin-top: 18px; padding: 14px 16px; border-radius: 12px; background: rgb(0 0 0 / .28); }
+.card-project b { display: block; font-family: var(--font-display); font-weight: 800; text-transform: uppercase; color: var(--yellow); }
+.card .btn { width: 100%; margin-top: 16px; }
+.card[data-cls="math"] { --c: var(--teal); }
+.card[data-cls="games"] { --c: var(--red); }
+.card[data-cls="code"] { --c: var(--blue); }
+.cls-item[data-cls="code"] { --c: #6f8dff; }
+.cls-item[data-cls="math"] { --c: #3fd3b4; }
+.cls-item[data-cls="games"] { --c: #ff6b5e; }
+@media (max-width: 900px) {
+  .classes { padding-block: 12vh; }
+  .cls-grid { grid-template-columns: minmax(0, 1fr); }
+  .cls-head, .cls-btn .name { font-size: 11vw; }
+  .card { position: relative; top: auto; }
+  .stats li { grid-template-columns: 7rem minmax(0, 1fr); }
 }
 
-/* запись */
-.join { padding-block: clamp(64px, 9vw, 120px); }
-.join-box { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: clamp(24px, 4vw, 56px); padding: clamp(28px, 5vw, 64px); border-radius: 32px; background: var(--blue); color: #fff; }
-.join-box h2 { font-size: clamp(2rem, 4.2vw, 3.6rem); line-height: 1.02; letter-spacing: -.03em; }
-.join-box > div > p { margin-top: 1.1rem; max-width: 28rem; font-size: 1.12rem; color: #dfe3ff; }
-.join-list { display: grid; gap: .5rem; margin: 1.6rem 0 0; padding: 0; list-style: none; }
-.join-list li { position: relative; padding-left: 1.7rem; }
-.join-list li::before { content: ""; position: absolute; left: 0; top: .5em; width: 12px; height: 7px; border-left: 2.5px solid #fff; border-bottom: 2.5px solid #fff; transform: rotate(-45deg); }
-.form { display: grid; gap: 1rem; align-content: start; padding: clamp(20px, 3vw, 32px); border-radius: var(--radius); background: var(--surface); color: var(--ink); }
-.form h3 { font-size: 1.4rem; letter-spacing: -.01em; }
-.field { display: grid; gap: .4rem; }
-.field label { font-weight: 600; font-size: .95rem; }
-.field input, .field select { width: 100%; min-height: 52px; padding: 0 1rem; border: 1.5px solid var(--line); border-radius: 12px; background: var(--bg); color: var(--ink); font: 400 1rem/1.2 var(--font-body); }
-.field input:focus, .field select:focus { border-color: var(--blue); outline: none; }
-.field .err { display: none; color: #c0262d; font-size: .9rem; }
-.field.is-bad input, .field.is-bad select { border-color: #c0262d; }
-.field.is-bad .err { display: block; }
-.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
-.form .btn { width: 100%; }
-.form-note { color: var(--muted); font-size: .9rem; }
-.form-note a { color: var(--blue); }
-@media (max-width: 900px) { .join-box { grid-template-columns: minmax(0, 1fr); } }
-@media (max-width: 420px) { .form-row { grid-template-columns: minmax(0, 1fr); } }
+/* ---------- 3. Уровень 1: юрта собирается, квесты стоят вдоль нижнего края ---------- */
+.level { position: relative; height: 100svh; min-height: 640px; overflow: clip; background: var(--black); }
+.level-photo { position: absolute; inset: 0; overflow: clip; }
+.level-photo img { width: 100%; height: 100%; object-fit: cover; }
+.level-photo::after { content: ""; position: absolute; inset: 0; background: rgb(10 10 10 / .55); }
+.level canvas { position: absolute; inset: 0; z-index: 1; width: 100%; height: 100%; }
+.level-copy { position: absolute; z-index: 2; left: 18%; top: 11%; max-width: 34rem; padding: 18px 22px; border-radius: var(--radius); background: rgb(17 17 17 / .7); }
+.level-copy .pixel { color: var(--yellow); }
+.level-copy h2 { margin-top: 10px; font-size: var(--step-head); line-height: .95; font-weight: 900; text-transform: uppercase; }
+.level-copy p:last-child { margin-top: 12px; font-size: var(--step-lead); line-height: 1.35; }
+.quests { position: absolute; z-index: 2; left: 0; right: 0; bottom: 0; margin: 0; list-style: none; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); align-items: end; gap: 12px; padding: 0 var(--m); }
+.quest { padding: 16px 18px 40px; border-radius: 12px 12px 0 0; background: #f4f4f4; color: var(--black); font-size: 1rem; line-height: 1.45; transition: background-color 300ms ease, transform 400ms var(--ease-out); transform: translateY(14px); }
+.quest:nth-child(1) { min-height: 30svh; rotate: -1.5deg; }
+.quest:nth-child(2) { min-height: 38svh; }
+.quest:nth-child(3) { min-height: 26svh; rotate: 1.2deg; }
+.quest:nth-child(4) { min-height: 34svh; }
+.quest b { display: block; font: 800 1.05rem/1.2 var(--font-display); text-transform: uppercase; }
+.quest .rule { display: block; margin: 6px 0; letter-spacing: 2px; color: #6b6b6b; }
+.quest .state { display: block; margin-top: 8px; font-weight: 600; color: #6b6b6b; }
+.quest.is-done { background: var(--yellow); transform: translateY(0); }
+.quest.is-done .state { color: var(--black); }
+@media (max-width: 760px) {
+  .level-copy { left: var(--m); right: var(--m); top: 8%; }
+  .level-copy p:last-child { font-size: var(--step-body); }
+  .quests { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+  .quest b { overflow-wrap: anywhere; }
+  .quest:nth-child(n) { min-height: 0; padding: 10px 12px 14px; rotate: 0deg; border-radius: 10px; font-size: .9rem; }
+  .quest .rule, .quest p { display: none; }
+  .quest .txt { display: none; }
+}
 
-/* подвал */
-.foot { padding-block: 40px 56px; border-top: 1px solid var(--line); color: var(--muted); font-size: .95rem; }
-.foot-in { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 1rem 2rem; }
-.foot ul { display: flex; flex-wrap: wrap; gap: .4rem 1.6rem; margin: 0; padding: 0; list-style: none; }
-.foot a { text-decoration: none; }
-.foot a:hover { color: var(--ink); }
+/* ---------- 4. Одно слово — кнопка ---------- */
+.start { display: block; position: relative; height: 60svh; min-height: 360px; padding: 20px var(--m); background: var(--yellow); color: var(--black); text-decoration: none; border-radius: 40px 40px 0 0; overflow: clip; }
+.start p { max-width: 30rem; font-size: 20px; font-weight: 600; line-height: 1.35; }
+.start svg { position: absolute; top: 20px; right: var(--m); width: 48px; height: 48px; }
+.start .word { position: absolute; left: var(--m); right: var(--m); bottom: 24px; font: 900 clamp(110px, 26vw, 420px)/.8 var(--font-display); text-transform: uppercase; letter-spacing: -.02em; white-space: nowrap; }
+.start:hover, .start:focus-visible { background: var(--black); color: var(--yellow); }
+@media (max-width: 760px) { .start { height: 46svh; } .start p { font-size: 17px; } .start svg { width: 32px; height: 32px; } .start .word { font-size: 26vw; } }
+
+/* ---------- 5. Подвал: обратная сторона картриджа ---------- */
+.foot { padding: 0 var(--m) 48px; background: var(--black); }
+.back { position: relative; max-width: 1100px; margin: 0 auto; padding: 72px clamp(20px, 4vw, 56px) 28px; background: #f4f4f4; color: var(--black); display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 32px; }
+.back::before { content: ""; position: absolute; left: 0; right: 0; top: -1px; height: 40px; background: radial-gradient(circle at 50% 0, var(--black) 49px, transparent 50px) 0 0 / 100px 40px repeat-x; }
+.back h2 { font-size: 32px; line-height: 1; font-weight: 900; text-transform: uppercase; }
+.back .msg { margin-top: 14px; }
+.back address { font-style: normal; display: grid; gap: 12px; align-content: start; font-size: 18px; }
+.back address a { text-decoration: none; font-weight: 600; }
+.back address a:hover { text-decoration: underline; }
+.stamp { position: absolute; top: 56px; right: clamp(20px, 4vw, 56px); width: 88px; padding: 6px; background: #f4f4f4; rotate: 4deg; outline: 2px dashed #9a9a9a; outline-offset: -2px; }
+.stamp img { width: 100%; height: auto; aspect-ratio: 3 / 4; object-fit: cover; }
+.back .imprint { grid-column: 1 / -1; max-width: 72ch; margin-inline: auto; text-align: center; font-size: var(--step-small); color: #4a4a4a; }
+.back .imprint a { color: inherit; }
+@media (max-width: 760px) { .back { grid-template-columns: minmax(0, 1fr); padding-top: 64px; } .back::before { background-size: calc(100% / 6) 40px; background-image: radial-gradient(circle at 50% 0, var(--black) 47%, transparent 48%); } .stamp { width: 64px; top: 52px; } .back h2 { padding-right: 76px; } address { font-size: 17px; } }
+
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition-duration: 1ms !important; } }
 </style>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -173,160 +192,86 @@ p { margin: 0; }
   <symbol id="wa" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2.2a9.8 9.8 0 0 0-8.4 14.8L2.3 21.8l4.9-1.3A9.8 9.8 0 1 0 12 2.2zm0 17.8a8 8 0 0 1-4.1-1.1l-.3-.2-2.9.8.8-2.8-.2-.3A8 8 0 1 1 12 20zm4.4-6c-.2-.1-1.4-.7-1.6-.8s-.4-.1-.5.1-.6.8-.8 1-.3.2-.5.1a6.6 6.6 0 0 1-3.3-2.9c-.2-.4.2-.4.7-1.3.1-.2 0-.3 0-.4l-.7-1.8c-.2-.5-.4-.4-.5-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.7 11.8 11.8 0 0 0 4.5 4c1.7.7 2.3.8 3.2.6a2.7 2.7 0 0 0 1.8-1.3 2.2 2.2 0 0 0 .2-1.3c-.1-.1-.3-.2-.5-.3z"/></symbol>
 </svg>
 
-<header class="top">
-  <div class="wrap top-in">
-    <a class="logo" href="#top"><svg aria-hidden="true"><use href="#mark"/></svg>Шаңырақ Code</a>
-    <ul class="menu">
-      <li><a href="#directions">Направления</a></li>
-      <li><a href="#yurt">3D-юрта</a></li>
-      <li><a href="#join">Запись</a></li>
+<header class="hero" id="top">
+  <nav class="hero-bar" aria-label="Главное меню">
+    <a class="wordmark" href="#top"><svg aria-hidden="true"><use href="#mark"/></svg>Шаңырақ Code</a>
+    <ul>
+      <li><a href="#classes">Классы</a></li>
+      <li><a href="#level">Уровень 1</a></li>
+      <li><a href="#start">Старт</a></li>
     </ul>
-    <a class="btn" href="#join">Бесплатный урок</a>
+  </nav>
+  <h1><span class="ln"><span>Нажми</span></span><span class="ln"><span>старт</span></span></h1>
+  <div class="hero-key" aria-hidden="true">
+    <svg class="key-fallback"><use href="#mark"/></svg>
+    <canvas id="sky"></canvas>
+  </div>
+  <div class="hero-band">
+    <div>
+      <p>Шаңырақ Code — онлайн-школа для 14–18 лет: программирование и ИИ, математика, создание игр.</p>
+      <p class="pixel hud">Урок 1 · 0 ₸</p>
+    </div>
+    <a class="btn" href="https://wa.me/77055823688?text=%D0%A1%D3%99%D0%BB%D0%B5%D0%BC%21%20%D0%A5%D0%BE%D1%87%D1%83%20%D0%BD%D0%B0%20%D0%B1%D0%B5%D1%81%D0%BF%D0%BB%D0%B0%D1%82%D0%BD%D1%8B%D0%B9%20%D0%BF%D1%80%D0%BE%D0%B1%D0%BD%D1%8B%D0%B9%20%D1%83%D1%80%D0%BE%D0%BA%20%D0%B2%20%D0%A8%D0%B0%D2%A3%D1%8B%D1%80%D0%B0%D2%9B%20Code." target="_blank" rel="noopener"><svg aria-hidden="true"><use href="#wa"/></svg>Начать бесплатно</a>
   </div>
 </header>
 
-<main id="top">
-  <section class="hero" aria-labelledby="hero-title">
-    <div class="wrap hero-in">
-      <div class="hero-copy">
-        <h1 id="hero-title">Код, математика и <span>свои игры</span></h1>
-        <p class="hero-lead">Онлайн-школа для подростков 14–18 лет. Три направления, в каждом модуле ты делаешь настоящую вещь, а первый урок бесплатный.</p>
-        <div class="hero-cta">
-          <a class="btn" href="#join">Записаться на бесплатный урок</a>
-          <a class="btn btn--line" href="#directions">Смотреть направления</a>
-        </div>
-        <ul class="facts">
-          <li><b>14–18</b><span>лет</span></li>
-          <li><b>3</b><span>направления</span></li>
-          <li><b>0 ₸</b><span>первый урок</span></li>
-        </ul>
-      </div>
-      <div class="hero-art" aria-hidden="true">
-        <svg class="art-fallback"><use href="#mark"/></svg>
-        <canvas id="sky"></canvas>
-      </div>
+<main>
+  <section class="classes" id="classes" aria-labelledby="cls-title">
+    <div class="cls-grid">
+      <ul class="cls-list">
+        <li class="cls-head"><h2 id="cls-title" style="font:inherit">Выбери класс</h2></li>
+        <li class="cls-item" data-cls="code"><button class="cls-btn" type="button" data-cls="code" aria-pressed="true" aria-controls="card-title"><span class="name">Кодер</span><span class="desc">Python с нуля, Telegram-боты и нейросети, которые помогают тебе, а не думают за тебя.</span></button></li>
+        <li class="cls-item" data-cls="math"><button class="cls-btn" type="button" data-cls="math" aria-pressed="false" aria-controls="card-title"><span class="name">Математик</span><span class="desc">Функции, графики и геометрия через задачи и код. Подготовка к контрольным и олимпиадам.</span></button></li>
+        <li class="cls-item" data-cls="games"><button class="cls-btn" type="button" data-cls="games" aria-pressed="false" aria-controls="card-title"><span class="name">Геймдизайнер</span><span class="desc">Roblox Studio, Godot, уровни, физика и звук. Игра, в которую играют друзья.</span></button></li>
+      </ul>
+      <article class="card" data-cls="code" aria-live="polite">
+        <canvas id="icons-3d" class="card-emblem" aria-hidden="true"></canvas>
+        <div class="card-media"><video id="card-video" src="assets/code-ai.mp4" poster="assets/code-ai.jpg" muted loop playsinline preload="none" width="960" height="600" aria-hidden="true"></video></div>
+        <h3 id="card-title">Кодер</h3>
+        <ul class="stats" id="card-stats"></ul>
+        <p class="card-project"><b>Твой проект</b><span id="card-project"></span></p>
+        <a class="btn" id="card-cta" href="https://wa.me/77055823688?text=%D0%A1%D3%99%D0%BB%D0%B5%D0%BC%21%20%D0%A5%D0%BE%D1%87%D1%83%20%D0%BD%D0%B0%20%D0%B1%D0%B5%D1%81%D0%BF%D0%BB%D0%B0%D1%82%D0%BD%D1%8B%D0%B9%20%D0%BF%D1%80%D0%BE%D0%B1%D0%BD%D1%8B%D0%B9%20%D1%83%D1%80%D0%BE%D0%BA%20%D0%B2%20%D0%A8%D0%B0%D2%A3%D1%8B%D1%80%D0%B0%D2%9B%20Code." target="_blank" rel="noopener"><svg aria-hidden="true"><use href="#wa"/></svg>Играть за этот класс</a>
+      </article>
     </div>
   </section>
 
-  <section class="dirs" id="directions" aria-labelledby="dirs-title">
-    <div class="wrap">
-      <div class="dirs-head">
-        <div>
-          <h2 id="dirs-title">Выбери, что будешь создавать</h2>
-          <p>Три направления. Выбери одно, а на бесплатном уроке поможем понять, с чего начать именно тебе.</p>
-        </div>
-        <canvas id="icons-3d" class="dirs-3d" aria-hidden="true"></canvas>
-      </div>
-      <div class="cards">
-        <article class="card">
-          <div class="card-media"><video src="assets/code-ai.mp4" poster="assets/code-ai.jpg" muted loop playsinline preload="none" width="960" height="600" aria-hidden="true"></video></div>
-          <div class="card-body">
-            <p class="card-tag">Программирование и ИИ</p>
-            <h3>Код и нейросети</h3>
-            <p class="card-text">Python с нуля и работа с ИИ так, чтобы он ускорял тебя, а не думал за тебя.</p>
-            <ul><li>Переменные, циклы, функции</li><li>Telegram-боты и простые сайты</li><li>Как проверять ответы нейросети</li></ul>
-            <p class="card-project"><b>Твой проект</b><span>Telegram-бот с нейросетью для тебя или друзей.</span></p>
-            <a class="btn" href="https://wa.me/77055823688?text=%D0%A1%D3%99%D0%BB%D0%B5%D0%BC%21%20%D0%A5%D0%BE%D1%87%D1%83%20%D0%BD%D0%B0%20%D0%B1%D0%B5%D1%81%D0%BF%D0%BB%D0%B0%D1%82%D0%BD%D1%8B%D0%B9%20%D0%BF%D1%80%D0%BE%D0%B1%D0%BD%D1%8B%D0%B9%20%D1%83%D1%80%D0%BE%D0%BA%20%D0%BF%D0%BE%20%D0%BD%D0%B0%D0%BF%D1%80%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D1%8E%20%C2%AB%D0%9F%D1%80%D0%BE%D0%B3%D1%80%D0%B0%D0%BC%D0%BC%D0%B8%D1%80%D0%BE%D0%B2%D0%B0%D0%BD%D0%B8%D0%B5%20%D0%B8%20%D0%98%D0%98%C2%BB%20%D0%B2%20%D0%A8%D0%B0%D2%A3%D1%8B%D1%80%D0%B0%D2%9B%20Code." target="_blank" rel="noopener">Записаться на это направление</a>
-          </div>
-        </article>
-        <article class="card card--teal">
-          <div class="card-media"><video src="assets/math.mp4" poster="assets/math.jpg" muted loop playsinline preload="none" width="960" height="600" aria-hidden="true"></video></div>
-          <div class="card-body">
-            <p class="card-tag">Математика</p>
-            <h3>Формулы оживают</h3>
-            <p class="card-text">Алгебра и геометрия через графики, задачи и код, а не через зубрёжку.</p>
-            <ul><li>Уравнения, функции и графики</li><li>Геометрия и логика</li><li>Подготовка к контрольным и олимпиадам</li></ul>
-            <p class="card-project"><b>Твой проект</b><span>Интерактивный график или решатель задач.</span></p>
-            <a class="btn" href="https://wa.me/77055823688?text=%D0%A1%D3%99%D0%BB%D0%B5%D0%BC%21%20%D0%A5%D0%BE%D1%87%D1%83%20%D0%BD%D0%B0%20%D0%B1%D0%B5%D1%81%D0%BF%D0%BB%D0%B0%D1%82%D0%BD%D1%8B%D0%B9%20%D0%BF%D1%80%D0%BE%D0%B1%D0%BD%D1%8B%D0%B9%20%D1%83%D1%80%D0%BE%D0%BA%20%D0%BF%D0%BE%20%D0%BD%D0%B0%D0%BF%D1%80%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D1%8E%20%C2%AB%D0%9C%D0%B0%D1%82%D0%B5%D0%BC%D0%B0%D1%82%D0%B8%D0%BA%D0%B0%C2%BB%20%D0%B2%20%D0%A8%D0%B0%D2%A3%D1%8B%D1%80%D0%B0%D2%9B%20Code." target="_blank" rel="noopener">Записаться на это направление</a>
-          </div>
-        </article>
-        <article class="card card--coral">
-          <div class="card-media"><video src="assets/games.mp4" poster="assets/games.jpg" muted loop playsinline preload="none" width="960" height="600" aria-hidden="true"></video></div>
-          <div class="card-body">
-            <p class="card-tag">Создание игр</p>
-            <h3>Игры для друзей</h3>
-            <p class="card-text">Механика, уровни, персонажи и звук. В конце модуля игру можно отправить по ссылке.</p>
-            <ul><li>Roblox Studio и язык Luau</li><li>2D- и 3D-игры на Godot</li><li>Физика, интерфейс и звук</li></ul>
-            <p class="card-project"><b>Твой проект</b><span>Своя игра или плейс в Roblox, открытый для всех.</span></p>
-            <a class="btn" href="https://wa.me/77055823688?text=%D0%A1%D3%99%D0%BB%D0%B5%D0%BC%21%20%D0%A5%D0%BE%D1%87%D1%83%20%D0%BD%D0%B0%20%D0%B1%D0%B5%D1%81%D0%BF%D0%BB%D0%B0%D1%82%D0%BD%D1%8B%D0%B9%20%D0%BF%D1%80%D0%BE%D0%B1%D0%BD%D1%8B%D0%B9%20%D1%83%D1%80%D0%BE%D0%BA%20%D0%BF%D0%BE%20%D0%BD%D0%B0%D0%BF%D1%80%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D1%8E%20%C2%AB%D0%A1%D0%BE%D0%B7%D0%B4%D0%B0%D0%BD%D0%B8%D0%B5%20%D0%B8%D0%B3%D1%80%C2%BB%20%D0%B2%20%D0%A8%D0%B0%D2%A3%D1%8B%D1%80%D0%B0%D2%9B%20Code." target="_blank" rel="noopener">Записаться на это направление</a>
-          </div>
-        </article>
-      </div>
+  <section class="level" id="level" aria-labelledby="level-title">
+    <div class="level-photo"><img src="assets/kazakh-yurts-at-night-in-the-kyzylkum.jpg" width="1800" height="1201" alt="Казахские юрты ночью в пустыне Кызылкум, внутри горит свет." loading="lazy"></div>
+    <canvas id="yurt-3d" aria-hidden="true"></canvas>
+    <div class="level-copy">
+      <p class="pixel">Уровень 1</p>
+      <h2 id="level-title">Собери юрту</h2>
+      <p>Проект собирается как юрта: по частям и в своём порядке. Листай, и каждая часть встанет на место.</p>
     </div>
+    <ol class="quests">
+      <li class="quest"><b lang="kk">Кереге</b><span class="rule">- - - - - - - - -</span><span class="txt">Стены-решётка держат весь дом. В учёбе это основы: переменные, условия, циклы.</span><span class="state">Квест 1</span></li>
+      <li class="quest"><b lang="kk">Уықтар</b><span class="rule">- - - - - - - - -</span><span class="txt">Жерди сходятся в одной точке. Так ты выбираешь класс и идёшь к цели.</span><span class="state">Квест 2</span></li>
+      <li class="quest"><b lang="kk">Шаңырақ</b><span class="rule">- - - - - - - - -</span><span class="txt">Венец держит купол и пропускает свет. Это твой первый собственный проект.</span><span class="state">Квест 3</span></li>
+      <li class="quest"><b lang="kk">Киіз</b><span class="rule">- - - - - - - - -</span><span class="txt">Войлок делает каркас домом. Показ проекта на демо-дне, и он в портфолио.</span><span class="state">Квест 4</span></li>
+    </ol>
   </section>
 
-  <section class="yurt" id="yurt" aria-labelledby="yurt-title">
-    <div class="yr-stage">
-      <canvas id="yurt-3d" aria-hidden="true"></canvas>
-      <div class="yr-copy">
-        <h2 id="yurt-title">Собери юрту в 3D</h2>
-        <p class="yr-lead">Такую сцену ты научишься собирать на направлении «Создание игр». Каждая деталь здесь отдельная модель, а вместе они складываются в дом.</p>
-        <ol class="yr-steps">
-          <li class="yr-step is-on"><i>1</i><b lang="kk">Кереге</b><span>решётчатые стены, которые складываются как гармошка</span></li>
-          <li class="yr-step is-on"><i>2</i><b lang="kk">Уық</b><span>жерди купола, все сходятся в одной точке</span></li>
-          <li class="yr-step is-on"><i>3</i><b lang="kk">Шаңырақ</b><span>венец юрты и символ дома на гербе Казахстана</span></li>
-          <li class="yr-step is-on"><i>4</i><b lang="kk">Киіз</b><span>войлок с орнаментом, который хранит тепло</span></li>
-        </ol>
-      </div>
-    </div>
-  </section>
-
-  <section class="join" id="join" aria-labelledby="join-title">
-    <div class="wrap">
-      <div class="join-box">
-        <div>
-          <h2 id="join-title">Первый урок бесплатно</h2>
-          <p>Заполни три поля, и заявка откроется в WhatsApp. Отправь её, мы ответим и подберём удобное время.</p>
-          <ul class="join-list">
-            <li>Знакомимся и узнаём, что тебе интересно</li>
-            <li>Вместе делаем первый мини-проект</li>
-            <li>Подбираем направление и план занятий</li>
-          </ul>
-        </div>
-        <form class="form" id="join-form" novalidate>
-          <h3>Заявка на пробный урок</h3>
-          <div class="field">
-            <label for="f-name">Имя</label>
-            <input id="f-name" name="name" type="text" autocomplete="given-name" maxlength="60" required aria-describedby="f-name-err">
-            <p class="err" id="f-name-err">Напиши, как тебя зовут</p>
-          </div>
-          <div class="form-row">
-            <div class="field">
-              <label for="f-age">Возраст</label>
-              <select id="f-age" name="age" required aria-describedby="f-age-err">
-                <option value="">Выбери</option>
-                <option>14</option><option>15</option><option>16</option><option>17</option><option>18</option>
-              </select>
-              <p class="err" id="f-age-err">Выбери возраст</p>
-            </div>
-            <div class="field">
-              <label for="f-dir">Направление</label>
-              <select id="f-dir" name="dir">
-                <option>Помогите выбрать</option>
-                <option>Программирование и ИИ</option>
-                <option>Математика</option>
-                <option>Создание игр</option>
-              </select>
-            </div>
-          </div>
-          <button class="btn" type="submit"><svg aria-hidden="true"><use href="#wa"/></svg>Отправить заявку в WhatsApp</button>
-          <p class="form-note">Если тебе нет 16 лет, заполни заявку вместе с родителями. Номер школы: <a href="https://wa.me/77055823688">+7 705 582 36 88</a>.</p>
-        </form>
-      </div>
-    </div>
-  </section>
+  <a class="start" id="start" href="https://wa.me/77055823688?text=%D0%A1%D3%99%D0%BB%D0%B5%D0%BC%21%20%D0%A5%D0%BE%D1%87%D1%83%20%D0%BD%D0%B0%20%D0%B1%D0%B5%D1%81%D0%BF%D0%BB%D0%B0%D1%82%D0%BD%D1%8B%D0%B9%20%D0%BF%D1%80%D0%BE%D0%B1%D0%BD%D1%8B%D0%B9%20%D1%83%D1%80%D0%BE%D0%BA%20%D0%B2%20%D0%A8%D0%B0%D2%A3%D1%8B%D1%80%D0%B0%D2%9B%20Code." target="_blank" rel="noopener">
+    <p>Первый урок бесплатный. Нажми, и заявка откроется в WhatsApp, мы ответим и подберём время.</p>
+    <svg viewBox="0 0 48 48" aria-hidden="true"><path d="M12 36L36 12M16 12H36V32" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="square"/></svg>
+    <span class="word">Старт</span>
+  </a>
 </main>
 
 <footer class="foot">
-  <div class="wrap foot-in">
-    <a class="logo" href="#top"><svg aria-hidden="true"><use href="#mark"/></svg>Шаңырақ Code</a>
-    <ul>
-      <li><a href="#directions">Направления</a></li>
-      <li><a href="#yurt">3D-юрта</a></li>
-      <li><a href="#join">Бесплатный урок</a></li>
-      <li><a href="https://wa.me/77055823688">WhatsApp: +7 705 582 36 88</a></li>
-    </ul>
-    <span>© 2026 Шаңырақ Code</span>
+  <div class="back">
+    <div>
+      <h2>До встречи на уроке</h2>
+      <p class="msg">Уроки онлайн, из любого города Казахстана. Если тебе нет 16, напиши нам вместе с родителями: расскажем, как всё устроено.</p>
+    </div>
+    <address>
+      <a href="https://wa.me/77055823688">WhatsApp: +7 705 582 36 88</a>
+      <a href="#classes">Три класса на выбор</a>
+      <a href="#level">Уровень 1: юрта</a>
+      <a href="#top">Наверх</a>
+    </address>
+    <div class="stamp"><img src="assets/sb-kazakh-man-on-horse-with-golden.jpg" width="1800" height="1159" alt="Казах с беркутом на коне, фотография 1911–1914 годов." loading="lazy"></div>
+    <p class="imprint">© 2026 Шаңырақ Code. Фотографии: «Kazakh yurts at night in the Kyzylkum desert», Carsten Siegel, <a href="https://creativecommons.org/licenses/by-sa/4.0">CC BY-SA 4.0</a>; «Kazakh man on horse with golden eagle», Сергей Борисов, 1911–1914, общественное достояние. Обе через <a href="https://commons.wikimedia.org">Wikimedia Commons</a>.</p>
   </div>
 </footer>
 
@@ -335,59 +280,80 @@ p { margin: 0; }
 <script>
 (() => {
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const WA = 'https://wa.me/77055823688';
+  const WA = 'https://wa.me/77055823688?text=';
+  const CLASSES = {"code": {"title": "Кодер", "dir": "Программирование и ИИ", "video": "code-ai", "stats": [["Логика", 5], ["Креатив", 3], ["Скорость", 4]], "project": "Telegram-бот с нейросетью, который помогает тебе или друзьям."}, "math": {"title": "Математик", "dir": "Математика", "video": "math", "stats": [["Логика", 5], ["Креатив", 3], ["Точность", 5]], "project": "Свой интерактивный график или решатель задач для школы."}, "games": {"title": "Геймдизайнер", "dir": "Создание игр", "video": "games", "stats": [["Логика", 3], ["Креатив", 5], ["Скорость", 4]], "project": "Своя игра или плейс в Roblox, открытый для всех игроков."}};
 
-  // Юрта: прогресс сборки привязан к прокрутке, его читает 3D-сцена
-  const yurtSec = document.querySelector('.yurt');
-  const steps = [...yurtSec.querySelectorAll('.yr-step')];
-  const marks = [0.08, 0.34, 0.58, 0.7];
+  // ---------- выбор класса: карточка персонажа, ролик и 3D-эмблема ----------
+  const card = document.querySelector('.card');
+  const video = document.getElementById('card-video');
+  const stats = document.getElementById('card-stats');
+  const btns = [...document.querySelectorAll('.cls-btn')];
+  window.__cls = 'code';
+  const pick = (id, play) => {
+    const c = CLASSES[id];
+    window.__cls = id;
+    btns.forEach(b => b.setAttribute('aria-pressed', String(b.dataset.cls === id)));
+    card.dataset.cls = id;
+    document.getElementById('card-title').textContent = c.title;
+    document.getElementById('card-project').textContent = c.project;
+    document.getElementById('card-cta').href = WA + encodeURIComponent(`Сәлем! Хочу на бесплатный пробный урок по направлению «${c.dir}» в Шаңырақ Code.`);
+    stats.innerHTML = c.stats.map(([k, v]) => `<li>${k}<span class="bar" aria-label="${v} из 5">${'<i class="on"></i>'.repeat(v)}${'<i></i>'.repeat(5 - v)}</span></li>`).join('');
+    if (video.dataset.src !== c.video) {
+      video.dataset.src = c.video;
+      video.poster = `assets/${c.video}.jpg`;
+      video.src = `assets/${c.video}.mp4`;
+      if (play && !reduce) video.play().catch(() => {});
+    }
+  };
+  btns.forEach(b => b.addEventListener('click', () => pick(b.dataset.cls, true)));
+  pick('code', false);
+  if ('IntersectionObserver' in window) new IntersectionObserver(([e]) => {
+    if (e.isIntersecting && !reduce) { video.preload = 'auto'; video.play().catch(() => {}); } else video.pause();
+  }, { rootMargin: '200px 0px' }).observe(video);
+
+  // ---------- уровень: прогресс сборки юрты и выполненные квесты ----------
+  const level = document.querySelector('.level');
+  const quests = [...level.querySelectorAll('.quest')];
+  const marks = [0.12, 0.38, 0.62, 0.86];
   const state = window.__yurt = { p: 1 };
-  const setSteps = p => steps.forEach((st, i) => st.classList.toggle('is-on', p >= marks[i]));
-  if (window.gsap && window.ScrollTrigger && !reduce) {
-    gsap.registerPlugin(ScrollTrigger);
-    const pin = ScrollTrigger.create({ trigger: yurtSec, start: 'top top', end: () => '+=' + Math.round(innerHeight * 1.6), pin: true });
-    state.p = 0;
-    setSteps(0);
-    gsap.to(state, { p: 1, ease: 'none', scrollTrigger: { start: () => pin.start, end: () => pin.end, scrub: 0.5 }, onUpdate: () => setSteps(state.p) });
-    addEventListener('load', () => ScrollTrigger.refresh());
-  }
-
-  // Видео в карточках играют, только когда карточка на экране
-  const vids = [...document.querySelectorAll('.card-media video')];
-  if ('IntersectionObserver' in window) {
-    const io = new IntersectionObserver(es => es.forEach(e => {
-      const v = e.target;
-      if (e.isIntersecting && !reduce) { v.preload = 'auto'; v.play().catch(() => {}); } else v.pause();
-    }), { rootMargin: '200px 0px' });
-    vids.forEach(v => io.observe(v));
-  }
-
-  // Заявка: проверяем поля и открываем WhatsApp с готовым текстом
-  const form = document.getElementById('join-form');
-  form.addEventListener('submit', e => {
-    e.preventDefault();
-    let first = null;
-    form.querySelectorAll('[required]').forEach(f => {
-      const bad = !f.value.trim();
-      f.closest('.field').classList.toggle('is-bad', bad);
-      f.setAttribute('aria-invalid', String(bad));
-      if (bad && !first) first = f;
-    });
-    if (first) { first.focus(); return; }
-    const d = new FormData(form);
-    const text = ['Сәлем! Хочу на бесплатный пробный урок в Шаңырақ Code.', `Имя: ${d.get('name').trim()}`, `Возраст: ${d.get('age')}`, `Направление: ${d.get('dir')}`].join('\n');
-    window.open(WA + '?text=' + encodeURIComponent(text), '_blank', 'noopener');
+  const setQuests = p => quests.forEach((q, i) => {
+    const done = p >= marks[i];
+    q.classList.toggle('is-done', done);
+    q.querySelector('.state').textContent = done ? `Квест ${i + 1} выполнен` : `Квест ${i + 1}`;
   });
-  form.addEventListener('input', e => {
-    const f = e.target.closest('.field');
-    if (f && e.target.value.trim()) { f.classList.remove('is-bad'); e.target.setAttribute('aria-invalid', 'false'); }
-  });
+  setQuests(1);
+
+  if (!window.gsap || !window.ScrollTrigger || reduce) return;
+  gsap.registerPlugin(ScrollTrigger);
+
+  // главный момент: строки заголовка поднимаются, ключевая картинка встаёт следом
+  gsap.from('.hero h1 .ln > span', { yPercent: 105, duration: 0.95, ease: 'expo.out', stagger: 0.11, delay: 0.1 });
+  gsap.from('.hero-band > *', { y: 18, opacity: 0, duration: 0.7, ease: 'expo.out', stagger: 0.08, delay: 0.5 });
+
+  // классы и карточка входят по очереди
+  gsap.from('.cls-list > li', { y: 40, opacity: 0, duration: 0.8, ease: 'expo.out', stagger: 0.08, scrollTrigger: { trigger: '.classes', start: 'top 75%' } });
+  gsap.from('.card', { y: 50, opacity: 0, duration: 0.9, ease: 'expo.out', scrollTrigger: { trigger: '.classes', start: 'top 70%' } });
+
+  // уровень: фото открывается шторкой, сцена закрепляется, юрта собирается и квесты закрываются
+  const photo = level.querySelector('.level-photo');
+  gsap.fromTo(photo, { clipPath: 'inset(0 0 100% 0)' }, { clipPath: 'inset(0 0 0% 0)', duration: 1.1, ease: 'expo.out', scrollTrigger: { trigger: level, start: 'top 75%' } });
+  gsap.fromTo(photo.querySelector('img'), { scale: 1.12 }, { scale: 1, duration: 1.4, ease: 'expo.out', scrollTrigger: { trigger: level, start: 'top 75%' } });
+  const pin = ScrollTrigger.create({ trigger: level, start: 'top top', end: () => '+=' + Math.round(innerHeight * 1.6), pin: true });
+  state.p = 0;
+  setQuests(0);
+  gsap.to(state, { p: 1, ease: 'none', scrollTrigger: { start: () => pin.start, end: () => pin.end, scrub: 0.5 }, onUpdate: () => setQuests(state.p) });
+  gsap.from('.quest', { yPercent: 40, opacity: 0, duration: 0.8, ease: 'expo.out', stagger: 0.07, scrollTrigger: { trigger: level, start: 'top 60%' } });
+
+  // старт: слово въезжает снизу
+  gsap.from('.start .word', { yPercent: 60, opacity: 0, duration: 0.9, ease: 'expo.out', scrollTrigger: { trigger: '.start', start: 'top 80%' } });
+  gsap.from('.back', { y: 40, opacity: 0, duration: 0.8, ease: 'expo.out', scrollTrigger: { trigger: '.foot', start: 'top 90%' } });
+  addEventListener('load', () => ScrollTrigger.refresh());
 })();
 </script>
 <script type="module">
 import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.186.0/build/three.module.js';
 
-const hero = document.querySelector('.hero-art');
+const hero = document.querySelector('.hero-key');
 const canvas = document.getElementById('sky');
 const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const small = matchMedia('(max-width: 760px)').matches;
@@ -432,7 +398,7 @@ function init() {
   // Окружение для отражений золота: тёплый свет сверху и с боков
   const pmrem = new THREE.PMREMGenerator(renderer);
   const env = new THREE.Scene();
-  env.background = new THREE.Color(0xd9dfea);
+  env.background = new THREE.Color(0x0a1430);
   const panel = (hex, k, pos, w, h) => {
     const m = new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshBasicMaterial({ color: new THREE.Color(hex).multiplyScalar(k), side: THREE.DoubleSide }));
     m.position.set(...pos);
@@ -499,7 +465,7 @@ function init() {
     horns.push(g);
   }
 
-  scene.add(new THREE.AmbientLight(0xffffff, 0.55));
+  scene.add(new THREE.AmbientLight(0x6f80b8, 0.35));
   const key = new THREE.DirectionalLight(0xffe0b0, 2.4);
   key.position.set(4, 6, 7);
   scene.add(key);
@@ -507,7 +473,8 @@ function init() {
   rim.position.set(-5, -3, 3);
   scene.add(rim);
 
-  // Шаңырақ по центру своего блока, вместе с рогами занимает почти весь круг
+  // Шаңырақ по центру своего блока и вместе с рогами занимает почти весь квадрат
+  const base = { s: 1 };
   const layout = () => {
     const w = hero.clientWidth, h = hero.clientHeight;
     if (!w || !h) return;
@@ -515,9 +482,8 @@ function init() {
     camera.aspect = w / h;
     camera.updateProjectionMatrix();
     const wpp = (2 * 10 * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2))) / h;
-    base.s = (Math.min(w, h) * 0.45 * wpp) / 2.9;
+    base.s = (Math.min(w, h) * 0.47 * wpp) / 2.9;
   };
-  const base = { s: 1 };
 
   const timer = new THREE.Timer();
   timer.connect(document);
@@ -649,7 +615,7 @@ function startScene(el, renderer, scene, camera, frame) {
 // ---------- 3D-иконки рядом с заголовком направлений ----------
 function initIcons() {
   const canvas = document.getElementById('icons-3d');
-  if (!canvas || !matchMedia('(min-width: 1061px)').matches) return;
+  if (!canvas) return;
   let renderer;
   try {
     renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
@@ -662,7 +628,7 @@ function initIcons() {
   scene.environment = makeEnv(renderer);
   const camera = new THREE.PerspectiveCamera(30, 1, 0.1, 50);
   camera.position.set(0, 0, 11);
-  scene.add(new THREE.AmbientLight(0xffffff, 0.7));
+  scene.add(new THREE.AmbientLight(0x8090c0, 0.3));
   const key = new THREE.DirectionalLight(0xffe6c0, 2);
   key.position.set(3, 5, 6);
   scene.add(key);
@@ -671,7 +637,6 @@ function initIcons() {
   const navy = new THREE.MeshPhysicalMaterial({ color: 0x1d3270, roughness: 0.3, clearcoat: 1, clearcoatRoughness: 0.15 });
   const felt = new THREE.MeshPhysicalMaterial({ color: 0xe65f43, roughness: 0.35, clearcoat: 0.8 });
   const milk = new THREE.MeshPhysicalMaterial({ color: 0xf4ecdf, roughness: 0.3, clearcoat: 1 });
-  const blue = new THREE.MeshPhysicalMaterial({ color: 0x3346f5, roughness: 0.28, clearcoat: 1, clearcoatRoughness: 0.12 });
   const glass = new THREE.MeshPhysicalMaterial({ color: 0x3cc6dc, roughness: 0.06, metalness: 0, clearcoat: 1, transparent: true, opacity: 0.72 });
 
   const ext = (shape, depth, bevel) => {
@@ -696,7 +661,7 @@ function initIcons() {
   const place = (obj, x, y, z, sc, spin) => {
     obj.position.set(x, y, z);
     obj.scale.setScalar(sc);
-    obj.userData = { base: new THREE.Vector3(x, y, z), ph: Math.random() * 6.28, spin };
+    obj.userData = { base: new THREE.Vector3(x, y, z), ph: Math.random() * 6.28, spin, sc };
     scene.add(obj);
     items.push(obj);
   };
@@ -725,22 +690,24 @@ function initIcons() {
     b.position.set(x, y, 0.26);
     pad.add(b);
   });
-  place(pad, -1.55, 1.05, 0, 0.95, 0.35);
+  place(pad, -2.4, 0, 0, 0.78, 0.35);
+  pad.userData.cls = 'games';
 
   // знак «пи» для математики
   const pi = new THREE.Group();
-  const bar = new THREE.Mesh(ext(roundRect(1.5, 0.26, 0.13), 0.3, 0.08), blue);
+  const bar = new THREE.Mesh(ext(roundRect(1.5, 0.26, 0.13), 0.3, 0.08), milk);
   bar.position.y = 0.48;
-  const legL = new THREE.Mesh(ext(roundRect(0.26, 1.05, 0.12), 0.3, 0.08), blue);
+  const legL = new THREE.Mesh(ext(roundRect(0.26, 1.05, 0.12), 0.3, 0.08), milk);
   legL.position.set(-0.36, -0.08, 0);
-  const legR = new THREE.Mesh(ext(roundRect(0.26, 1.0, 0.12), 0.3, 0.08), blue);
+  const legR = new THREE.Mesh(ext(roundRect(0.26, 1.0, 0.12), 0.3, 0.08), milk);
   legR.position.set(0.36, -0.06, 0);
   legR.rotation.z = 0.12;
   pi.add(bar, legL, legR);
   const piDot = new THREE.Mesh(new THREE.SphereGeometry(0.11, 20, 14), gold);
   piDot.position.set(0.78, -0.58, 0.05);
   pi.add(piDot);
-  place(pi, 1.75, -0.85, 0.2, 0.82, 0.4);
+  place(pi, 2.4, -0.05, 0, 0.7, 0.4);
+  pi.userData.cls = 'math';
 
   // кристалл ИИ со светящимся ядром и золотыми скобками кода вокруг
   const ai = new THREE.Group();
@@ -762,7 +729,8 @@ function initIcons() {
   cl.position.set(-1.0, 0, 0);
   cr.position.set(1.0, 0, 0);
   ai.add(cl, cr);
-  place(ai, 0.15, 0.25, 0.9, 1.0, 0.45);
+  place(ai, 0, 0.05, 0, 0.72, 0.45);
+  ai.userData.cls = 'code';
 
   const resize = () => {
     const w = canvas.clientWidth, h = canvas.clientHeight;
@@ -771,7 +739,7 @@ function initIcons() {
     camera.updateProjectionMatrix();
   };
   resize();
-  addEventListener('resize', resize);
+  new ResizeObserver(resize).observe(canvas);
 
   const timer = new THREE.Timer();
   timer.connect(document);
@@ -788,9 +756,12 @@ function initIcons() {
     items.forEach(o => {
       const u = o.userData;
       o.position.y = u.base.y + Math.sin(t * 0.9 + u.ph) * 0.12;
-      o.position.x = u.base.x + mx * 0.35 * (1 + u.base.z * 0.3);
+      o.position.x = u.base.x + mx * 0.2;
       o.rotation.y += reduce ? 0 : dt * u.spin + spinV;
       o.rotation.x = Math.sin(t * 0.6 + u.ph) * 0.3 + my * 0.4;
+      // эмблема выбранного класса крупнее, остальные отходят назад
+      const want = (window.__cls === u.cls ? 1.4 : 0.78) * u.sc;
+      o.scale.setScalar(o.scale.x + (want - o.scale.x) * (reduce ? 1 : 0.12));
     });
     renderer.render(scene, camera);
   };
@@ -799,7 +770,7 @@ function initIcons() {
 
 // ---------- Киіз үй: юрта собирается при прокрутке ----------
 function initYurt() {
-  const stage = document.querySelector('.yr-stage');
+  const stage = document.querySelector('.level');
   const canvas = document.getElementById('yurt-3d');
   if (!stage || !canvas) return;
   let renderer;
@@ -1088,8 +1059,8 @@ function initYurt() {
   startScene(stage, renderer, scene, camera, frame);
 }
 
-whenNear(document.querySelector('.dirs'), initIcons);
-whenNear(document.querySelector('.yr-stage'), initYurt);
+whenNear(document.querySelector('.classes'), initIcons);
+whenNear(document.querySelector('.level'), initYurt);
 </script>
 
 </html>
