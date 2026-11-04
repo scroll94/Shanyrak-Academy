@@ -36,7 +36,7 @@
 
 *, *::before, *::after { box-sizing: border-box; }
 [hidden] { display: none !important; }
-html { scroll-behavior: smooth; scroll-padding-top: 84px; }
+html { scroll-behavior: smooth; scroll-padding-top: 84px; overflow-x: hidden; }
 html.lenis, html.lenis body { height: auto; }
 .lenis.lenis-smooth { scroll-behavior: auto !important; }
 .lenis.lenis-stopped { overflow: hidden; }
@@ -62,11 +62,12 @@ h1, h2, h3 { text-wrap: balance; }
 
 /* ---------- Плёночное зерно и курсор ---------- */
 .grain {
-  position: fixed; inset: -50%; z-index: 80; pointer-events: none; opacity: .055;
+  position: fixed; inset: 0; z-index: 80; pointer-events: none; opacity: .055;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   animation: grain 1.4s steps(6) infinite;
 }
-@keyframes grain { 0%, 100% { transform: translate(0, 0); } 20% { transform: translate(-4%, 3%); } 40% { transform: translate(3%, -5%); } 60% { transform: translate(-6%, -2%); } 80% { transform: translate(5%, 4%); } }
+/* зерно сдвигается фоном, а не самим слоем: слой не выходит за экран и не расширяет страницу на телефоне */
+@keyframes grain { 0%, 100% { background-position: 0 0; } 20% { background-position: -37px 23px; } 40% { background-position: 29px -51px; } 60% { background-position: -61px -17px; } 80% { background-position: 47px 41px; } }
 .cursor {
   position: fixed; left: 0; top: 0; z-index: 100; pointer-events: none;
   width: 36px; height: 36px; margin: -18px 0 0 -18px; border-radius: 50%;
@@ -136,6 +137,8 @@ h1, h2, h3 { text-wrap: balance; }
 .nav-links a:hover { color: var(--milk); }
 .nav-links a:hover::after { transform: scaleX(1); transform-origin: 0 50%; }
 .nav .btn { min-height: 44px; padding: 0 1.2rem; font-size: .92rem; }
+.nav .btn { white-space: nowrap; flex: none; }
+@media (max-width: 420px) { .nav-in { gap: .8rem; } .nav .btn { padding: 0 .9rem; font-size: .86rem; } .logo { font-size: .92rem; min-width: 0; } }
 @media (max-width: 900px) {
   .nav-links { display: none; }
   .nav .btn { margin-left: auto; }
@@ -207,7 +210,43 @@ h1, h2, h3 { text-wrap: balance; }
 .bk-svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
 .bk-flow { stroke-dasharray: 5 150; animation: bk-flow 2.6s linear infinite; }
 .bk-fx { position: absolute; inset: 0; z-index: 1; overflow: hidden; pointer-events: none; }
+/* Боковые ленты-басқұр: стебель растёт вместе с прокруткой, узоры вырисовываются по одному */
+.page { position: relative; }
+.side-orn { position: absolute; top: 0; z-index: 2; width: var(--rail-w); overflow: hidden; pointer-events: none; color: var(--gold); display: none; }
+.side-orn--l { left: 0; }
+.side-orn--r { right: 0; transform: scaleX(-1); }
+.side-orn svg { display: block; width: 100%; height: 100%; overflow: visible; }
+.side-orn .vine { fill: none; stroke: currentColor; stroke-width: 1.4; stroke-linecap: round; opacity: .5; }
+.side-orn .vine-2 { fill: none; stroke: var(--sky); stroke-width: 1; stroke-linecap: round; opacity: .28; }
+.side-orn .m-horn path { fill: none; stroke: currentColor; stroke-width: 6; stroke-linecap: round; stroke-linejoin: round; }
+.side-orn .m-gem { fill: none; stroke: var(--gold-soft); stroke-width: 1.6; }
+.side-orn .m-dot { fill: var(--gold-soft); }
+.side-orn .m-leaf { fill: color-mix(in srgb, var(--felt) 70%, transparent); }
+/* на телефоне и планшете лента тонкая и живёт в поле страницы, не заходя на текст */
+:root { --rail-w: clamp(12px, calc(4vw - 4px), 34px); }
+.side-orn { display: block; opacity: .75; }
+@media (min-width: 1024px) {
+  :root { --rail-w: clamp(44px, calc((100vw - 1240px) / 2 + 30px), 112px); }
+  .side-orn { opacity: 1; }
+}
 .bk-embers { position: absolute; inset: 0; z-index: 1; display: block; width: 100%; height: 100%; pointer-events: none; }
+/* внутри контура тёмная заливка цветом ночи: дальнее крыло не просвечивает сквозь тело, рисунок остаётся линейным */
+.bk-eagle path { fill: #0b1634; }
+.bk-eagle path.bk-contour, .bk-eagle path.bk-rachis, .bk-eagle path.bk-detail { fill: none; }
+.bk-eagle .bk-front path.bk-head { stroke-width: 1.9; }
+.bk-eagle .bk-front path.bk-brow { fill: #f4d48a; fill-opacity: .9; stroke-width: 1.2; }
+.bk-eagle .bk-front path.bk-eye { fill: #0b1634; stroke: #f4d48a; stroke-width: 1.3; }
+.bk-eagle .bk-wl path { stroke: #3cc6dc; stroke-opacity: .5; stroke-width: .8; }
+.bk-eagle .bk-tail path { stroke: #8fd8e8; stroke-opacity: .7; stroke-width: 1; }
+.bk-eagle .bk-back path { stroke: #f4d48a; stroke-opacity: .8; stroke-width: 1.15; }
+.bk-eagle .bk-wr path { stroke: #fff1cf; stroke-opacity: .95; stroke-width: 1.5; }
+.bk-eagle .bk-front path { stroke: #fff4d2; stroke-width: 1.7; }
+.bk-eagle path.bk-contour { stroke-width: .7; stroke-opacity: .45; }
+.bk-eagle path.bk-pupil { fill: #f4d48a; stroke: none; }
+.bk-stage.is-compact .bk-eagle .bk-wr path, .bk-stage.is-compact .bk-eagle .bk-front path { stroke-width: 1.1; }
+.bk-stage.is-compact .bk-eagle .bk-back path, .bk-stage.is-compact .bk-eagle .bk-tail path { stroke-width: .85; }
+.bk-eagle path.bk-rachis { stroke-opacity: .4; stroke-width: .6; fill: none; }
+.bk-eagle .bk-shade { pointer-events: none; }
 .bk-tail { animation: bk-flick 1.3s ease-in-out infinite; }
 @keyframes bk-flick { 0%, 100% { transform: scale(1, 1) rotate(0deg); } 35% { transform: scale(1.03, 1.08) rotate(1.5deg); } 70% { transform: scale(.98, .94) rotate(-1.5deg); } }
 .bk-glyph { position: absolute; left: 0; top: 0; opacity: 0; white-space: nowrap; will-change: transform, opacity; font: 700 clamp(.8rem, 1.15vw, 1.05rem)/1 var(--font-display); color: var(--gold-soft); text-shadow: 0 0 14px color-mix(in srgb, var(--gold) 75%, transparent); }
@@ -217,6 +256,7 @@ h1, h2, h3 { text-wrap: balance; }
 @keyframes spin { to { transform: rotate(360deg); } }
 .bk-cap { position: relative; z-index: 2; max-width: 46rem; margin: 0 auto; padding: 100px var(--gutter-r) 0 var(--gutter-l); text-align: center; }
 .bk-cap .label { justify-content: center; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 .bk-cap h2 { margin: 0; font: 700 clamp(1.9rem, 4vw, 3.4rem)/1.08 var(--font-display); letter-spacing: -.02em; }
 .bk-cap p { max-width: 34rem; margin: .9rem auto 0; color: var(--muted); font-size: clamp(.98rem, 1.3vw, 1.12rem); }
 .bk-nodes { margin: 0; padding: 0; list-style: none; }
@@ -640,6 +680,22 @@ h1, h2, h3 { text-wrap: balance; }
 .field.is-bad .field-err { display: block; }
 .form .btn { grid-column: 1 / -1; width: 100%; margin-top: .4rem; }
 .form-note { grid-column: 1 / -1; margin: 0; font-size: .82rem; color: var(--muted); }
+.form-note a { color: var(--gold-soft); }
+.btn-wa svg { width: 20px; height: 20px; flex: none; }
+.hero-note { margin: 1.4rem 0 0; color: var(--muted); font-size: .92rem; }
+.wa-float { position: fixed; right: 18px; bottom: 18px; z-index: 60; display: inline-flex; align-items: center; gap: .55rem; padding: .85rem 1.15rem; border-radius: 999px; background: #25d366; color: #06301a; font: 700 .95rem/1 var(--font-display); text-decoration: none; transition: transform .16s cubic-bezier(.23,1,.32,1), opacity .3s ease; }
+.wa-float svg { width: 22px; height: 22px; }
+.wa-float:active { transform: scale(.96); }
+@media (hover: hover) and (pointer: fine) { .wa-float:hover { transform: translateY(-2px); } }
+.wa-float.is-away { opacity: 0; transform: translateY(12px); pointer-events: none; }
+@media (max-width: 560px) { .wa-float { right: 14px; bottom: calc(14px + env(safe-area-inset-bottom, 0px)); padding: .75rem 1rem; font-size: .88rem; } }
+.cta-strip { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 1rem 2rem; margin-top: 3rem; padding: 1.4rem 1.6rem; border-radius: 18px; background: color-mix(in srgb, var(--gold) 10%, transparent); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--gold) 35%, transparent); }
+.cta-strip p { margin: 0; max-width: 36rem; font-size: 1.02rem; }
+.cta-strip b { color: var(--gold-soft); }
+.par-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.2rem; margin: 2.6rem 0 0; padding: 0; list-style: none; }
+.par-grid li { padding: 1.5rem; border-radius: 18px; background: color-mix(in srgb, var(--milk) 5%, transparent); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--milk) 12%, transparent); }
+.par-grid h3 { margin: 0 0 .6rem; font: 700 1.12rem/1.25 var(--font-display); color: var(--gold-soft); }
+.par-grid p { margin: 0; color: var(--muted); line-height: 1.55; }
 .done { display: grid; gap: 1rem; }
 .done h3 { outline: none; }
 .done p { margin: 0; color: var(--muted); }
@@ -690,6 +746,7 @@ h1, h2, h3 { text-wrap: balance; }
         <path d="M60 18L67 28L60 38L53 28Z"/>
       </g>
     </symbol>
+    <symbol id="wa" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2.2a9.8 9.8 0 0 0-8.4 14.8L2.3 21.8l4.9-1.3A9.8 9.8 0 1 0 12 2.2zm0 17.8a8 8 0 0 1-4.1-1.1l-.3-.2-2.9.8.8-2.8-.2-.3A8 8 0 1 1 12 20zm4.4-6c-.2-.1-1.4-.7-1.6-.8s-.4-.1-.5.1-.6.8-.8 1-.3.2-.5.1a6.6 6.6 0 0 1-3.3-2.9c-.2-.4.2-.4.7-1.3.1-.2 0-.3 0-.4l-.7-1.8c-.2-.5-.4-.4-.5-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.7 11.8 11.8 0 0 0 4.5 4c1.7.7 2.3.8 3.2.6a2.7 2.7 0 0 0 1.8-1.3 2.2 2.2 0 0 0 .2-1.3c-.1-.1-.3-.2-.5-.3z"/></symbol>
     <symbol id="logo" viewBox="0 0 48 48">
       <g fill="none" stroke="currentColor" stroke-linecap="round">
         <circle cx="24" cy="24" r="17" stroke-width="2.6"/>
@@ -712,6 +769,8 @@ h1, h2, h3 { text-wrap: balance; }
 <div class="cursor" aria-hidden="true"></div>
 
 <div class="page" lang="ru">
+<div class="side-orn side-orn--l" aria-hidden="true"></div>
+<div class="side-orn side-orn--r" aria-hidden="true"></div>
 
 <header class="nav">
   <div class="nav-in">
@@ -723,9 +782,10 @@ h1, h2, h3 { text-wrap: balance; }
       <li><a href="#directions">Направления</a></li>
       <li><a href="#path">Обучение</a></li>
       <li><a href="#rules">Правила ИИ</a></li>
+      <li><a href="#parents">Родителям</a></li>
       <li><a href="#faq">Вопросы</a></li>
     </ul>
-    <a class="btn btn-gold" href="#join">Записаться</a>
+    <a class="btn btn-gold" href="#join">Бесплатный урок</a>
   </div>
   <div class="nav-progress" aria-hidden="true"></div>
 </header>
@@ -739,9 +799,9 @@ h1, h2, h3 { text-wrap: balance; }
     <div class="hero-copy">
       <p class="kicker" lang="kk" data-in>Сәлем, болашақ инженер!</p>
       <h1 id="hero-title" class="hero-title">Создавай игры,<br>чат-ботов<br>и <em>3D-миры</em></h1>
-      <p class="lead" data-in>Школа искусственного интеллекта и программирования для подростков 14–18 лет. Учимся на настоящих проектах: от игры в Roblox до Telegram-бота с нейросетью.</p>
+      <p class="lead" data-in>Онлайн-школа ИИ и программирования для подростков 14–18 лет. За модуль ты собираешь свою вещь, от игры в Roblox до Telegram-бота с нейросетью, и показываешь её на демо-дне. Первый урок бесплатный.</p>
       <div class="cta-row" data-in>
-        <a class="btn btn-gold" href="#join" data-magnet>Записаться на пробный урок
+        <a class="btn btn-gold" href="#join" data-magnet>Записаться на бесплатный урок
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
         </a>
         <a class="btn btn-ghost" href="#directions" data-magnet>Смотреть направления</a>
@@ -750,7 +810,9 @@ h1, h2, h3 { text-wrap: balance; }
         <li><b>14–18</b>лет</li>
         <li><b>7</b>направлений</li>
         <li><b>Проект</b>в конце каждого модуля</li>
+        <li><b>0 ₸</b>первый урок</li>
       </ul>
+      <p class="hero-note" data-in>Заявка уходит в WhatsApp, отвечаем и подбираем удобное время.</p>
     </div>
   </div>
   <div class="hero-hint" aria-hidden="true"><i></i>Листай</div>
@@ -765,8 +827,8 @@ h1, h2, h3 { text-wrap: balance; }
     <div class="bk-fx" aria-hidden="true"></div>
     <div class="bk-cap">
       <p class="label" lang="kk">Бүркіт</p>
-      <h2 id="berkut-title" data-reveal="lines">Расправь крылья</h2>
-      <p>Беркут поднимается из огня и взмахивает крыльями, а из них рождается всё, чему ты научишься: семь направлений и сотни новых навыков.</p>
+      <h2 id="berkut-title" class="sr-only">Беркут и семь направлений</h2>
+      <p>Беркут вырисовывается линия за линией и взмахивает крыльями, а за ним раскрывается всё, чему ты научишься: семь направлений и сотни новых навыков.</p>
     </div>
     <ul class="bk-nodes">
       <li class="bk-node"><span class="bk-dot"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.5l1.9 5.1 5.1 1.9-5.1 1.9L12 17.5l-1.9-5.1L5 10.5l5.1-1.9z"/><path d="M18.5 16v4M16.5 18h4"/></svg></span><span class="bk-name">ИИ</span><span class="bk-sub">понимать и применять</span></li>
@@ -951,6 +1013,7 @@ h1, h2, h3 { text-wrap: balance; }
       </article>
 
     </div>
+    <div class="cta-strip" data-reveal="up"><p>Не знаешь, что выбрать? <b>На бесплатном уроке</b> попробуешь сам и вместе с преподавателем выберешь направление.</p><a class="btn btn-gold" href="#join">Выбрать на бесплатном уроке</a></div>
   </div>
 </section>
 
@@ -996,8 +1059,8 @@ h1, h2, h3 { text-wrap: balance; }
     <ol class="path-track">
       <li class="step is-on">
         <span class="step-mark"><b>1</b></span>
-        <h3>Пробный урок</h3>
-        <p>Знакомимся, вместе собираем мини-проект и выбираем направление под твои интересы.</p>
+        <h3>Бесплатный пробный урок</h3>
+        <p>Знакомимся, вместе собираем мини-проект и выбираем направление под твои интересы. Платить за него не нужно.</p>
       </li>
       <li class="step is-on">
         <span class="step-mark"><b>2</b></span>
@@ -1015,6 +1078,7 @@ h1, h2, h3 { text-wrap: balance; }
         <p>Показываешь проект, получаешь отзыв и добавляешь работу в портфолио.</p>
       </li>
     </ol>
+    <div class="cta-strip" data-reveal="up"><p>Первый шаг ничего не стоит: <b>пробный урок бесплатный</b>, проходит онлайн из дома.</p><a class="btn btn-gold" href="#join">Начать с первого шага</a></div>
   </div>
 </section>
 
@@ -1070,6 +1134,22 @@ h1, h2, h3 { text-wrap: balance; }
 
 <div class="basqur" aria-hidden="true"><svg width="100%" height="100%"><rect width="100%" height="100%" fill="url(#basqur-a)"/></svg></div>
 
+<section class="sec parents" id="parents" aria-labelledby="parents-title">
+  <div class="wrap">
+    <header class="sec-head">
+      <h2 id="parents-title" data-reveal="lines">Родителям: что получит ваш ребёнок</h2>
+      <p class="sec-lead" data-reveal="up">Короткие ответы на то, что обычно спрашивают перед первым уроком.</p>
+    </header>
+    <ul class="par-grid">
+      <li data-reveal="up"><h3>Результат, который можно проверить</h3><p>Каждый модуль заканчивается готовым проектом. Его можно открыть, запустить и увидеть, чему ребёнок научился.</p></li>
+      <li data-reveal="up"><h3>Учёба из дома</h3><p>Занятия онлайн: не нужно возить на другой конец города. Нужен обычный компьютер с интернетом.</p></li>
+      <li data-reveal="up"><h3>ИИ без списывания</h3><p>Учим пяти правилам честного ИИ: понимать каждую строку, проверять факты и не выдавать чужое за своё.</p></li>
+      <li data-reveal="up"><h3>Время у экрана с пользой</h3><p>Вместо бесконечных роликов ребёнок сам делает игры и программы, которыми пользуются друзья.</p></li>
+    </ul>
+    <div class="cta-strip" data-reveal="up"><p>Остались вопросы? <b>Напишите нам в WhatsApp</b>, ответим лично.</p><a class="btn btn-ghost btn-wa" href="https://wa.me/77055823688?text=%D0%97%D0%B4%D1%80%D0%B0%D0%B2%D1%81%D1%82%D0%B2%D1%83%D0%B9%D1%82%D0%B5!%20%D0%A3%20%D0%BC%D0%B5%D0%BD%D1%8F%20%D0%B2%D0%BE%D0%BF%D1%80%D0%BE%D1%81%20%D0%BF%D1%80%D0%BE%20%D0%A8%D0%B0%D2%A3%D1%8B%D1%80%D0%B0%D2%9B%20Code." target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#wa"/></svg>Задать вопрос</a></div>
+  </div>
+</section>
+
 <section class="sec" id="faq" aria-labelledby="faq-title">
   <div class="wrap faq-grid">
     <header class="sec-head">
@@ -1110,8 +1190,8 @@ h1, h2, h3 { text-wrap: balance; }
   <div class="wrap join-grid">
     <div>
       <p class="label" lang="kk" data-reveal="up">Тіркелу</p>
-      <h2 id="join-title"><span lang="kk" data-reveal="chars">Есік ашық</span><small>Дверь открыта: приходи на пробный урок</small></h2>
-      <p class="join-lead" data-reveal="up">Оставь заявку, и мы свяжемся с тобой, чтобы договориться о времени.</p>
+      <h2 id="join-title"><span lang="kk" data-reveal="chars">Есік ашық</span><small>Дверь открыта: первый урок бесплатно</small></h2>
+      <p class="join-lead" data-reveal="up">Заполни три поля, и заявка откроется в WhatsApp. Отправь её, мы ответим и подберём время. Ничего покупать заранее не нужно: приходи, попробуй и реши сам.</p>
       <ul class="trial">
         <li data-reveal="up">Знакомимся и узнаём, что тебе интересно</li>
         <li data-reveal="up">Вместе собираем первый мини-проект</li>
@@ -1128,7 +1208,7 @@ h1, h2, h3 { text-wrap: balance; }
       <svg class="orn draw door-orn door-orn--br" viewBox="0 0 120 120" data-horn aria-hidden="true"></svg>
 
       <form class="form" id="join-form" novalidate>
-        <h3>Заявка на пробный урок</h3>
+        <h3>Бесплатный пробный урок</h3>
         <div class="field">
           <label for="f-name">Имя</label>
           <input id="f-name" name="name" type="text" autocomplete="given-name" required aria-describedby="f-name-err">
@@ -1155,21 +1235,17 @@ h1, h2, h3 { text-wrap: balance; }
             <option>3D-моделирование</option>
           </select>
         </div>
-        <div class="field field--full">
-          <label for="f-contact">Telegram или телефон</label>
-          <input id="f-contact" name="contact" type="text" autocomplete="tel" placeholder="@nickname или номер" required aria-describedby="f-contact-err">
-          <p class="field-err" id="f-contact-err">Оставь Telegram или номер, чтобы мы могли ответить</p>
-        </div>
-        <button class="btn btn-gold" type="submit">Записаться</button>
-        <p class="form-note">Если тебе нет 16 лет, заполни заявку вместе с родителями.</p>
+        <button class="btn btn-gold btn-wa" type="submit"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#wa"/></svg>Отправить заявку в WhatsApp</button>
+        <p class="form-note">Если тебе нет 16 лет, заполни заявку вместе с родителями. Номер школы: <a href="https://wa.me/77055823688">+7 705 582 36 88</a>.</p>
       </form>
 
       <div class="done" id="join-done" hidden>
         <h3 tabindex="-1">Заявка готова</h3>
-        <p>Скопируй текст и отправь его преподавателю в Telegram или WhatsApp.</p>
+        <p>Мы открыли WhatsApp с готовым текстом: осталось нажать «Отправить». Если окно не открылось, нажми кнопку ниже.</p>
         <pre id="done-text"></pre>
         <div class="done-actions">
-          <button class="btn btn-gold" type="button" id="copy-btn">Скопировать</button>
+          <a class="btn btn-gold btn-wa" id="wa-btn" href="https://wa.me/77055823688" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#wa"/></svg>Открыть WhatsApp</a>
+          <button class="btn btn-ghost" type="button" id="copy-btn">Скопировать</button>
           <button class="btn btn-ghost" type="button" id="edit-btn">Изменить</button>
         </div>
       </div>
@@ -1178,6 +1254,8 @@ h1, h2, h3 { text-wrap: balance; }
 </section>
 
 </main>
+
+<a class="wa-float" href="https://wa.me/77055823688?text=Сәлем!%20Хочу%20на%20бесплатный%20пробный%20урок%20в%20Шаңырақ%20Code." target="_blank" rel="noopener" aria-label="Записаться на бесплатный урок через WhatsApp"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#wa"/></svg>Бесплатный урок</a>
 
 <footer>
   <div class="basqur" aria-hidden="true"><svg width="100%" height="100%"><rect width="100%" height="100%" fill="url(#basqur-b)"/></svg></div>
@@ -1191,7 +1269,8 @@ h1, h2, h3 { text-wrap: balance; }
       <li><a href="#directions">Направления</a></li>
       <li><a href="#path">Как проходит обучение</a></li>
       <li><a href="#rules">Правила честного ИИ</a></li>
-      <li><a href="#join">Записаться</a></li>
+      <li><a href="#join">Бесплатный урок</a></li>
+      <li><a href="https://wa.me/77055823688">WhatsApp: +7 705 582 36 88</a></li>
     </ul>
     <p class="copy"><span>© 2026 Шаңырақ Code</span><span>Сделано на HTML, Three.js и GSAP</span></p>
   </div>
@@ -1397,6 +1476,8 @@ h1, h2, h3 { text-wrap: balance; }
   const done = document.getElementById('join-done');
   const doneText = document.getElementById('done-text');
   const copyBtn = document.getElementById('copy-btn');
+  const waBtn = document.getElementById('wa-btn');
+  const WA_URL = 'https://wa.me/77055823688';
   form.addEventListener('submit', e => {
     e.preventDefault();
     let first = null;
@@ -1409,12 +1490,14 @@ h1, h2, h3 { text-wrap: balance; }
     if (first) { first.focus(); return; }
     const d = new FormData(form);
     doneText.textContent = [
-      'Сәлем! Хочу на пробный урок.',
+      'Сәлем! Хочу на бесплатный пробный урок в Шаңырақ Code.',
       `Имя: ${d.get('name').trim()}`,
       `Возраст: ${d.get('age')}`,
-      `Направление: ${d.get('dir')}`,
-      `Контакт: ${d.get('contact').trim()}`
+      `Направление: ${d.get('dir')}`
     ].join('\n');
+    const wa = WA_URL + '?text=' + encodeURIComponent(doneText.textContent);
+    waBtn.href = wa;
+    window.open(wa, '_blank', 'noopener');
     copyBtn.textContent = 'Скопировать';
     form.hidden = true;
     done.hidden = false;
@@ -1448,6 +1531,18 @@ h1, h2, h3 { text-wrap: balance; }
     refreshSoon();
   });
 
+  // Кнопка WhatsApp: не мешает на первом экране и рядом с формой записи
+  (() => {
+    const fab = document.querySelector('.wa-float');
+    if (!fab) return;
+    const near = new Set();
+    const io = new IntersectionObserver(es => {
+      es.forEach(e => (e.isIntersecting ? near.add(e.target) : near.delete(e.target)));
+      fab.classList.toggle('is-away', near.size > 0);
+    }, { threshold: 0.25 });
+    ['.hero', '#join'].forEach(sel => { const el = document.querySelector(sel); if (el) io.observe(el); });
+  })();
+
   // Пословица: слова по отдельности, чтобы они загорались при прокрутке
   const prov = document.querySelector('[data-words]');
   prov.innerHTML = prov.textContent.trim().split(/\s+/).map(w => `<span class="w is-lit">${w}</span>`).join(' ');
@@ -1471,7 +1566,9 @@ h1, h2, h3 { text-wrap: balance; }
     const bez = (e, t) => { const u = 1 - t; return P(u * u * u * e[0].x + 3 * u * u * t * e[1].x + 3 * u * t * t * e[2].x + t * t * t * e[3].x, u * u * u * e[0].y + 3 * u * u * t * e[1].y + 3 * u * t * t * e[2].y + t * t * t * e[3].y); };
     const groups = { wl: [], tail: [], back: [], wr: [], front: [] };
     let g = 'back';
-    const shape = (d, fill, o) => groups[g].push({ d, fill, o });
+    const shape = (d, fill, o, extra = '') => groups[g].push({ d, fill, o, extra });
+    // накладка света и тени поверх пера: так плоский силуэт становится объёмным
+    const shade = (d, o, kind = 'url(#bk-sh)') => shape(d, kind, o + 0.00001, ' stroke="none" class="bk-shade"');
     // перо-сабля: изогнутое по длине, сужается к острому кончику
     const sabre = (B, ang, L, w, curl, fill, o) => {
       const d = P(Math.cos(ang), Math.sin(ang)), n = P(-d.y, d.x);
@@ -1479,7 +1576,11 @@ h1, h2, h3 { text-wrap: balance; }
       const M = add(add(B, mul(d, L * 0.55)), mul(n, curl * L * 0.28));
       const dt = nrm(sub(T, M)), nt = P(-dt.y, dt.x);
       const BL = add(B, mul(n, w / 2)), BR = add(B, mul(n, -w / 2));
-      shape(`M${pt(BL)}C${pt(add(M, mul(n, w * 0.5)))} ${pt(add(sub(T, mul(dt, L * 0.18)), mul(nt, w * 0.22)))} ${pt(T)}C${pt(add(sub(T, mul(dt, L * 0.22)), mul(nt, -w * 0.12)))} ${pt(add(M, mul(n, -w * 0.4)))} ${pt(BR)}Z`, fill, o);
+      const fd = `M${pt(BL)}C${pt(add(M, mul(n, w * 0.5)))} ${pt(add(sub(T, mul(dt, L * 0.18)), mul(nt, w * 0.22)))} ${pt(T)}C${pt(add(sub(T, mul(dt, L * 0.22)), mul(nt, -w * 0.12)))} ${pt(add(M, mul(n, -w * 0.4)))} ${pt(BR)}Z`;
+      shape(fd, fill, o);
+      shade(fd, o);
+      // стержень пера тонкой светлой линией
+      if (L > 0.2) shape(`M${pt(add(B, mul(d, L * 0.04)))}Q${pt(add(M, mul(n, w * 0.04)))} ${pt(add(T, mul(sub(B, T), 0.12)))}`, 'none', o + 0.00002, ' class="bk-rachis"');
       return T;
     };
     const dot = (c, r, fill, o) => {
@@ -1510,6 +1611,18 @@ h1, h2, h3 { text-wrap: balance; }
       }
       // сплошная плоскость крыла под кроющими перьями
       const mem = [];
+      const arc = [];
+      for (let i = 0; i <= 12; i++) arc.push(bez(arm, i / 12));
+      [0.07, 0.14].forEach((off, li) => {
+        let cd = '';
+        arc.forEach((p, i) => {
+          const t = nrm(sub(arc[Math.min(arc.length - 1, i + 1)], arc[Math.max(0, i - 1)]));
+          let n = P(-t.y, t.x);
+          if (n.x * side < 0) n = mul(n, -1);
+          cd += (i ? 'L' : 'M') + pt(add(p, mul(n, off * k0 * (1 - i / 16))));
+        });
+        shape(cd, 'none', 0.07 + li * 0.001, ' class="bk-contour"');
+      });
       for (let i = 0; i <= 12; i++) mem.push(bez(arm, i / 12));
       mem.push(H);
       const trail = mem.map((p, i) => {
@@ -1558,15 +1671,36 @@ h1, h2, h3 { text-wrap: balance; }
     }
     g = 'back';
     shape(`M${pt(P(-0.16, -0.18))}C${pt(P(-0.02, -0.27))} ${pt(P(0.17, -0.09))} ${pt(P(0.17, 0.12))}C${pt(P(0.18, 0.28))} ${pt(P(0.11, 0.38))} ${pt(P(0.02, 0.38))}C${pt(P(-0.1, 0.36))} ${pt(P(-0.21, 0.16))} ${pt(P(-0.21, 0))}C${pt(P(-0.21, -0.08))} ${pt(P(-0.2, -0.14))} ${pt(P(-0.16, -0.18))}Z`, 'url(#bk-fire)', 0.3);
+    for (let k = 0; k < 5; k++) {
+      const y = -0.07 + k * 0.085, xl = -0.2 + k * 0.012, xr = 0.165 - k * 0.012;
+      shape(`M${pt(P(xl, y))}Q${pt(P((xl + xr) / 2 - 0.02, y + 0.075))} ${pt(P(xr, y - 0.01))}`, 'none', 0.305, ' class="bk-contour"');
+    }
     for (let r = 0; r < 5; r++) for (let c = 0; c < 3; c++) {
       const x = -0.15 + c * 0.09 + (r % 2) * 0.045 + r * 0.02, y = -0.1 + r * 0.085;
       if (x > 0.14) continue;
       shape(`M${pt(P(x - 0.045, y))}Q${pt(P(x, y + 0.08))} ${pt(P(x + 0.045, y))}Q${pt(P(x, y + 0.035))} ${pt(P(x - 0.045, y))}Z`, 'url(#bk-fire)', 0.31 + r * 0.001);
+      shade(groups[g][groups[g].length - 1].d, 0.31 + r * 0.001);
     }
 
     // лапы с длинными когтями и голова — поверх ближнего крыла
     g = 'front';
-    const leg = (x0, y0, x1, y1, o) => shape(`M${pt(P(x0 + 0.06, y0))}C${pt(P(x0 + 0.04, y0 + 0.12))} ${pt(P(x1 + 0.08, y1 - 0.1))} ${pt(P(x1 + 0.05, y1))}L${pt(P(x1 + 0.02, y1 - 0.03))}L${pt(P(x1, y1 + 0.01))}L${pt(P(x1 - 0.03, y1 - 0.025))}L${pt(P(x1 - 0.055, y1 + 0.005))}C${pt(P(x1 - 0.07, y1 - 0.12))} ${pt(P(x0 - 0.08, y0 + 0.03))} ${pt(P(x0 - 0.05, y0 - 0.03))}Z`, 'url(#bk-fire)', o);
+    // лапы в перьевых «штанах»: широкие сверху, с зубчатой бахромой у щиколотки
+    const leg = (x0, y0, x1, y1, o) => {
+      const A0 = P(x0, y0), A1 = P(x1, y1), d = nrm(sub(A1, A0)), n = P(-d.y, d.x), L = Math.hypot(x1 - x0, y1 - y0);
+      const at = (t, side, w) => add(add(A0, mul(sub(A1, A0), t)), mul(n, side * w));
+      let path = `M${pt(at(0, 1, 0.07))}C${pt(add(at(0.45, 1, 0.1), mul(d, 0)))} ${pt(at(0.8, 1, 0.06))} ${pt(at(1, 1, 0.035))}`;
+      for (let k = 0; k < 4; k++) {
+        const u = 1 - (k + 0.5) / 4, v = 1 - (k + 1) / 4;
+        path += `L${pt(add(add(A1, mul(n, (u * 2 - 1) * 0.035)), mul(d, 0.05)))}L${pt(add(A1, mul(n, (v * 2 - 1) * 0.035)))}`;
+      }
+      path += `C${pt(at(0.8, -1, 0.05))} ${pt(at(0.45, -1, 0.08))} ${pt(at(0, -1, 0.06))}Z`;
+      shape(path, 'none', o);
+      // перья на «штанах» шевронами
+      for (let k = 1; k <= 3; k++) {
+        const t = k / 4.2;
+        shape(`M${pt(at(t, 1, 0.06))}Q${pt(add(at(t, 0, 0), mul(d, L * 0.12)))} ${pt(at(t, -1, 0.055))}`, 'none', o + 0.001, ' class="bk-contour"');
+      }
+    };
     const claw = (B, a, L, o) => {
       const d = P(Math.cos(a), Math.sin(a)), n = P(-d.y, d.x), w = 0.034;
       const K = add(B, mul(d, L * 0.6)), T = add(add(B, mul(d, L)), mul(n, L * 0.5));
@@ -1575,12 +1709,30 @@ h1, h2, h3 { text-wrap: balance; }
     leg(-0.1, 0.14, -0.3, 0.42, 0.5);
     leg(0.04, 0.2, -0.14, 0.48, 0.52);
     for (const [fx, fy, o] of [[-0.31, 0.43, 0.51], [-0.15, 0.49, 0.53]]) [158, 128, 100, 72].forEach((a, i) => claw(P(fx, fy), deg(a), i === 0 ? 0.11 : 0.17, o));
-    shape(`M${pt(P(-0.02, -0.12))}L${pt(P(0.04, -0.17))}L${pt(P(0, -0.2))}L${pt(P(0.05, -0.25))}L${pt(P(-0.01, -0.27))}L${pt(P(0.02, -0.32))}L${pt(P(-0.06, -0.31))}L${pt(P(-0.09, -0.24))}Z`, 'url(#bk-fire)', 0.6);
-    shape(`M${pt(P(-0.03, -0.2))}C${pt(P(-0.05, -0.31))} ${pt(P(-0.14, -0.37))} ${pt(P(-0.24, -0.36))}C${pt(P(-0.3, -0.355))} ${pt(P(-0.34, -0.33))} ${pt(P(-0.365, -0.295))}L${pt(P(-0.345, -0.24))}C${pt(P(-0.3, -0.2))} ${pt(P(-0.24, -0.16))} ${pt(P(-0.19, -0.12))}C${pt(P(-0.13, -0.08))} ${pt(P(-0.06, -0.1))} ${pt(P(-0.03, -0.2))}Z`, '#dff8ff', 0.62);
-    shape(`M${pt(P(-0.365, -0.295))}C${pt(P(-0.415, -0.31))} ${pt(P(-0.46, -0.28))} ${pt(P(-0.462, -0.225))}C${pt(P(-0.463, -0.2))} ${pt(P(-0.452, -0.182))} ${pt(P(-0.44, -0.175))}C${pt(P(-0.442, -0.2))} ${pt(P(-0.43, -0.217))} ${pt(P(-0.41, -0.222))}L${pt(P(-0.345, -0.24))}Z`, '#f4fcff', 0.63);
-    shape(`M${pt(P(-0.345, -0.24))}L${pt(P(-0.405, -0.226))}C${pt(P(-0.39, -0.205))} ${pt(P(-0.36, -0.2))} ${pt(P(-0.335, -0.215))}Z`, '#bfeefa', 0.64);
-    shape(`M${pt(P(-0.33, -0.322))}L${pt(P(-0.2, -0.345))}L${pt(P(-0.235, -0.312))}Z`, '#0a1430', 0.65);
-    dot(P(-0.27, -0.3), 0.021, '#0a1430', 0.66);
+    // голова в профиле, как у беркута на гербовом рисунке: покатый лоб, тяжёлая бровь, крючковатый клюв
+    const hs = 0.21, HO = P(-0.18, -0.26);
+    const hp = (x, y) => pt(P(HO.x + x * hs, HO.y + y * hs));
+    // силуэт головы и шеи
+    shape(`M${hp(0.9, 0.55)}C${hp(0.75, 0.1)} ${hp(0.6, -0.4)} ${hp(0.2, -0.55)}C${hp(-0.1, -0.65)} ${hp(-0.45, -0.55)} ${hp(-0.62, -0.38)}L${hp(-0.72, -0.36)}` +
+      `C${hp(-0.95, -0.42)} ${hp(-1.25, -0.3)} ${hp(-1.3, 0)}C${hp(-1.32, 0.15)} ${hp(-1.25, 0.28)} ${hp(-1.12, 0.33)}C${hp(-1.18, 0.2)} ${hp(-1.15, 0.1)} ${hp(-1.04, 0.06)}` +
+      `L${hp(-0.75, 0.08)}C${hp(-0.6, 0.1)} ${hp(-0.45, 0.12)} ${hp(-0.35, 0.2)}C${hp(-0.3, 0.4)} ${hp(-0.1, 0.6)} ${hp(0.1, 0.75)}C${hp(0.4, 0.8)} ${hp(0.7, 0.7)} ${hp(0.9, 0.55)}Z`, 'none', 0.6, ' class="bk-head"');
+    // перья-шипы по затылку
+    [[0.62, 0.05], [0.72, 0.28], [0.8, 0.48]].forEach(([x, y], i) => shape(`M${hp(x - 0.08, y - 0.12)}L${hp(x + 0.32 + i * 0.04, y + 0.06)}L${hp(x, y + 0.1)}`, 'none', 0.605, ' class="bk-detail"'));
+    // восковица, ноздря и линия рта
+    shape(`M${hp(-0.72, -0.36)}C${hp(-0.76, -0.2)} ${hp(-0.74, -0.05)} ${hp(-0.76, 0.08)}`, 'none', 0.62, ' class="bk-detail"');
+    shape(`M${hp(-0.92, -0.24)}Q${hp(-0.86, -0.3)} ${hp(-0.8, -0.24)}`, 'none', 0.62, ' class="bk-detail"');
+    shape(`M${hp(-0.3, 0.1)}C${hp(-0.55, 0)} ${hp(-0.85, 0.02)} ${hp(-1.05, 0.08)}`, 'none', 0.62, ' class="bk-detail"');
+    // клюв: блик по гребню даёт объём
+    shape(`M${hp(-0.8, -0.34)}C${hp(-1.02, -0.36)} ${hp(-1.2, -0.24)} ${hp(-1.24, -0.04)}`, 'none', 0.63, ' class="bk-contour"');
+    // тяжёлая нахмуренная бровь над глазом
+    shape(`M${hp(0.02, -0.41)}C${hp(-0.25, -0.53)} ${hp(-0.56, -0.52)} ${hp(-0.8, -0.32)}C${hp(-0.58, -0.37)} ${hp(-0.3, -0.37)} ${hp(0.0, -0.37)}Z`, 'none', 0.64, ' class="bk-brow"');
+    // миндалевидный глаз и зрачок
+    shape(`M${hp(-0.62, -0.24)}Q${hp(-0.42, -0.4)} ${hp(-0.18, -0.27)}Q${hp(-0.4, -0.1)} ${hp(-0.62, -0.24)}Z`, 'none', 0.65, ' class="bk-eye"');
+    dot(P(HO.x - 0.44 * hs, HO.y - 0.25 * hs), 0.065 * hs, '#f4d48a', 0.66);
+    groups[g][groups[g].length - 1].extra = ' class="bk-pupil"';
+    // линии щеки и шеи уходят от глаза назад: голова читается круглой
+    [[-0.18, -0.16, 0.6, 0.22], [-0.3, 0.05, 0.45, 0.45], [-0.05, -0.38, 0.55, -0.12]].forEach(([x0, y0, x1, y1]) =>
+      shape(`M${hp(x0, y0)}C${hp(x0 + (x1 - x0) * 0.4, y0 - 0.02)} ${hp(x1 - 0.1, y1 - 0.15)} ${hp(x1, y1)}`, 'none', 0.655, ' class="bk-contour"'));
     dot(P(-0.276, -0.306), 0.006, '#ffffff', 0.67);
 
     Object.values(groups).forEach(list => list.sort((a, b) => a.o - b.o));
@@ -1590,6 +1742,93 @@ h1, h2, h3 { text-wrap: balance; }
   eagle(0, 0, 1, EB);
   EB.w = EB.x1 - EB.x0;
   EB.h = EB.y1 - EB.y0;
+
+
+  // ---------- Боковые ленты с орнаментом ----------
+  // Стебель тянется вниз вслед за экраном, а қошқар мүйіз, ромбы и листья вырисовываются, когда до них доходит прокрутка
+  const rails = (() => {
+    const els = [...document.querySelectorAll('.side-orn')];
+    const page = document.querySelector('.page');
+    const wide = { matches: true };
+    let H = 0, W = 0, triggers = [], grow = null;
+    const f = n => n.toFixed(1);
+    const build = () => {
+      triggers.forEach(t => t.kill());
+      triggers = [];
+      if (grow) { grow.kill(); grow = null; }
+      if (!wide.matches) { els.forEach(el => { el.innerHTML = ''; }); H = 0; return; }
+      H = page.scrollHeight;
+      W = els[0].getBoundingClientRect().width;
+      if (!W) return;
+      const slim = W < 40;
+      const cx = W * 0.5, amp = W * (slim ? 0.16 : 0.2), step = slim ? 200 : 250;
+      // стебель-волна и тонкая вторая линия рядом
+      let d = `M${f(cx)} 0`, d2 = `M${f(cx - amp * 0.9)} 0`;
+      for (let y = 0; y <= H; y += 20) {
+        const x = cx + Math.sin((y / step) * Math.PI) * amp;
+        d += `L${f(x)} ${y}`;
+        d2 += `L${f(cx - Math.sin((y / step) * Math.PI) * amp * 0.9)} ${y}`;
+      }
+      let motifs = '';
+      for (let i = 0, y = 170; y < H - 80; i++, y += step / 2) {
+        const side = i % 2 ? 1 : -1;
+        const x = cx + side * amp * 0.95;
+        if (i % 2 === 0) {
+          const sz = slim ? W * 1.1 : Math.min(W * 0.78, 62);
+          motifs += `<g class="m m-horn" transform="translate(${f(x - sz / 2)} ${f(y - sz / 2)}) scale(${f(sz / 120)})">` +
+            HORN.map(p => `<path d="${p}"/>`).join('') + `</g>`;
+        } else {
+          const r = slim ? W * 0.24 : Math.min(W * 0.14, 11);
+          motifs += `<g class="m m-small" transform="translate(${f(x)} ${f(y)})">` +
+            `<path class="m-gem" d="M0 ${-r * 1.6}L${r} 0L0 ${r * 1.6}L${-r} 0Z"/>` +
+            `<path class="m-leaf" d="M0 ${-r * 0.6}C${r * 0.5} ${-r * 0.2} ${r * 0.5} ${r * 0.2} 0 ${r * 0.6}C${-r * 0.5} ${r * 0.2} ${-r * 0.5} ${-r * 0.2} 0 ${-r * 0.6}Z"/>` +
+            `<circle class="m-dot" cx="0" cy="${f(-r * 2.4)}" r="1.8"/><circle class="m-dot" cx="0" cy="${f(r * 2.4)}" r="1.8"/></g>`;
+        }
+      }
+      els.forEach(el => {
+        el.style.height = H + 'px';
+        el.innerHTML = `<svg viewBox="0 0 ${f(W)} ${H}" preserveAspectRatio="none"><path class="vine-2" d="${d2}"/><path class="vine" d="${d}"/>${motifs}</svg>`;
+      });
+      if (!motion) return;
+      // стебель дорастает до нижнего края экрана
+      const vines = els.flatMap(el => [...el.querySelectorAll('.vine, .vine-2')]);
+      const st = { v: 0 };
+      const paint = () => gsap.set(vines, { drawSVG: `0% ${Math.min(100, st.v * 100)}%` });
+      const target = () => Math.min(1, (scrollY + innerHeight * 0.92) / H);
+      st.v = target();
+      paint();
+      grow = ScrollTrigger.create({
+        start: 0, end: 'max',
+        onUpdate: () => gsap.to(st, { v: target(), duration: 0.8, ease: 'power3.out', overwrite: true, onUpdate: paint })
+      });
+      // узоры: рисуются линией и раскрываются, при прокрутке назад сворачиваются обратно
+      els.forEach(el => el.querySelectorAll('.m').forEach((m, i) => {
+        const strokes = m.querySelectorAll('path');
+        const tl = gsap.timeline({ paused: true, defaults: { ease: 'expo.out' } })
+          .fromTo(strokes, { drawSVG: '50% 50%' }, { drawSVG: '0% 100%', duration: 1.1, stagger: 0.06 }, 0)
+          .fromTo(m, { opacity: 0, scale: 0.55, rotation: -28, transformOrigin: '50% 50%' }, { opacity: 1, scale: 1, rotation: 0, duration: 1.2 }, 0)
+          .fromTo(m.querySelectorAll('.m-dot, .m-leaf'), { opacity: 0 }, { opacity: 1, duration: 0.5, stagger: 0.08 }, 0.35);
+        triggers.push(ScrollTrigger.create({ trigger: m, start: 'top 92%', onEnter: () => tl.play(), onLeaveBack: () => tl.reverse() }));
+      }));
+    };
+    let lastH = 0, lastW = 0, t = 0;
+    // пересобираем ленту, когда меняется высота страницы или ширина ленты
+    const maybe = () => {
+      clearTimeout(t);
+      t = setTimeout(() => {
+        const h = page.scrollHeight, w = Math.round(els[0].getBoundingClientRect().width);
+        if (Math.abs(h - lastH) < 4 && w === lastW) return;
+        lastH = h;
+        lastW = w;
+        build();
+      }, 250);
+    };
+    if (motion) ScrollTrigger.addEventListener('refresh', maybe);
+    addEventListener('resize', maybe);
+    addEventListener('load', maybe);
+    maybe();
+    return { build };
+  })();
 
   const bk = (() => {
     const sec = document.querySelector('.berkut');
@@ -1618,7 +1857,7 @@ h1, h2, h3 { text-wrap: balance; }
       let s, ox, oy, pos;
       if (!compact) {
         const top = capB + 28, bottom = h - 150;
-        s = Math.max(100, Math.min((w * 0.36) / EB.w, (bottom - top) / EB.h, (w - 500) / EB.w));
+        s = Math.max(100, Math.min((w * 0.44) / EB.w, (bottom - top) / EB.h, (w - 440) / EB.w));
         const bTop = top + Math.max(0, (bottom - top) - EB.h * s) / 2;
         ox = cx - (EB.x0 + EB.w / 2) * s;
         oy = bTop - EB.y0 * s;
@@ -1632,7 +1871,7 @@ h1, h2, h3 { text-wrap: balance; }
           [cx, Math.min(h - 96, bTop + EB.h * s + 56)]
         ];
       } else {
-        s = Math.min((w - 28) / EB.w, (h * 0.38) / EB.h);
+        s = Math.min((w - 28) / EB.w, (h * 0.44) / EB.h);
         const bTop = capB + 14;
         ox = cx - (EB.x0 + EB.w / 2) * s;
         oy = bTop - EB.y0 * s;
@@ -1663,7 +1902,7 @@ h1, h2, h3 { text-wrap: balance; }
         const a = (i / 32) * Math.PI * 2, r1 = ringR * 1.12, r2 = ringR * (i % 2 ? 1.28 : 1.4);
         return `M${f(C.x + Math.cos(a) * r1)} ${f(C.y + Math.sin(a) * r1)}L${f(C.x + Math.cos(a) * r2)} ${f(C.y + Math.sin(a) * r2)}`;
       }).join('');
-      const grp = name => E.groups[name].map(p => `<path d="${p.d}" fill="${p.fill}"/>`).join('');
+      const grp = name => E.groups[name].filter(p => !/stroke="none"/.test(p.extra || '')).map(p => `<path d="${p.d}"${p.extra || ''}/>`).join('');
       // ночные хребты Тянь-Шаня в тумане
       const ridge = (base, a1, f1, a2, f2, ph) => {
         let d = `M0 ${f(h)}`;
@@ -1681,6 +1920,11 @@ h1, h2, h3 { text-wrap: balance; }
             <stop offset="0" stop-color="#effcff"/><stop offset=".2" stop-color="#9fe9f7"/><stop offset=".42" stop-color="#3cc6dc"/><stop offset=".6" stop-color="#2a5fd6"/>
             <stop class="bk-f" offset=".7" stop-color="#ff7a2e"/><stop class="bk-f" offset=".86" stop-color="#ffae45"/><stop class="bk-f" offset="1" stop-color="#ffe2a0"/>
           </radialGradient>
+          <linearGradient id="bk-sh" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffffff" stop-opacity=".42"/><stop offset=".38" stop-color="#ffffff" stop-opacity="0"/><stop offset=".62" stop-color="#050b22" stop-opacity="0"/><stop offset="1" stop-color="#050b22" stop-opacity=".55"/></linearGradient>
+          <radialGradient id="bk-ball" cx=".34" cy=".28" r=".85"><stop offset="0" stop-color="#ffffff" stop-opacity=".5"/><stop offset=".35" stop-color="#ffffff" stop-opacity="0"/><stop offset=".7" stop-color="#050b22" stop-opacity=".1"/><stop offset="1" stop-color="#050b22" stop-opacity=".6"/></radialGradient>
+          <linearGradient id="bk-head" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset=".45" stop-color="#bfeefa"/><stop offset="1" stop-color="#3cc6dc"/></linearGradient>
+          <linearGradient id="bk-beak" x1="1" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffe7a8"/><stop offset=".6" stop-color="#e8b64a"/><stop offset="1" stop-color="#7a4a12"/></linearGradient>
+          <filter id="bk-depth" x="-30%" y="-30%" width="160%" height="160%"><feDropShadow dx="${compact ? 3 : 6}" dy="${compact ? 6 : 12}" stdDeviation="${compact ? 5 : 9}" flood-color="#020616" flood-opacity=".7"/></filter>
           <filter id="bk-glow" x="-25%" y="-25%" width="150%" height="150%"><feGaussianBlur in="SourceGraphic" stdDeviation="${compact ? 4 : 7}" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
           <radialGradient id="bk-halo"><stop offset="0" stop-color="#3cc6dc" stop-opacity=".3"/><stop offset="1" stop-color="#3cc6dc" stop-opacity="0"/></radialGradient>
           <radialGradient id="bk-flame"><stop offset="0" stop-color="#ff8a3a" stop-opacity=".55"/><stop offset=".5" stop-color="#3cc6dc" stop-opacity=".18"/><stop offset="1" stop-color="#3cc6dc" stop-opacity="0"/></radialGradient>
@@ -1690,15 +1934,14 @@ h1, h2, h3 { text-wrap: balance; }
         <path d="${ridge(h * 0.8, h * 0.06, 0.009, h * 0.05, 0.021, 1.3)}" fill="#12234f" opacity=".7"/>
         <path d="${ridge(h * 0.9, h * 0.05, 0.013, h * 0.04, 0.031, 2.1)}" fill="url(#bk-mtn)"/>
         <rect x="0" y="${f(h * 0.7)}" width="${w}" height="${f(h * 0.3)}" fill="url(#bk-mist)"/>
-        <ellipse cx="${f(C.x)}" cy="${f(eBottom + 0.04 * s)}" rx="${f(0.62 * s)}" ry="${f(0.16 * s)}" fill="url(#bk-flame)"/>
-        <circle class="bk-halo" cx="${f(C.x)}" cy="${f(C.y - 0.2 * s)}" r="${f(EB.h * s * 0.62)}" fill="url(#bk-halo)"/>
+        <circle class="bk-halo" cx="${f(C.x)}" cy="${f(C.y - 0.2 * s)}" r="1" fill="none"/>
         <g fill="none" stroke="#e8b64a">
           <circle class="bk-disc" cx="${f(C.x)}" cy="${f(C.y)}" r="${f(ringR)}" stroke-opacity=".55" stroke-width="1.3"/>
           <circle cx="${f(C.x)}" cy="${f(C.y)}" r="${f(ringR * 0.9)}" stroke-opacity=".2" stroke-dasharray="2 7"/>
           <g class="bk-rays-wrap"><g class="bk-rays"><path d="${rays}" stroke-opacity=".34" stroke-width="1.6" stroke-linecap="round"/></g></g>
         </g>
         <g fill="none" stroke-linecap="round">${links.map(d => `<path class="bk-glow" d="${d}" stroke="#e8b64a" stroke-opacity=".16" stroke-width="7"/><path class="bk-line" d="${d}" stroke="#f4d48a" stroke-width="1.6"/><path class="bk-flow" d="${d}" stroke="#fff4d2" stroke-width="2.4"/><circle class="bk-spark" r="5" fill="#fff4d2" opacity="0"/>`).join('')}</g>
-        <g class="bk-eagle" filter="url(#bk-glow)" stroke="#d9f8ff" stroke-opacity=".5" stroke-width="${compact ? 0.9 : 1.1}" stroke-linejoin="round" stroke-linecap="round">
+        <g class="bk-eagle" fill="none" stroke-linejoin="round" stroke-linecap="round">
           <g class="bk-rig"><g class="bk-wl">${grp('wl')}</g><g class="bk-tail" style="transform-origin: ${f(tailBase.x)}px ${f(tailBase.y)}px">${grp('tail')}</g><g class="bk-back">${grp('back')}</g><g class="bk-wr">${grp('wr')}</g><g class="bk-front">${grp('front')}</g></g>
         </g>`;
       nodes.forEach((n, i) => { n.style.left = `${f(pos[i][0])}px`; n.style.top = `${f(pos[i][1])}px`; });
@@ -1783,6 +2026,7 @@ h1, h2, h3 { text-wrap: balance; }
     const pool = [];
     let pi = 0;
     const emit = () => {
+      return;
       if (!refs) return;
       if (!pool.length) for (let i = 0; i < 20; i++) { const el = document.createElement('span'); el.className = 'bk-glyph'; fx.appendChild(el); pool.push(el); }
       const r = gsap.utils.random;
@@ -1816,7 +2060,7 @@ h1, h2, h3 { text-wrap: balance; }
     const updateFlap = () => {
       if (!flapTl) return;
       const p = tl ? tl.progress() : 1;
-      embers.toggle(seen && p >= emberAt);
+      embers.toggle(false);
       const should = seen && p >= flapAt;
       if (should && !flapping) { flapping = true; flapTl.play(); }
       else if (!should && flapping) { flapping = false; flapTl.pause(); flapTl.progress(0, true); }
