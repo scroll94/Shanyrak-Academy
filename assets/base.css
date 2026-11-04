@@ -1,0 +1,92 @@
+/* Общее для страниц классов: тот же мир, что на главной — уголь, чистые цвета, шрифты Tektur и Golos Text.
+   Цвет класса задаётся на странице переменной --c. */
+:root {
+  color-scheme: dark;
+  --bg: #191919;
+  --surface: #242424;
+  --ink: #ffffff;
+  --muted: #b4b4b4;
+  --red: #d71e1e;
+  --blue: #1e4bd7;
+  --teal: #0c7866;
+  --yellow: #ffe927;
+  --black: #111111;
+  --c: var(--blue);
+  --c-soft: #6f8dff;
+  --font-display: "Tektur", "Arial Black", system-ui, sans-serif;
+  --font-body: "Golos Text", "Segoe UI", system-ui, sans-serif;
+  --font-pixel: "Press Start 2P", "Courier New", monospace;
+  --font-code: "JetBrains Mono", Consolas, monospace;
+  --step-small: clamp(0.8125rem, 0.79rem + 0.1vw, 0.875rem);
+  --step-body: clamp(1.0625rem, 1rem + 0.25vw, 1.1875rem);
+  --step-lead: clamp(1.25rem, 1.1rem + 0.7vw, 1.625rem);
+  --step-head: clamp(2rem, 1.3rem + 3.2vw, 4rem);
+  --m: clamp(16px, 3vw, 44px);
+  --radius: 14px;
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+}
+*, *::before, *::after { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html { scroll-padding-top: 80px; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 400 var(--step-body)/1.55 var(--font-body); -webkit-font-smoothing: antialiased; overflow-x: clip; }
+img, svg, video, canvas { display: block; max-width: 100%; }
+button, input, select { font: inherit; }
+a { color: inherit; }
+h1, h2, h3 { margin: 0; font-family: var(--font-display); text-wrap: balance; }
+p { margin: 0; }
+::selection { background: var(--yellow); color: var(--black); }
+:focus-visible { outline: 3px solid var(--yellow); outline-offset: 3px; border-radius: 4px; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.pixel { font-family: var(--font-pixel); font-size: var(--step-small); line-height: 1.6; text-transform: uppercase; }
+.wrap { max-width: 1280px; margin-inline: auto; padding-inline: var(--m); }
+.ln { display: block; overflow: clip; padding-top: .06em; }
+.ln > span { display: block; }
+
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: .6rem; min-height: 56px; padding: 0 1.5rem; border: 0; border-radius: var(--radius); background: var(--yellow); color: var(--black); font: 800 1.05rem/1 var(--font-display); letter-spacing: .02em; text-transform: uppercase; text-decoration: none; cursor: pointer; transition: transform 160ms var(--ease-out), background-color 160ms ease; }
+.btn:active { transform: scale(0.97); }
+@media (hover: hover) and (pointer: fine) { .btn:hover { background: #fff36b; } }
+.btn svg { width: 22px; height: 22px; flex: none; }
+.btn--ghost { background: transparent; color: var(--ink); box-shadow: inset 0 0 0 2px currentColor; }
+@media (hover: hover) and (pointer: fine) { .btn--ghost:hover { background: rgb(255 255 255 / .1); } }
+
+/* шапка страницы класса: назад к выбору, название школы, запись */
+.bar { position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 1rem; padding: 14px var(--m); background: rgb(17 17 17 / .86); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); }
+.bar .back { display: inline-flex; align-items: center; gap: .5rem; font-weight: 600; text-decoration: none; }
+.bar .back:hover { color: var(--yellow); }
+.bar .wordmark { display: inline-flex; align-items: center; gap: .55rem; margin-inline: auto; font: 800 1.05rem/1 var(--font-display); text-transform: uppercase; text-decoration: none; }
+.bar .wordmark svg { width: 26px; height: 26px; color: var(--yellow); }
+.bar .btn { min-height: 44px; padding: 0 1rem; font-size: .9rem; }
+.others { display: flex; gap: .6rem; }
+.others a { padding: .4rem .8rem; border-radius: 999px; font-size: .9rem; font-weight: 600; text-decoration: none; box-shadow: inset 0 0 0 1.5px rgb(255 255 255 / .3); }
+.others a:hover { box-shadow: inset 0 0 0 1.5px var(--yellow); color: var(--yellow); }
+@media (max-width: 760px) { .bar .wordmark span { display: none; } .others { display: none; } }
+
+/* раздел с заголовком */
+.sec { padding-block: clamp(72px, 11vw, 150px); }
+.sec-head { max-width: 46rem; }
+.sec-head .pixel { color: var(--c-soft); }
+.sec-head h2 { margin-top: .6rem; font-size: var(--step-head); line-height: .98; font-weight: 900; text-transform: uppercase; }
+.sec-head p { margin-top: 1rem; font-size: var(--step-lead); line-height: 1.4; color: var(--muted); }
+
+/* уровни курса: шкала опыта заполняется при прокрутке */
+.levels { display: grid; gap: 14px; margin: 3rem 0 0; padding: 0; list-style: none; counter-reset: lv; }
+.lv { position: relative; display: grid; grid-template-columns: 5.5rem minmax(0, 1fr) minmax(0, 1.2fr); gap: 1.5rem; align-items: center; padding: 22px 24px; border-radius: 18px; background: var(--surface); overflow: clip; }
+.lv::after { content: ""; position: absolute; left: 0; bottom: 0; height: 4px; width: 100%; background: var(--c); transform: scaleX(var(--xp, 0)); transform-origin: 0 50%; }
+.lv-n { font: 900 2.8rem/1 var(--font-display); color: var(--c-soft); }
+.lv h3 { font-size: 1.5rem; line-height: 1.1; text-transform: uppercase; }
+.lv p { color: var(--muted); }
+@media (max-width: 760px) { .lv { grid-template-columns: 3.2rem minmax(0, 1fr); } .lv p { grid-column: 2; } .lv-n { font-size: 2rem; } }
+
+/* финал: одно слово — кнопка записи */
+.go { display: block; position: relative; min-height: 56svh; padding: 22px var(--m); background: var(--yellow); color: var(--black); text-decoration: none; border-radius: 40px 40px 0 0; overflow: clip; }
+.go p { max-width: 32rem; font-size: 20px; font-weight: 600; line-height: 1.35; }
+.go svg { position: absolute; top: 22px; right: var(--m); width: 48px; height: 48px; }
+.go .word { position: absolute; left: var(--m); right: var(--m); bottom: 22px; font: 900 clamp(90px, 20vw, 340px)/.8 var(--font-display); text-transform: uppercase; white-space: nowrap; }
+.go:hover, .go:focus-visible { background: var(--black); color: var(--yellow); }
+@media (max-width: 760px) { .go { min-height: 44svh; } .go p { font-size: 17px; } .go .word { font-size: 19vw; } }
+
+.foot { padding: 28px var(--m) 40px; background: var(--black); color: var(--muted); font-size: .95rem; display: flex; flex-wrap: wrap; gap: .8rem 2rem; justify-content: space-between; }
+.foot a { text-decoration: none; }
+.foot a:hover { color: var(--yellow); }
+
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition-duration: 1ms !important; animation-duration: 1ms !important; } }

@@ -67,10 +67,11 @@ p { margin: 0; }
 .hero-bar ul a { text-underline-offset: 6px; text-decoration-thickness: 2px; }
 .hero-bar ul a:hover { text-decoration: underline; }
 .hero h1 { position: absolute; z-index: 2; left: var(--m); top: 16%; margin: 0; font-size: clamp(80px, 12vw, 190px); line-height: .84; font-weight: 900; letter-spacing: -.01em; text-transform: uppercase; }
-.hero-key { position: absolute; z-index: 3; right: 5vw; bottom: 3%; width: min(40vw, 74svh); aspect-ratio: 1; }
-.hero-key canvas { width: 100%; height: 100%; }
+.hero-key { position: absolute; z-index: 1; right: 5vw; bottom: 3%; width: min(40vw, 74svh); aspect-ratio: 1; }
+.hero-sky { position: absolute; inset: 0; z-index: 1; width: 100%; height: 100%; pointer-events: none; }
+.hero-key { pointer-events: none; }
 .hero-key .key-fallback { position: absolute; inset: 18%; color: #e8b64a; }
-.hero-key.has-3d .key-fallback { display: none; }
+.hero.has-3d .key-fallback { display: none; }
 .hero-band { position: absolute; z-index: 4; left: 0; right: 0; bottom: 0; height: 18%; display: flex; align-items: center; justify-content: space-between; gap: 1.5rem; padding: 0 var(--m); }
 .hero-band p { max-width: 44ch; font-size: var(--step-body); line-height: 1.45; }
 .hero-band .hud { color: var(--yellow); margin-top: .4rem; }
@@ -202,10 +203,8 @@ p { margin: 0; }
     </ul>
   </nav>
   <h1><span class="ln"><span>Нажми</span></span><span class="ln"><span>старт</span></span></h1>
-  <div class="hero-key" aria-hidden="true">
-    <svg class="key-fallback"><use href="#mark"/></svg>
-    <canvas id="sky"></canvas>
-  </div>
+  <canvas id="sky" class="hero-sky" aria-hidden="true"></canvas>
+  <div class="hero-key" aria-hidden="true"><svg class="key-fallback"><use href="#mark"/></svg></div>
   <div class="hero-band">
     <div>
       <p>Шаңырақ Code — онлайн-школа для 14–18 лет: программирование и ИИ, математика, создание игр.</p>
@@ -230,7 +229,7 @@ p { margin: 0; }
         <h3 id="card-title">Кодер</h3>
         <ul class="stats" id="card-stats"></ul>
         <p class="card-project"><b>Твой проект</b><span id="card-project"></span></p>
-        <a class="btn" id="card-cta" href="https://wa.me/77055823688?text=%D0%A1%D3%99%D0%BB%D0%B5%D0%BC%21%20%D0%A5%D0%BE%D1%87%D1%83%20%D0%BD%D0%B0%20%D0%B1%D0%B5%D1%81%D0%BF%D0%BB%D0%B0%D1%82%D0%BD%D1%8B%D0%B9%20%D0%BF%D1%80%D0%BE%D0%B1%D0%BD%D1%8B%D0%B9%20%D1%83%D1%80%D0%BE%D0%BA%20%D0%B2%20%D0%A8%D0%B0%D2%A3%D1%8B%D1%80%D0%B0%D2%9B%20Code." target="_blank" rel="noopener"><svg aria-hidden="true"><use href="#wa"/></svg>Играть за этот класс</a>
+        <a class="btn" id="card-cta" href="code.html">Открыть класс <span aria-hidden="true">→</span></a>
       </article>
     </div>
   </section>
@@ -281,7 +280,7 @@ p { margin: 0; }
 (() => {
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const WA = 'https://wa.me/77055823688?text=';
-  const CLASSES = {"code": {"title": "Кодер", "dir": "Программирование и ИИ", "video": "code-ai", "stats": [["Логика", 5], ["Креатив", 3], ["Скорость", 4]], "project": "Telegram-бот с нейросетью, который помогает тебе или друзьям."}, "math": {"title": "Математик", "dir": "Математика", "video": "math", "stats": [["Логика", 5], ["Креатив", 3], ["Точность", 5]], "project": "Свой интерактивный график или решатель задач для школы."}, "games": {"title": "Геймдизайнер", "dir": "Создание игр", "video": "games", "stats": [["Логика", 3], ["Креатив", 5], ["Скорость", 4]], "project": "Своя игра или плейс в Roblox, открытый для всех игроков."}};
+  const CLASSES = {"code": {"page": "code.html", "title": "Кодер", "dir": "Программирование и ИИ", "video": "code-ai", "stats": [["Логика", 5], ["Креатив", 3], ["Скорость", 4]], "project": "Telegram-бот с нейросетью, который помогает тебе или друзьям."}, "math": {"page": "math.html", "title": "Математик", "dir": "Математика", "video": "math", "stats": [["Логика", 5], ["Креатив", 3], ["Точность", 5]], "project": "Свой интерактивный график или решатель задач для школы."}, "games": {"page": "games.html", "title": "Геймдизайнер", "dir": "Создание игр", "video": "games", "stats": [["Логика", 3], ["Креатив", 5], ["Скорость", 4]], "project": "Своя игра или плейс в Roblox, открытый для всех игроков."}};
 
   // ---------- выбор класса: карточка персонажа, ролик и 3D-эмблема ----------
   const card = document.querySelector('.card');
@@ -296,7 +295,9 @@ p { margin: 0; }
     card.dataset.cls = id;
     document.getElementById('card-title').textContent = c.title;
     document.getElementById('card-project').textContent = c.project;
-    document.getElementById('card-cta').href = WA + encodeURIComponent(`Сәлем! Хочу на бесплатный пробный урок по направлению «${c.dir}» в Шаңырақ Code.`);
+    const cta = document.getElementById('card-cta');
+    cta.href = c.page;
+    cta.setAttribute('aria-label', `Открыть класс «${c.title}»: ${c.dir}`);
     stats.innerHTML = c.stats.map(([k, v]) => `<li>${k}<span class="bar" aria-label="${v} из 5">${'<i class="on"></i>'.repeat(v)}${'<i></i>'.repeat(5 - v)}</span></li>`).join('');
     if (video.dataset.src !== c.video) {
       video.dataset.src = c.video;
@@ -353,7 +354,8 @@ p { margin: 0; }
 <script type="module">
 import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.186.0/build/three.module.js';
 
-const hero = document.querySelector('.hero-key');
+const hero = document.querySelector('.hero');
+const keyBox = document.querySelector('.hero-key');
 const canvas = document.getElementById('sky');
 const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const small = matchMedia('(max-width: 760px)').matches;
@@ -465,6 +467,29 @@ function init() {
     horns.push(g);
   }
 
+  // Уықтар: лучи-жерди уходят от шаңырака в темноту
+  const rayN = small ? 40 : 64, rp = [], rc = [];
+  const cg = new THREE.Color(0xe8b64a);
+  for (let i = 0; i < rayN; i++) {
+    const a = (i / rayN) * Math.PI * 2 + Math.PI / rayN;
+    const r1 = R + 0.95, r2 = 11;
+    rp.push(Math.cos(a) * r1, Math.sin(a) * r1, -0.3, Math.cos(a) * r2, Math.sin(a) * r2, -6);
+    rc.push(cg.r, cg.g, cg.b, 0, 0, 0);
+  }
+  const rg = new THREE.BufferGeometry();
+  rg.setAttribute('position', new THREE.Float32BufferAttribute(rp, 3));
+  rg.setAttribute('color', new THREE.Float32BufferAttribute(rc, 3));
+  const rays = new THREE.LineSegments(rg, new THREE.LineBasicMaterial({ vertexColors: true, transparent: true, opacity: 0.5, blending: THREE.AdditiveBlending, depthWrite: false }));
+  shan.add(rays);
+
+  const glow = new THREE.Sprite(new THREE.SpriteMaterial({
+    map: radialTexture([[0, 'rgba(255,200,110,0.55)'], [0.4, 'rgba(232,160,60,0.16)'], [1, 'rgba(232,160,60,0)']]),
+    blending: THREE.AdditiveBlending, transparent: true, depthWrite: false, opacity: 0.6, toneMapped: false
+  }));
+  glow.scale.set(7, 7, 1);
+  glow.position.z = -1;
+  shan.add(glow);
+
   scene.add(new THREE.AmbientLight(0x6f80b8, 0.35));
   const key = new THREE.DirectionalLight(0xffe0b0, 2.4);
   key.position.set(4, 6, 7);
@@ -473,8 +498,8 @@ function init() {
   rim.position.set(-5, -3, 3);
   scene.add(rim);
 
-  // Шаңырақ по центру своего блока и вместе с рогами занимает почти весь квадрат
-  const base = { s: 1 };
+  // Холст на весь первый экран, чтобы лучи не обрезались; шаңырақ стоит там, где место под ключевую картинку
+  const base = { x: 0, y: 0, s: 1 };
   const layout = () => {
     const w = hero.clientWidth, h = hero.clientHeight;
     if (!w || !h) return;
@@ -482,7 +507,10 @@ function init() {
     camera.aspect = w / h;
     camera.updateProjectionMatrix();
     const wpp = (2 * 10 * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2))) / h;
-    base.s = (Math.min(w, h) * 0.47 * wpp) / 2.9;
+    const hr = hero.getBoundingClientRect(), kr = keyBox.getBoundingClientRect();
+    base.x = (kr.left - hr.left + kr.width / 2 - w / 2) * wpp;
+    base.y = (h / 2 - (kr.top - hr.top + kr.height / 2)) * wpp;
+    base.s = (kr.width * 0.47 * wpp) / 2.9;
   };
 
   const timer = new THREE.Timer();
@@ -502,9 +530,14 @@ function init() {
     my += (tmy - my) * 0.045;
 
     shan.scale.setScalar(base.s * (0.82 + 0.18 * e));
+    shan.position.set(base.x, base.y, 0);
     shan.rotation.set(-0.25 * (1 - e) + my * 0.16, mx * 0.28, (reduce ? 0 : t * 0.04) - 0.9 * (1 - e));
     crown.rotation.z = reduce ? 0 : -t * 0.09;
     horns.forEach((g, i) => g.scale.setScalar(0.62 * Math.max(0.001, easeBack(clamp01(intro * 1.7 - (i / horns.length) * 0.7)))));
+    // солнце: свечение дышит, лучи-уықтар медленно проворачиваются
+    glow.material.opacity = 0.85 * e * (reduce ? 1 : 0.85 + 0.15 * Math.sin(t * 1.4));
+    rays.material.opacity = 0.6 * e;
+    rays.rotation.z = reduce ? 0 : t * 0.03;
     renderer.render(scene, camera);
   };
 
@@ -516,6 +549,7 @@ function init() {
   };
   layout();
   new ResizeObserver(layout).observe(hero);
+  addEventListener('resize', layout);
   if (document.fonts) document.fonts.ready.then(layout);
   canvas.addEventListener('webglcontextlost', () => { setRun(false); hero.classList.remove('has-3d'); });
   const start = () => {
