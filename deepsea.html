@@ -1,0 +1,303 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Бездна — глубоководный хоррор · Шаңырақ Code</title>
+<meta name="description" content="Мини-игра про подлодку в глубине океана: фонарь, сонар и существа во тьме. Пример игры учеников Шаңырақ Code.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Tektur:wght@800;900&family=Golos+Text:wght@400;600&display=swap">
+<style>
+  :root { color-scheme: dark; --gold: #f2b84b; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; background: #000; color: #e8f2f5; font: 400 15px/1.45 "Golos Text", system-ui, sans-serif; overflow: hidden; user-select: none; -webkit-user-select: none; }
+  [hidden] { display: none !important; }
+  /* ?card: заставка в карточке на главной, без интерфейса */
+  body.card .hud, body.card .screen, body.card .mute { display: none !important; }
+  canvas { position: fixed; inset: 0; width: 100%; height: 100%; display: block; touch-action: auto; cursor: crosshair; }
+  /* палец управляет подлодкой только во время игры, иначе страница листается как обычно */
+  body.playing canvas { touch-action: none; }
+  .hud { position: fixed; left: 16px; right: 16px; top: 14px; z-index: 3; display: flex; justify-content: space-between; gap: 12px; pointer-events: none; font-weight: 600; text-shadow: 0 1px 6px #000; }
+  .meter { display: grid; gap: 4px; min-width: 140px; }
+  .meter i { display: block; height: 6px; border-radius: 3px; background: rgb(255 255 255 / .15); overflow: hidden; }
+  .meter i b { display: block; height: 100%; width: 100%; background: #6fe0ff; transform-origin: 0 50%; }
+  .meter.bat i b { background: var(--gold); }
+  .depth { font: 900 22px/1 "Tektur", sans-serif; text-align: center; }
+  .screen { position: fixed; inset: 0; z-index: 4; display: grid; place-items: center; padding: 20px; background: radial-gradient(ellipse at center, rgb(0 20 30 / .55), rgb(0 0 0 / .92)); text-align: center; }
+  .screen h1 { margin: 0; font: 900 clamp(34px, 6vw, 72px)/1 "Tektur", sans-serif; text-transform: uppercase; letter-spacing: .02em; color: #dff6ff; }
+  .screen p { margin: 12px auto 0; max-width: 30rem; color: #9fb8c0; }
+  .keys { margin-top: 14px; color: #7f9aa3; font-size: 13px; }
+  .play { margin-top: 22px; min-height: 52px; padding: 0 26px; border: 0; border-radius: 14px; background: var(--gold); color: #111; font: 800 16px/1 "Tektur", sans-serif; text-transform: uppercase; cursor: pointer; transition: transform 160ms cubic-bezier(.23, 1, .32, 1); }
+  .play:active { transform: scale(.97); }
+  .play:focus-visible, .mute:focus-visible { outline: 3px solid #fff; outline-offset: 3px; }
+  .mute { position: fixed; right: 14px; bottom: 14px; z-index: 5; min-height: 40px; padding: 0 14px; border: 0; border-radius: 12px; background: rgb(255 255 255 / .1); color: #cfe6ec; font: 600 13px/1 "Golos Text", sans-serif; cursor: pointer; }
+</style>
+</head>
+<body>
+<canvas id="c" aria-label="Игра «Бездна»: подлодка спускается во тьму, свет фонаря выхватывает существ" role="img"></canvas>
+<div class="hud" aria-live="off">
+  <div class="meter"><span>Кислород</span><i><b id="o2"></b></i></div>
+  <div class="depth" id="depth">0 м</div>
+  <div class="meter bat"><span>Фонарь</span><i><b id="bat"></b></i></div>
+</div>
+<div class="screen" id="screen">
+  <div>
+    <h1 id="s-title">Бездна</h1>
+    <p id="s-text">Спустись как можно глубже. Собирай светящиеся образцы, они дают кислород. Во тьме кто-то есть. Свет фонаря его отпугивает, но батарея садится. Сонар покажет, где он.</p>
+    <p class="keys">Мышь или палец — куда плыть · Пробел или двойной тап — сонар · Звук включи</p>
+    <button class="play" id="play" type="button">Погрузиться</button>
+  </div>
+</div>
+<button class="mute" id="mute" type="button" aria-pressed="false">Звук: вкл</button>
+
+<script>
+(() => {
+  const cv = document.getElementById('c'), g = cv.getContext('2d');
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const cardMode = new URLSearchParams(location.search).has('card');
+  if (cardMode) document.body.classList.add('card');
+  // в маленьком окне мир показываем вдвое мельче, чтобы чудовище целиком влезало
+  const VS = cardMode ? 0.5 : 1;
+  let W = 0, H = 0, dpr = 1;
+  const resize = () => { dpr = Math.min(devicePixelRatio, 2); W = innerWidth / VS; H = innerHeight / VS; cv.width = innerWidth * dpr; cv.height = innerHeight * dpr; g.setTransform(dpr * VS, 0, 0, dpr * VS, 0, 0); };
+  addEventListener('resize', resize); resize();
+
+  // ---------- звук: низкий гул, сонар и сердцебиение, всё синтезируется WebAudio ----------
+  let A = null, master = null, muted = false, drone = null, heartGain = null;
+  const startAudio = () => {
+    if (A) return;
+    A = new (window.AudioContext || window.webkitAudioContext)();
+    master = A.createGain(); master.gain.value = muted ? 0 : 0.7; master.connect(A.destination);
+    const lp = A.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 260; lp.Q.value = 4; lp.connect(master);
+    const dg = A.createGain(); dg.gain.value = 0.22; dg.connect(lp);
+    [41.2, 41.7, 61.7].forEach((f, i) => { const o = A.createOscillator(); o.type = i === 2 ? 'triangle' : 'sawtooth'; o.frequency.value = f; const og = A.createGain(); og.gain.value = i === 2 ? 0.25 : 0.5; o.connect(og); og.connect(dg); o.start(); });
+    // медленная волна по фильтру: гул дышит
+    const lfo = A.createOscillator(); lfo.frequency.value = 0.06; const lg = A.createGain(); lg.gain.value = 140; lfo.connect(lg); lg.connect(lp.frequency); lfo.start();
+    // шум воды
+    const buf = A.createBuffer(1, A.sampleRate * 2, A.sampleRate), d = buf.getChannelData(0);
+    for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+    const n = A.createBufferSource(); n.buffer = buf; n.loop = true;
+    const nf = A.createBiquadFilter(); nf.type = 'lowpass'; nf.frequency.value = 500;
+    const ng = A.createGain(); ng.gain.value = 0.05;
+    n.connect(nf); nf.connect(ng); ng.connect(master); n.start();
+    drone = { lp, dg };
+    heartGain = A.createGain(); heartGain.gain.value = 0; heartGain.connect(master);
+  };
+  const ping = () => {
+    if (!A) return;
+    const t = A.currentTime, o = A.createOscillator(), og = A.createGain();
+    o.type = 'sine'; o.frequency.setValueAtTime(1480, t); o.frequency.exponentialRampToValueAtTime(980, t + 1.4);
+    og.gain.setValueAtTime(0.0001, t); og.gain.exponentialRampToValueAtTime(0.25, t + 0.02); og.gain.exponentialRampToValueAtTime(0.0001, t + 1.6);
+    const dl = A.createDelay(); dl.delayTime.value = 0.42; const fb = A.createGain(); fb.gain.value = 0.35;
+    o.connect(og); og.connect(master); og.connect(dl); dl.connect(fb); fb.connect(dl); dl.connect(master);
+    o.start(t); o.stop(t + 1.8);
+  };
+  const thump = (k) => {
+    if (!A) return;
+    const t = A.currentTime;
+    [0, 0.18].forEach((off, i) => {
+      const o = A.createOscillator(), og = A.createGain();
+      o.type = 'sine'; o.frequency.setValueAtTime(70, t + off); o.frequency.exponentialRampToValueAtTime(38, t + off + 0.2);
+      og.gain.setValueAtTime(0.0001, t + off); og.gain.exponentialRampToValueAtTime(0.5 * k * (i ? 0.7 : 1), t + off + 0.015); og.gain.exponentialRampToValueAtTime(0.0001, t + off + 0.25);
+      o.connect(og); og.connect(heartGain); o.start(t + off); o.stop(t + off + 0.3);
+    });
+  };
+  const roar = () => {
+    if (!A) return;
+    const t = A.currentTime, o = A.createOscillator(), og = A.createGain(), f = A.createBiquadFilter();
+    o.type = 'sawtooth'; o.frequency.setValueAtTime(90, t); o.frequency.exponentialRampToValueAtTime(30, t + 1.6);
+    f.type = 'lowpass'; f.frequency.value = 600;
+    og.gain.setValueAtTime(0.0001, t); og.gain.exponentialRampToValueAtTime(0.6, t + 0.05); og.gain.exponentialRampToValueAtTime(0.0001, t + 1.8);
+    o.connect(f); f.connect(og); og.connect(master); o.start(t); o.stop(t + 2);
+  };
+  document.getElementById('mute').addEventListener('click', e => {
+    muted = !muted;
+    e.currentTarget.textContent = muted ? 'Звук: выкл' : 'Звук: вкл';
+    e.currentTarget.setAttribute('aria-pressed', String(muted));
+    if (master) master.gain.setTargetAtTime(muted ? 0 : 0.7, A.currentTime, 0.1);
+  });
+
+  // ---------- мир ----------
+  const S = {};
+  const rnd = (a, b) => a + Math.random() * (b - a);
+  const reset = () => {
+    Object.assign(S, { run: true, t: 0, x: 0, y: 0, vx: 0, vy: 0, ang: 0, o2: 1, bat: 1, depth: 0, sonar: -10, best: S.best || 0, samples: [], rocks: [], particles: [], monster: null, shake: 0, caught: 0, lastBeat: 0 });
+    for (let i = 0; i < 60; i++) S.samples.push({ x: rnd(-900, 900), y: rnd(200, 9000), r: rnd(5, 9), ph: rnd(0, 6) });
+    for (let i = 0; i < 90; i++) S.rocks.push({ x: (Math.random() < 0.5 ? -1 : 1) * rnd(520, 900), y: rnd(-200, 9200), r: rnd(60, 180) });
+    for (let i = 0; i < 140; i++) S.particles.push({ x: rnd(-W, W), y: rnd(-H, H), s: rnd(0.5, 2) });
+    // чудовище с удильщиковой приманкой ждёт глубже и подкрадывается, когда ты светишь мимо
+    S.monster = { x: rnd(-300, 300), y: 900, vx: 0, vy: 0, mood: 0, seen: 0 };
+  };
+  const aim = { x: 0, y: 0, down: false };
+  const toWorld = (sx, sy) => ({ x: S.x + (sx - W / 2), y: S.y + (sy - H * 0.42) });
+  cv.addEventListener('pointermove', e => { aim.x = e.clientX; aim.y = e.clientY; });
+  cv.addEventListener('pointerdown', e => { aim.x = e.clientX; aim.y = e.clientY; aim.down = true; const now = performance.now(); if (now - (aim.lastTap || 0) < 300) sonar(); aim.lastTap = now; });
+  addEventListener('pointerup', () => { aim.down = false; });
+  addEventListener('keydown', e => { if (e.code === 'Space') { e.preventDefault(); sonar(); } });
+  const sonar = () => { if (!S.run || S.t - S.sonar < 1.6) return; S.sonar = S.t; S.bat = Math.max(0, S.bat - 0.04); ping(); };
+
+  const screen = document.getElementById('screen');
+  document.getElementById('play').addEventListener('click', () => { startAudio(); if (A.state === 'suspended') A.resume(); reset(); screen.hidden = true; document.body.classList.add('playing'); last = performance.now(); });
+  const over = (title, text) => {
+    S.run = false;
+    document.body.classList.remove('playing');
+    S.best = Math.max(S.best, Math.floor(S.depth));
+    document.getElementById('s-title').textContent = title;
+    document.getElementById('s-text').textContent = `${text} Глубина ${Math.floor(S.depth)} м, рекорд ${S.best} м.`;
+    document.getElementById('play').textContent = 'Ещё раз';
+    screen.hidden = false;
+  };
+
+  const o2El = document.getElementById('o2'), batEl = document.getElementById('bat'), depthEl = document.getElementById('depth');
+  let last = performance.now();
+  const step = dt => {
+    S.t += dt;
+    // подлодка плывёт к курсору, медленно и тяжело, как в воде
+    const target = aim.x || aim.y ? toWorld(aim.x, aim.y) : { x: S.x, y: S.y + 80 };
+    const dx = target.x - S.x, dy = target.y - S.y, dist = Math.hypot(dx, dy) || 1;
+    const thrust = Math.min(1, dist / 220) * 170;
+    S.vx += (dx / dist) * thrust * dt; S.vy += (dy / dist) * thrust * dt + 12 * dt;
+    S.vx *= 1 - 1.6 * dt; S.vy *= 1 - 1.6 * dt;
+    S.x += S.vx * dt; S.y = Math.max(0, S.y + S.vy * dt);
+    S.x = Math.max(-500, Math.min(500, S.x));
+    S.ang = Math.atan2(dy, dx);
+    S.depth = S.y / 10;
+    S.o2 -= dt * (0.018 + S.depth / 60000);
+    S.bat = Math.max(0, S.bat - dt * 0.012);
+    S.samples.forEach(s => { if (!s.got && Math.hypot(s.x - S.x, s.y - S.y) < 26) { s.got = true; S.o2 = Math.min(1, S.o2 + 0.2); S.bat = Math.min(1, S.bat + 0.12); } });
+    // чудовище: злится от света, приближается во тьме, бросается, если слишком близко
+    const m = S.monster, mdx = S.x - m.x, mdy = S.y - m.y, md = Math.hypot(mdx, mdy) || 1;
+    const lightAng = Math.abs(Math.atan2(Math.sin(Math.atan2(-mdy, -mdx) - S.ang), Math.cos(Math.atan2(-mdy, -mdx) - S.ang)));
+    const lit = S.bat > 0.02 && md < 360 && lightAng < 0.45;
+    m.seen = lit ? Math.min(1, m.seen + dt * 2) : Math.max(0, m.seen - dt);
+    const wake = Math.min(1, S.t / 10); // первые секунды оно только наблюдает
+    const speed = (lit ? -40 : (55 + S.depth * 0.06) * wake) * (md < 160 ? 2.6 : 1);
+    m.vx += (mdx / md) * speed * dt; m.vy += (mdy / md) * speed * dt;
+    m.vx *= 1 - 0.9 * dt; m.vy *= 1 - 0.9 * dt;
+    m.x += m.vx * dt; m.y += m.vy * dt;
+    if (md > 1400) { m.x = S.x + rnd(-600, 600); m.y = S.y + rnd(500, 900); m.vx = m.vy = 0; }
+    // сердце бьётся чаще, когда оно рядом
+    const fear = Math.max(0, 1 - md / 700);
+    if (heartGain) heartGain.gain.setTargetAtTime(fear, A.currentTime, 0.2);
+    if (drone) drone.lp.frequency.setTargetAtTime(220 + fear * 400, A.currentTime, 0.4);
+    if (fear > 0.05 && S.t - S.lastBeat > 1.2 - fear * 0.8) { S.lastBeat = S.t; thump(fear); }
+    S.shake = fear * fear * 6;
+    if (md < 70) { roar(); over('Тебя нашли', 'Оно было рядом всё это время.'); }
+    if (S.o2 <= 0) over('Кислород кончился', 'Образцы с кислородом светятся голубым — не пропускай их.');
+    o2El.style.transform = `scaleX(${Math.max(0, S.o2).toFixed(3)})`;
+    batEl.style.transform = `scaleX(${S.bat.toFixed(3)})`;
+    depthEl.textContent = `${Math.floor(S.depth)} м`;
+  };
+
+  // силуэт удильщика: открытая пасть смотрит на подлодку
+  const BODY = new Path2D('M150 -18 Q60 -110 -60 -78 Q-130 -60 -160 -12 L-230 -70 L-212 0 L-230 70 L-160 12 Q-120 70 -40 82 Q70 96 156 36 L58 6 Z');
+  const FIN = new Path2D('M-20 -76 L-60 -128 L-80 -70 Z M-10 80 L-50 124 L-70 76 Z');
+  const TEETH = (() => { const t = new Path2D(); for (let i = 0; i < 8; i++) { const u = i / 8, x1 = 150 - u * 90, y1 = -18 + u * 24; t.moveTo(x1, y1); t.lineTo(x1 - 5, y1 + 18); t.lineTo(x1 - 10, y1 + 2); const x2 = 156 - u * 96, y2 = 36 - u * 30; t.moveTo(x2, y2); t.lineTo(x2 - 5, y2 - 16); t.lineTo(x2 - 10, y2 - 1); } return t; })();
+  const drawMonster = (lit, color) => {
+    const m = S.monster;
+    g.save(); g.translate(m.x, m.y); g.rotate(Math.atan2(S.y - m.y, S.x - m.x));
+    if (color) { g.fillStyle = color; g.fill(BODY); g.fill(FIN); g.restore(); return; }
+    if (lit) {
+      g.fillStyle = 'rgba(52,66,64,.97)'; g.fill(BODY); g.fill(FIN);
+      g.strokeStyle = 'rgba(20,28,28,.9)'; g.lineWidth = 2; g.stroke(BODY);
+      g.fillStyle = '#e4ece6'; g.fill(TEETH);
+      g.fillStyle = '#0a0606'; g.beginPath(); g.moveTo(150, -18); g.lineTo(58, 6); g.lineTo(156, 36); g.closePath(); g.fill();
+      g.fillStyle = '#ff3b30'; g.beginPath(); g.arc(70, -46, 8, 0, Math.PI * 2); g.fill();
+      g.fillStyle = '#fff'; g.beginPath(); g.arc(72, -48, 2.4, 0, Math.PI * 2); g.fill();
+    }
+    // приманка светится всегда: в темноте видно только её
+    g.strokeStyle = 'rgba(200,220,210,' + (lit ? .55 : .14) + ')'; g.lineWidth = 2;
+    g.beginPath(); g.moveTo(40, -86); g.quadraticCurveTo(120, -170, 190, -70); g.stroke();
+    const p = 0.75 + 0.25 * Math.sin(S.t * 2.3);
+    const lure = g.createRadialGradient(190, -70, 0, 190, -70, 44);
+    lure.addColorStop(0, `rgba(180,255,200,${0.95 * p})`); lure.addColorStop(1, 'rgba(180,255,200,0)');
+    g.fillStyle = lure; g.beginPath(); g.arc(190, -70, 44, 0, Math.PI * 2); g.fill();
+    g.restore();
+  };
+
+  const draw = () => {
+    const sh = reduce ? 0 : S.shake;
+    const sx = (Math.random() - 0.5) * sh, sy = (Math.random() - 0.5) * sh;
+    const cx = W / 2 + sx, cy = H * 0.42 + sy, ox = cx - S.x, oy = cy - S.y;
+    // 1. вода: чем глубже, тем чернее
+    const k = Math.min(1, S.depth / 500);
+    g.fillStyle = `rgb(${Math.round(3 - k * 3)}, ${Math.round(22 - k * 20)}, ${Math.round(32 - k * 28)})`;
+    g.fillRect(0, 0, W, H);
+    // 2. слабый ореол вокруг подлодки
+    const halo = g.createRadialGradient(cx, cy, 0, cx, cy, 130);
+    halo.addColorStop(0, 'rgba(120,170,180,.10)'); halo.addColorStop(1, 'rgba(120,170,180,0)');
+    g.fillStyle = halo; g.fillRect(0, 0, W, H);
+    // 3. конус фонаря: только в нём видно скалы и того, кто рядом
+    if (S.bat > 0.02) {
+      const len = 400 * (0.45 + S.bat * 0.55), spread = 0.45;
+      g.save();
+      g.beginPath(); g.moveTo(cx, cy); g.arc(cx, cy, len, S.ang - spread, S.ang + spread); g.closePath(); g.clip();
+      const lg = g.createRadialGradient(cx, cy, 16, cx, cy, len);
+      lg.addColorStop(0, `rgba(255,232,180,${0.28 * S.bat + 0.06})`); lg.addColorStop(1, 'rgba(255,232,180,0)');
+      g.fillStyle = lg; g.fillRect(0, 0, W, H);
+      g.translate(ox, oy);
+      g.fillStyle = 'rgba(58,78,82,.6)';
+      S.rocks.forEach(r => { if (Math.abs(r.y - S.y) < len + 200) { g.beginPath(); g.arc(r.x, r.y, r.r, 0, Math.PI * 2); g.fill(); } });
+      drawMonster(true);
+      g.restore();
+    }
+    g.save(); g.translate(ox, oy);
+    // 4. то, что светится само: образцы и приманка
+    S.samples.forEach(s => { if (s.got || Math.abs(s.y - S.y) > H) return; const p = 0.6 + 0.4 * Math.sin(S.t * 3 + s.ph); const gr = g.createRadialGradient(s.x, s.y, 0, s.x, s.y, s.r * 4); gr.addColorStop(0, `rgba(120,230,255,${0.9 * p})`); gr.addColorStop(1, 'rgba(120,230,255,0)'); g.fillStyle = gr; g.beginPath(); g.arc(s.x, s.y, s.r * 4, 0, Math.PI * 2); g.fill(); });
+    if (S.monster.seen < 0.5) drawMonster(false);
+    g.restore();
+    // 5. сонар: кольцо расходится, силуэт вспыхивает красным, когда кольцо его касается
+    const st = S.t - S.sonar, m = S.monster;
+    if (st < 1.6) {
+      const R = st * 700, fade = 1 - st / 1.6;
+      g.strokeStyle = `rgba(120,230,255,${fade * 0.6})`; g.lineWidth = 2;
+      g.beginPath(); g.arc(cx, cy, R, 0, Math.PI * 2); g.stroke();
+      const md = Math.hypot(m.x - S.x, m.y - S.y);
+      if (R > md - 120) { g.save(); g.translate(ox, oy); drawMonster(false, `rgba(255,70,60,${0.35 * fade})`); g.restore(); }
+    }
+    // 6. взвесь в воде
+    g.fillStyle = 'rgba(200,230,240,.22)';
+    S.particles.forEach(p => { const px = ((p.x - S.x * 0.3) % W + W) % W, py = ((p.y - S.y * 0.6) % H + H) % H; g.fillRect(px, py, p.s, p.s); });
+    // 7. подлодка
+    g.save(); g.translate(cx, cy); g.rotate(S.ang);
+    g.fillStyle = '#f2b84b'; g.beginPath(); g.ellipse(0, 0, 24, 13, 0, 0, Math.PI * 2); g.fill();
+    g.fillStyle = '#1a1a1a'; g.beginPath(); g.arc(8, -2, 5, 0, Math.PI * 2); g.fill();
+    g.fillStyle = '#c99231'; g.fillRect(-30, -4, 8, 8);
+    g.restore();
+    // 8. виньетка: края всегда в темноте
+    const vg = g.createRadialGradient(cx, cy, Math.min(W, H) * 0.35, cx, cy, Math.max(W, H) * 0.75);
+    vg.addColorStop(0, 'rgba(0,0,0,0)'); vg.addColorStop(1, 'rgba(0,0,0,.85)');
+    g.fillStyle = vg; g.fillRect(0, 0, W, H);
+  };
+
+  // заставка: подлодка плывёт сама, фонарь водит по сторонам, сонар пищит, рядом кружит удильщик
+  const cardStep = dt => {
+    S.t += dt;
+    S.y += 22 * dt; S.x = Math.sin(S.t * 0.35) * 160; S.depth = S.y / 10;
+    const m = S.monster, ma = S.t * 0.22, R = 300 + Math.sin(S.t * 0.5) * 60;
+    m.x = S.x + Math.cos(ma) * R; m.y = S.y + Math.sin(ma) * R * 0.7;
+    const toM = Math.atan2(m.y - S.y, m.x - S.x);
+    S.ang = reduce ? toM : toM + Math.sin(S.t * 0.6) * 0.9;
+    const diff = Math.abs(Math.atan2(Math.sin(toM - S.ang), Math.cos(toM - S.ang)));
+    m.seen = diff < 0.45 ? Math.min(1, m.seen + dt * 2) : Math.max(0, m.seen - dt);
+    if (S.t - S.sonar > 3.2) S.sonar = S.t;
+    S.bat = 1; S.shake = 0;
+  };
+  if (cardMode) { reset(); screen.hidden = true; }
+  const loop = now => {
+    const dt = Math.min(0.05, (now - last) / 1000); last = now;
+    if (paused) { requestAnimationFrame(loop); return; }
+    if (cardMode) cardStep(dt); else if (S.run) step(dt);
+    if (S.x !== undefined) draw(); else { g.fillStyle = '#02080b'; g.fillRect(0, 0, W, H); }
+    requestAnimationFrame(loop);
+  };
+  if (new URLSearchParams(location.search).has('demo')) { reset(); S.y = 2600; S.depth = 260; S.monster.x = 230; S.monster.y = 2830; S.monster.seen = 1; S.ang = 0.75; S.run = false; S.sonar = -0.9; screen.hidden = true; depthEl.textContent = '260 м'; }
+  // главная сообщает, видна ли карточка: за экраном заставка не рисуется
+  let paused = false;
+  addEventListener('message', ev => { if (ev.data && typeof ev.data.active === 'boolean') paused = !ev.data.active; });
+  requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>
