@@ -5,27 +5,29 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Шаңырақ Code</title>
 <meta name="description" content="Онлайн-школа для подростков 14–18 лет: программирование и ИИ, математика, создание игр. Первый урок бесплатный.">
-<meta name="theme-color" content="#191919">
+<meta name="theme-color" content="#121212">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Tektur:wght@600;800;900&family=Golos+Text:wght@400;500;600&family=Press+Start+2P&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Tektur:wght@600;800;900&family=Golos+Text:wght@400;500;600&family=Press+Start+2P&family=JetBrains+Mono:wght@400;600&display=swap">
 <style>
-/* Школа, одетая как запуск видеоигры: угольный фон, плоские панели чистых цветов, у каждого класса свой цвет.
-   Золото только у 3D-шаңырақа. Жёлтый — кнопка «Старт». */
+/* Тёмная сцена и тёплое золото в тон шаңыраку. У каждого раздела свой глубокий цвет:
+   синий — код, бирюзовый — математика, кирпично-красный — игры. Кнопки золотые, как сам шаңырақ. */
 :root {
   color-scheme: dark;
-  --bg: #191919;
-  --surface: #242424;
+  --bg: #121212;
+  --surface: #1e1e1e;
   --ink: #ffffff;
-  --muted: #b4b4b4;
-  --red: #d71e1e;
-  --blue: #1e4bd7;
-  --teal: #0c7866;
-  --yellow: #ffe927;
-  --black: #111111;
+  --muted: #b8b2a6;
+  --red: #b8241c;
+  --blue: #1d3fbf;
+  --teal: #0b6b5c;
+  --yellow: #f2b84b;
+  --yellow-hi: #f7cd73;
+  --black: #0c0c0c;
   --font-display: "Tektur", "Arial Black", system-ui, sans-serif;
   --font-body: "Golos Text", "Segoe UI", system-ui, sans-serif;
   --font-pixel: "Press Start 2P", "Courier New", monospace;
+  --font-code: "JetBrains Mono", Consolas, monospace;
   --step-small: clamp(0.8125rem, 0.79rem + 0.1vw, 0.875rem);
   --step-body: clamp(1.0625rem, 1rem + 0.25vw, 1.1875rem);
   --step-lead: clamp(1.25rem, 1.1rem + 0.7vw, 1.625rem);
@@ -36,7 +38,7 @@
 }
 *, *::before, *::after { box-sizing: border-box; }
 [hidden] { display: none !important; }
-html { scroll-padding-top: 80px; }
+html { scroll-padding-top: 20px; }
 body { margin: 0; background: var(--bg); color: var(--ink); font: 400 var(--step-body)/1.55 var(--font-body); -webkit-font-smoothing: antialiased; overflow-x: clip; }
 img, svg, video, canvas { display: block; max-width: 100%; }
 button, input, select { font: inherit; }
@@ -49,87 +51,193 @@ p { margin: 0; }
 .pixel { font-family: var(--font-pixel); font-size: var(--step-small); line-height: 1.6; letter-spacing: 0; text-transform: uppercase; }
 .ln { display: block; overflow: clip; padding-top: .06em; }
 .ln > span { display: block; }
+.wrap { max-width: 1320px; margin-inline: auto; padding-inline: var(--m); }
 
-/* одна форма кнопки на всю страницу: жёлтая плитка, как кнопка на джойстике */
 .btn { display: inline-flex; align-items: center; justify-content: center; gap: .6rem; min-height: 56px; padding: 0 1.5rem; border: 0; border-radius: var(--radius); background: var(--yellow); color: var(--black); font: 800 1.05rem/1 var(--font-display); letter-spacing: .02em; text-transform: uppercase; text-decoration: none; cursor: pointer; transition: transform 160ms var(--ease-out), background-color 160ms ease; }
 .btn:active { transform: scale(0.97); }
-@media (hover: hover) and (pointer: fine) { .btn:hover { background: #fff36b; } }
+@media (hover: hover) and (pointer: fine) { .btn:hover { background: var(--yellow-hi); } }
 .btn svg { width: 22px; height: 22px; flex: none; }
+.btn--ghost { background: transparent; color: var(--ink); box-shadow: inset 0 0 0 2px currentColor; }
+@media (hover: hover) and (pointer: fine) { .btn--ghost:hover { background: rgb(255 255 255 / .1); } }
 
-/* ---------- 1. Первый экран: плакат игры ---------- */
-.hero { position: relative; height: 100svh; min-height: 640px; background: var(--red); overflow: clip; }
-.hero::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 18%; background: var(--black); }
+/* ---------- 1. Первый экран: золотое солнце на тёмной сцене ---------- */
+.hero { position: relative; height: 100svh; min-height: 640px; background: var(--bg); overflow: clip; }
+.hero-sky { position: absolute; inset: 0; z-index: 1; width: 100%; height: 100%; pointer-events: none; }
 .hero-bar { position: absolute; inset: 0 0 auto; z-index: 4; display: flex; align-items: center; gap: 1.6rem; padding: 20px var(--m); }
-.wordmark { display: inline-flex; align-items: center; gap: .6rem; font: 800 1.15rem/1 var(--font-display); text-decoration: none; text-transform: uppercase; letter-spacing: .02em; }
+.wordmark { display: inline-flex; align-items: center; gap: .6rem; font: 800 1.15rem/1 var(--font-display); text-decoration: none; text-transform: uppercase; letter-spacing: .02em; white-space: nowrap; }
 .wordmark svg { width: 30px; height: 30px; color: var(--yellow); }
 .hero-bar ul { display: flex; gap: 1.6rem; margin: 0 0 0 auto; padding: 0; list-style: none; }
-.hero-bar a:not(.wordmark) { text-decoration: none; font-weight: 600; }
-.hero-bar ul a { text-underline-offset: 6px; text-decoration-thickness: 2px; }
-.hero-bar ul a:hover { text-decoration: underline; }
+.hero-bar ul a { text-decoration: none; font-weight: 600; text-underline-offset: 6px; text-decoration-thickness: 2px; }
+.hero-bar ul a:hover { text-decoration: underline; color: var(--yellow); }
 .hero h1 { position: absolute; z-index: 2; left: var(--m); top: 16%; margin: 0; font-size: clamp(80px, 12vw, 190px); line-height: .84; font-weight: 900; letter-spacing: -.01em; text-transform: uppercase; }
-.hero-key { position: absolute; z-index: 1; right: 5vw; bottom: 3%; width: min(40vw, 74svh); aspect-ratio: 1; }
-.hero-sky { position: absolute; inset: 0; z-index: 1; width: 100%; height: 100%; pointer-events: none; }
-.hero-key { pointer-events: none; }
+.hero h1 .gold { color: var(--yellow); }
+.hero-key { position: absolute; z-index: 1; right: 6vw; top: 50%; width: min(40vw, 70svh); aspect-ratio: 1; translate: 0 -50%; pointer-events: none; }
 .hero-key .key-fallback { position: absolute; inset: 18%; color: #e8b64a; }
 .hero.has-3d .key-fallback { display: none; }
-.hero-band { position: absolute; z-index: 4; left: 0; right: 0; bottom: 0; height: 18%; display: flex; align-items: center; justify-content: space-between; gap: 1.5rem; padding: 0 var(--m); }
-.hero-band p { max-width: 44ch; font-size: var(--step-body); line-height: 1.45; }
-.hero-band .hud { color: var(--yellow); margin-top: .4rem; }
+.hero-band { position: absolute; z-index: 4; left: 0; right: 0; bottom: 0; display: flex; align-items: flex-end; justify-content: space-between; gap: 1.5rem; padding: 0 var(--m) 40px; }
+.hero-band p { max-width: 44ch; font-size: var(--step-lead); line-height: 1.35; }
+.hero-band .hud { color: var(--yellow); margin-top: .6rem; font-size: var(--step-small); }
 @media (max-width: 760px) {
-  .hero { display: flex; flex-direction: column; height: auto; min-height: 100svh; padding-bottom: 0; }
-  .hero h1 { order: 1; }
-  .hero-band { order: 2; }
-  .hero-key { order: 3; }
-  .hero::after { display: none; }
+  .hero { display: flex; flex-direction: column; height: auto; min-height: 100svh; }
   .hero-bar ul { display: none; }
-  .hero h1 { position: relative; left: auto; top: auto; padding: 96px var(--m) 0; font-size: 19vw; }
-  .hero-key { position: relative; right: auto; bottom: auto; width: 78%; margin: 8px auto 12px; }
-  .hero-band { position: relative; height: auto; flex-direction: column; align-items: stretch; padding: 18px var(--m) 4px; }
+  .hero h1 { position: relative; order: 1; left: auto; top: auto; padding: 96px var(--m) 0; font-size: 19vw; }
+  .hero-band { position: relative; order: 2; flex-direction: column; align-items: stretch; padding: 18px var(--m) 8px; }
+  .hero-band p { font-size: var(--step-body); }
   .hero-band .btn { width: 100%; }
-  .hero-band .hud { color: #fff; }
+  .hero-key { position: relative; order: 3; right: auto; top: auto; translate: none; width: 82%; margin: 8px auto 16px; }
 }
 
-/* ---------- 2. Выбор класса: живая вещь ---------- */
-.classes { padding: 18vh var(--m); }
-.cls-grid { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: clamp(24px, 4vw, 64px); align-items: start; max-width: 1400px; margin-inline: auto; }
-.cls-list { margin: 0; padding: 0; list-style: none; }
-.cls-head { font: 900 clamp(40px, 5.2vw, 84px)/1 var(--font-display); text-transform: uppercase; color: var(--muted); }
-.cls-item { margin-top: .35em; }
-.cls-btn { display: block; width: 100%; padding: 0; border: 0; background: none; color: var(--muted); text-align: left; cursor: pointer; }
-.cls-btn .name { display: block; font: 900 clamp(40px, 5.2vw, 84px)/1 var(--font-display); text-transform: uppercase; transition: color 200ms ease; }
-.cls-btn .desc { display: block; max-width: 34rem; margin-top: .5rem; font-size: var(--step-body); color: var(--muted); }
-.cls-btn[aria-pressed="true"] .name { color: var(--c); }
-.cls-btn[aria-pressed="true"] .desc { color: var(--ink); }
-@media (hover: hover) and (pointer: fine) { .cls-btn:hover .name { color: var(--ink); } .cls-btn[aria-pressed="true"]:hover .name { color: var(--c); } }
-.cls-btn .name::before { content: "▸ "; display: inline-block; width: 0; overflow: hidden; vertical-align: top; transition: width 220ms var(--ease-out); }
-.cls-btn[aria-pressed="true"] .name::before { width: .9em; }
+/* ---------- общий вид раздела-направления ---------- */
+.chap-intro { display: grid; grid-template-columns: minmax(0, .95fr) minmax(0, 1.05fr); align-items: center; gap: clamp(24px, 4vw, 64px); min-height: 100svh; padding: clamp(48px, 7vw, 96px) var(--m); background: var(--c); }
+.chap-intro h2 { font-size: clamp(64px, 9vw, 150px); line-height: .86; font-weight: 900; text-transform: uppercase; letter-spacing: -.01em; }
+.chap-intro h2 .w { display: block; white-space: nowrap; }
+.chap-intro h2 .ch, .chap-intro h2 .glyph { display: inline-block; }
+.chap-lead { margin-top: 1.4rem; max-width: 32rem; font-size: var(--step-lead); line-height: 1.35; }
+.chap-list { display: grid; gap: .5rem; margin: 1.6rem 0 0; padding: 0; list-style: none; }
+.chap-list li { position: relative; padding-left: 1.6rem; font-weight: 600; }
+.chap-list li::before { content: ""; position: absolute; left: 0; top: .4em; width: 12px; height: 12px; border-radius: 3px; background: var(--yellow); }
+.chap-cta { display: flex; flex-wrap: wrap; gap: .8rem; margin-top: 2rem; }
+.sec-head .pixel { color: var(--c-soft); }
+.sec-head h2 { margin-top: .6rem; font-size: clamp(1.8rem, 3vw, 3rem); line-height: .98; font-weight: 900; text-transform: uppercase; }
+.sec-head p { margin-top: 1rem; max-width: 40rem; font-size: var(--step-lead); line-height: 1.4; color: var(--muted); }
+.chap--code { --c: var(--blue); --c-soft: #8ea6ff; }
+.chap--math { --c: var(--teal); --c-soft: #3fd3b4; }
+.chap--games { --c: var(--red); --c-soft: #ff8a7e; }
+@media (max-width: 900px) { .chap-intro { grid-template-columns: minmax(0, 1fr); min-height: 0; } .chap-intro h2 { font-size: 15vw; } }
 
-.card { position: sticky; top: 32px; padding: 18px; border-radius: 22px; background: var(--c); color: var(--ink); transition: background-color 300ms ease; }
-.card-emblem { height: 200px; margin: -6px -6px 6px; }
-.card-media { aspect-ratio: 16 / 10; border-radius: 12px; overflow: hidden; background: var(--black); }
-.card-media video { width: 100%; height: 100%; object-fit: cover; }
-.card h3 { margin-top: 18px; font-size: var(--step-head); line-height: .95; font-weight: 900; text-transform: uppercase; }
-.stats { display: grid; gap: .55rem; margin: 18px 0 0; padding: 0; list-style: none; }
-.stats li { display: grid; grid-template-columns: 8.5rem minmax(0, 1fr); align-items: center; gap: .8rem; font-weight: 600; }
-.bar { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; }
-.bar i { height: 12px; border-radius: 3px; background: rgb(255 255 255 / .25); }
-.bar i.on { background: var(--yellow); }
-.card-project { margin-top: 18px; padding: 14px 16px; border-radius: 12px; background: rgb(0 0 0 / .28); }
-.card-project b { display: block; font-family: var(--font-display); font-weight: 800; text-transform: uppercase; color: var(--yellow); }
-.card .btn { width: 100%; margin-top: 16px; }
-.card[data-cls="math"] { --c: var(--teal); }
-.card[data-cls="games"] { --c: var(--red); }
-.card[data-cls="code"] { --c: var(--blue); }
-.cls-item[data-cls="code"] { --c: #6f8dff; }
-.cls-item[data-cls="math"] { --c: #3fd3b4; }
-.cls-item[data-cls="games"] { --c: #ff6b5e; }
+/* ---------- код: терминал, бот, нейросеть ---------- */
+.term { border-radius: 18px; background: var(--black); box-shadow: 0 30px 80px -30px rgb(0 0 0 / .7); overflow: clip; }
+.term-top { display: flex; align-items: center; gap: 8px; padding: 14px 18px; background: #1b1b1b; }
+.term-top i { width: 12px; height: 12px; border-radius: 50%; background: #ff5f57; }
+.term-top i:nth-child(2) { background: #febc2e; }
+.term-top i:nth-child(3) { background: #28c840; }
+.term-top span { margin-left: 10px; color: var(--muted); font: 400 .9rem/1 var(--font-code); }
+.term pre { margin: 0; min-height: 17.5em; padding: 20px 22px 26px; font: 400 clamp(.95rem, 1.2vw, 1.12rem)/1.65 var(--font-code); white-space: pre-wrap; color: #e8e8e8; }
+.term .p { color: var(--yellow); }
+.term .o { color: #7fe3ad; }
+.caret { display: inline-block; width: .6em; height: 1.1em; vertical-align: -.18em; background: var(--yellow); animation: blink 1s steps(1) infinite; }
+@keyframes blink { 50% { opacity: 0; } }
+.bot-build { position: relative; height: 100svh; min-height: 640px; display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, .75fr); align-items: center; gap: clamp(20px, 4vw, 60px); padding: 100px var(--m) 40px; max-width: 1320px; margin-inline: auto; }
+.bot-build .sec-head { position: absolute; top: 40px; left: var(--m); max-width: 36rem; }
+.editor { margin-top: 80px; border-radius: 18px; background: #101010; overflow: clip; }
+.editor .term-top { background: #181818; }
+.editor pre { margin: 0; padding: 20px 22px; font: 400 clamp(.85rem, 1.15vw, 1.08rem)/1.75 var(--font-code); counter-reset: line; min-height: 20em; }
+.editor .row { display: block; min-height: 1.75em; }
+.editor .row::before { counter-increment: line; content: counter(line); display: inline-block; width: 2.2em; color: #555; }
+.k { color: #8ea6ff; } .f { color: var(--yellow); } .s { color: #7fe3ad; } .c { color: #7a7a7a; } .d { color: #ff8f8f; }
+.phone { justify-self: center; width: min(320px, 100%); margin-top: 80px; padding: 12px; border-radius: 40px; background: #0d0d0d; box-shadow: inset 0 0 0 2px #2a2a2a; }
+.screen { display: flex; flex-direction: column; min-height: 520px; border-radius: 30px; background: #17212b; overflow: clip; }
+.chat-top { display: flex; align-items: center; gap: 10px; padding: 16px; background: #232e3c; }
+.ava { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 50%; background: var(--blue); }
+.ava svg { width: 24px; height: 24px; color: var(--yellow); }
+.chat-top b { display: block; font-size: .98rem; }
+.chat-top small { display: block; color: #8b9bab; font-size: .82rem; }
+.chat-top small.on { color: #6ab3f3; }
+.msgs { display: flex; flex: 1; flex-direction: column; justify-content: flex-end; gap: 8px; padding: 14px; }
+.msg { max-width: 84%; margin: 0; padding: 9px 12px; border-radius: 14px; font-size: .95rem; line-height: 1.4; opacity: 0; transform: translateY(12px) scale(.96); transition: opacity 260ms ease, transform 320ms var(--ease-out); }
+.msg.show { opacity: 1; transform: none; }
+.msg.me { align-self: flex-end; background: #2b5278; border-bottom-right-radius: 4px; }
+.msg.bot { align-self: flex-start; background: #182533; box-shadow: inset 0 0 0 1px #263545; border-bottom-left-radius: 4px; }
+.msg.sys { align-self: center; padding: 4px 10px; border-radius: 999px; background: rgb(0 0 0 / .3); font-size: .8rem; color: #9db1c4; }
+.typing span { display: inline-block; width: 7px; height: 7px; margin-right: 3px; border-radius: 50%; background: #9db1c4; animation: dot 1s infinite; }
+.typing span:nth-child(2) { animation-delay: .15s; } .typing span:nth-child(3) { animation-delay: .3s; }
+@keyframes dot { 0%, 100% { opacity: .3; transform: translateY(0); } 50% { opacity: 1; transform: translateY(-3px); } }
+.net-sec { padding-block: clamp(72px, 10vw, 130px); }
+.net-wrap { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, .9fr); gap: clamp(20px, 4vw, 56px); align-items: center; margin-top: 3rem; }
+.net { width: 100%; height: auto; border-radius: 22px; background: var(--surface); }
+.net .edge { stroke: #3a3a3a; stroke-width: 1.5; }
+.net .pulse { stroke: var(--yellow); stroke-width: 3; stroke-linecap: round; fill: none; }
+.net .node { fill: #2e2e2e; stroke: #4a4a4a; stroke-width: 2; }
+.net .node.lit { fill: var(--blue); stroke: #8ea6ff; }
+.net text { fill: var(--ink); font: 600 15px var(--font-body); }
+.net .in { fill: #8ea6ff; }
+.probs { display: grid; gap: 14px; }
+.prob { display: grid; grid-template-columns: 6.5rem minmax(0, 1fr) 3.5rem; align-items: center; gap: .8rem; font-weight: 600; }
+.prob .track { height: 14px; border-radius: 7px; background: var(--surface); overflow: clip; }
+.prob .fill { display: block; height: 100%; width: 100%; border-radius: 7px; background: var(--blue); transform: scaleX(0); transform-origin: 0 50%; }
+.prob:first-child .fill { background: var(--yellow); }
+.prob b { text-align: right; font-family: var(--font-code); }
+.net-note { margin-top: 1.4rem; color: var(--muted); }
+.again { margin-top: 1.4rem; }
 @media (max-width: 900px) {
-  .classes { padding-block: 12vh; }
-  .cls-grid { grid-template-columns: minmax(0, 1fr); }
-  .cls-head, .cls-btn .name { font-size: 11vw; }
-  .card { position: relative; top: auto; }
-  .stats li { grid-template-columns: 7rem minmax(0, 1fr); }
+  .bot-build { height: auto; min-height: 0; grid-template-columns: minmax(0, 1fr); padding-block: 72px; }
+  .bot-build .sec-head { position: static; }
+  .editor, .phone { margin-top: 24px; }
+  .screen { min-height: 420px; }
+  .net-wrap { grid-template-columns: minmax(0, 1fr); }
 }
+
+/* ---------- математика: живой график и Пифагор ---------- */
+.lab { padding: 18px; border-radius: 22px; background: var(--black); }
+.plot { width: 100%; height: auto; border-radius: 14px; background: #0f1513; touch-action: none; }
+.plot .grid { stroke: #22302c; stroke-width: 1; }
+.plot .axis { stroke: #5c706a; stroke-width: 2; }
+.plot .curve { fill: none; stroke: #3fd3b4; stroke-width: 4; stroke-linecap: round; stroke-linejoin: round; }
+.plot .vtx { fill: var(--yellow); }
+.plot .root { fill: #ff7a6e; }
+.plot text { fill: #d8e4e0; font: 600 14px var(--font-code); }
+.formula { margin-top: 14px; font: 600 clamp(1.1rem, 1.8vw, 1.5rem)/1.3 var(--font-code); color: var(--yellow); }
+.sliders { display: grid; gap: 12px; margin-top: 14px; }
+.sl { display: grid; grid-template-columns: 1.6rem minmax(0, 1fr) 3.6rem; align-items: center; gap: .8rem; font: 600 1rem var(--font-code); }
+.sl input { width: 100%; accent-color: var(--yellow); height: 28px; }
+.sl output { text-align: right; color: #3fd3b4; }
+.lab-note { margin-top: 10px; color: var(--muted); font-size: var(--step-small); }
+.pyth { position: relative; height: 100svh; min-height: 640px; display: grid; grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr); align-items: center; gap: clamp(20px, 4vw, 60px); max-width: 1320px; margin-inline: auto; padding: 60px var(--m) 40px; }
+.pyth svg { width: 100%; max-height: 86svh; }
+.pyth .tri { fill: rgb(63 211 180 / .12); stroke: #3fd3b4; stroke-width: 4; stroke-linejoin: round; }
+.pyth .frame { fill: none; stroke: #4a4a4a; stroke-width: 2; stroke-dasharray: 6 6; }
+.pyth .cell rect { stroke: var(--black); stroke-width: 2; }
+.pyth .lbl { fill: var(--ink); font: 800 26px var(--font-display); }
+.eq { margin-top: 1.6rem; font: 900 clamp(2rem, 4vw, 3.6rem)/1 var(--font-display); }
+.eq span { color: var(--yellow); }
+.steps-text { display: grid; gap: .6rem; margin: 1.6rem 0 0; padding: 0; list-style: none; color: var(--muted); }
+.steps-text li { transition: color 240ms ease; }
+.steps-text li.on { color: var(--ink); }
+.steps-text li.on::before { content: "▸ "; color: var(--yellow); }
+@media (max-width: 900px) { .pyth { height: auto; grid-template-columns: minmax(0, 1fr); padding-block: 72px; } .pyth svg { max-height: none; } }
+
+/* ---------- игры: мини-игра и уровень из блоков ---------- */
+.arcade { position: relative; padding: 14px; border-radius: 24px; background: var(--black); }
+.arcade canvas { width: 100%; height: auto; aspect-ratio: 16 / 10; border-radius: 14px; background: #1c1c1c; cursor: pointer; touch-action: manipulation; }
+.arcade-bar { display: flex; justify-content: space-between; align-items: center; gap: 1rem; margin-top: 12px; color: var(--muted); }
+.arcade-bar .pixel { color: var(--yellow); }
+.lvl-build { position: relative; height: 100svh; min-height: 620px; display: grid; grid-template-rows: auto 1fr; gap: 24px; padding: 60px var(--m) 32px; max-width: 1320px; margin-inline: auto; }
+.map { position: relative; width: 100%; aspect-ratio: 16 / 7; max-height: 64svh; align-self: center; border-radius: 22px; background: #1c1c1c; overflow: clip; }
+.tile { position: absolute; border-radius: 4px; }
+.tile.ground { background: #6b3f1f; box-shadow: inset 0 6px 0 #3fb34f; }
+.tile.dirt { background: #5a3418; }
+.tile.brick { background: var(--red); box-shadow: inset 0 0 0 3px #7e140f; }
+.tile.coin { border-radius: 50%; background: var(--yellow); box-shadow: inset 0 0 0 4px var(--yellow-hi); }
+.tile.spike::before { content: ""; position: absolute; inset: 0; background: #e8e8e8; clip-path: polygon(50% 0, 100% 100%, 0 100%); }
+.tile.flag::before { content: ""; position: absolute; left: 10%; top: 0; bottom: 0; width: 10%; background: #e8e8e8; }
+.tile.flag::after { content: ""; position: absolute; left: 20%; top: 4%; width: 60%; height: 36%; background: var(--yellow); clip-path: polygon(0 0, 100% 50%, 0 100%); }
+.hero-sprite { position: absolute; z-index: 2; border-radius: 6px; background: #fff; opacity: 0; }
+.hero-sprite::after { content: ""; position: absolute; right: 18%; top: 22%; width: 22%; height: 22%; background: var(--black); }
+.build-steps { display: flex; flex-wrap: wrap; gap: .6rem; margin: 1rem 0 0; padding: 0; list-style: none; }
+.build-steps li { padding: .45rem .9rem; border-radius: 999px; background: var(--surface); color: var(--muted); font-weight: 600; transition: background-color 240ms ease, color 240ms ease; }
+.build-steps li.on { background: var(--red); color: #fff; }
+@media (max-width: 900px) { .lvl-build { height: auto; min-height: 0; padding-block: 72px; } .map { aspect-ratio: 16 / 10; } }
+
+/* ---------- чему мы учим создавать: витрина работ ---------- */
+.works { padding-block: clamp(80px, 11vw, 150px); }
+.works .sec-head .pixel { color: var(--yellow); }
+.works-tabs { display: flex; flex-wrap: wrap; gap: .6rem; margin: 2.4rem 0 0; padding: 0; list-style: none; }
+.works-tabs button { display: inline-flex; align-items: center; gap: .6rem; min-height: 48px; padding: 0 1.1rem; border: 0; border-radius: 999px; background: var(--surface); color: var(--ink); font: 800 .98rem/1 var(--font-display); text-transform: uppercase; cursor: pointer; transition: background-color 200ms ease, color 200ms ease, transform 160ms var(--ease-out); }
+.works-tabs button:active { transform: scale(.97); }
+.works-tabs button[aria-selected="true"] { background: var(--yellow); color: var(--black); }
+.works-stage { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(0, .9fr); gap: clamp(20px, 3vw, 40px); align-items: start; margin-top: 1.4rem; }
+.works-frame { position: relative; height: min(78svh, 720px); border-radius: 24px; overflow: clip; background: #0d0d0d; }
+.works-frame iframe { display: block; width: 100%; height: 100%; border: 0; }
+.works-frame .loading { position: absolute; inset: 0; display: grid; place-items: center; color: var(--muted); }
+.works-info h3 { font-size: clamp(1.6rem, 2.6vw, 2.4rem); line-height: 1; text-transform: uppercase; }
+.works-info p { margin-top: 1rem; color: var(--muted); }
+.works-info ul { display: grid; gap: .5rem; margin: 1.2rem 0 0; padding: 0; list-style: none; }
+.works-info li { position: relative; padding-left: 1.4rem; }
+.works-info li::before { content: ""; position: absolute; left: 0; top: .5em; width: 8px; height: 8px; border-radius: 50%; background: var(--yellow); }
+.works-info .tags { display: flex; flex-wrap: wrap; gap: .4rem; margin-top: 1.2rem; }
+.works-info .tags span { padding: .3rem .7rem; border-radius: 999px; font-size: .85rem; box-shadow: inset 0 0 0 1.5px rgb(255 255 255 / .25); }
+.works-info .btn { margin-top: 1.6rem; }
+@media (max-width: 900px) { .works-stage { grid-template-columns: minmax(0, 1fr); } .works-frame { height: 68svh; } }
 
 /* ---------- 3. Уровень 1: юрта собирается, квесты стоят вдоль нижнего края ---------- */
 .level { position: relative; height: 100svh; min-height: 640px; overflow: clip; background: var(--black); }
@@ -186,6 +294,8 @@ p { margin: 0; }
 @media (max-width: 760px) { .back { grid-template-columns: minmax(0, 1fr); padding-top: 64px; } .back::before { background-size: calc(100% / 6) 40px; background-image: radial-gradient(circle at 50% 0, var(--black) 47%, transparent 48%); } .stamp { width: 64px; top: 52px; } .back h2 { padding-right: 76px; } address { font-size: 17px; } }
 
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition-duration: 1ms !important; } }
+
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition-duration: 1ms !important; animation-duration: 1ms !important; } }
 </style>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -197,40 +307,159 @@ p { margin: 0; }
   <nav class="hero-bar" aria-label="Главное меню">
     <a class="wordmark" href="#top"><svg aria-hidden="true"><use href="#mark"/></svg>Шаңырақ Code</a>
     <ul>
-      <li><a href="#classes">Классы</a></li>
-      <li><a href="#level">Уровень 1</a></li>
+      <li><a href="#code">Код и ИИ</a></li>
+      <li><a href="#math">Математика</a></li>
+      <li><a href="#games">Игры</a></li>
+      <li><a href="#works">Работы</a></li>
       <li><a href="#start">Старт</a></li>
     </ul>
   </nav>
-  <h1><span class="ln"><span>Нажми</span></span><span class="ln"><span>старт</span></span></h1>
+  <h1><span class="ln"><span>Нажми</span></span><span class="ln"><span class="gold">старт</span></span></h1>
   <canvas id="sky" class="hero-sky" aria-hidden="true"></canvas>
   <div class="hero-key" aria-hidden="true"><svg class="key-fallback"><use href="#mark"/></svg></div>
   <div class="hero-band">
     <div>
       <p>Шаңырақ Code — онлайн-школа для 14–18 лет: программирование и ИИ, математика, создание игр.</p>
-      <p class="pixel hud">Урок 1 · 0 ₸</p>
+      <p class="pixel hud">Урок 1 · бесплатно</p>
     </div>
     <a class="btn" href="https://wa.me/77055823688?text=%D0%A1%D3%99%D0%BB%D0%B5%D0%BC%21%20%D0%A5%D0%BE%D1%87%D1%83%20%D0%BD%D0%B0%20%D0%B1%D0%B5%D1%81%D0%BF%D0%BB%D0%B0%D1%82%D0%BD%D1%8B%D0%B9%20%D0%BF%D1%80%D0%BE%D0%B1%D0%BD%D1%8B%D0%B9%20%D1%83%D1%80%D0%BE%D0%BA%20%D0%B2%20%D0%A8%D0%B0%D2%A3%D1%8B%D1%80%D0%B0%D2%9B%20Code." target="_blank" rel="noopener"><svg aria-hidden="true"><use href="#wa"/></svg>Начать бесплатно</a>
   </div>
 </header>
 
 <main>
-  <section class="classes" id="classes" aria-labelledby="cls-title">
-    <div class="cls-grid">
-      <ul class="cls-list">
-        <li class="cls-head"><h2 id="cls-title" style="font:inherit">Выбери класс</h2></li>
-        <li class="cls-item" data-cls="code"><button class="cls-btn" type="button" data-cls="code" aria-pressed="true" aria-controls="card-title"><span class="name">Кодер</span><span class="desc">Python с нуля, Telegram-боты и нейросети, которые помогают тебе, а не думают за тебя.</span></button></li>
-        <li class="cls-item" data-cls="math"><button class="cls-btn" type="button" data-cls="math" aria-pressed="false" aria-controls="card-title"><span class="name">Математик</span><span class="desc">Функции, графики и геометрия через задачи и код. Подготовка к контрольным и олимпиадам.</span></button></li>
-        <li class="cls-item" data-cls="games"><button class="cls-btn" type="button" data-cls="games" aria-pressed="false" aria-controls="card-title"><span class="name">Геймдизайнер</span><span class="desc">Roblox Studio, Godot, уровни, физика и звук. Игра, в которую играют друзья.</span></button></li>
-      </ul>
-      <article class="card" data-cls="code" aria-live="polite">
-        <canvas id="icons-3d" class="card-emblem" aria-hidden="true"></canvas>
-        <div class="card-media"><video id="card-video" src="assets/code-ai.mp4" poster="assets/code-ai.jpg" muted loop playsinline preload="none" width="960" height="600" aria-hidden="true"></video></div>
-        <h3 id="card-title">Кодер</h3>
-        <ul class="stats" id="card-stats"></ul>
-        <p class="card-project"><b>Твой проект</b><span id="card-project"></span></p>
-        <a class="btn" id="card-cta" href="code.html">Открыть класс <span aria-hidden="true">→</span></a>
-      </article>
+  <!-- ===================== 1. Программирование и ИИ ===================== -->
+  <section class="chap chap--code" id="code" aria-labelledby="code-title">
+    <div class="chap-intro">
+      <div>
+        <p class="pixel">Направление 1</p>
+        <h2 id="code-title" data-decode="Код и ИИ">Код и ИИ</h2>
+        <p class="chap-lead">Python с нуля, Telegram-боты и нейросети, которые помогают тебе, а не думают за тебя.</p>
+        <ul class="chap-list"><li>Основы Python: переменные, циклы, функции</li><li>Боты в Telegram</li><li>Как устроены нейросети и как проверять их ответы</li></ul>
+        <div class="chap-cta"><a class="btn" href="https://wa.me/77055823688?text=%D0%A1%D3%99%D0%BB%D0%B5%D0%BC%21%20%D0%A5%D0%BE%D1%87%D1%83%20%D0%BD%D0%B0%20%D0%B1%D0%B5%D1%81%D0%BF%D0%BB%D0%B0%D1%82%D0%BD%D1%8B%D0%B9%20%D0%BF%D1%80%D0%BE%D0%B1%D0%BD%D1%8B%D0%B9%20%D1%83%D1%80%D0%BE%D0%BA%20%D0%BF%D0%BE%20%D0%BD%D0%B0%D0%BF%D1%80%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D1%8E%20%C2%AB%D0%9F%D1%80%D0%BE%D0%B3%D1%80%D0%B0%D0%BC%D0%BC%D0%B8%D1%80%D0%BE%D0%B2%D0%B0%D0%BD%D0%B8%D0%B5%20%D0%B8%20%D0%98%D0%98%C2%BB%20%D0%B2%20%D0%A8%D0%B0%D2%A3%D1%8B%D1%80%D0%B0%D2%9B%20Code." target="_blank" rel="noopener"><svg aria-hidden="true"><use href="#wa"/></svg>Записаться на код</a></div>
+      </div>
+      <div class="term" aria-label="Терминал: первая программа на Python">
+        <div class="term-top"><i></i><i></i><i></i><span>терминал</span></div>
+        <pre id="term"></pre>
+      </div>
+    </div>
+    <div class="bot-build" aria-labelledby="build-title">
+      <div class="sec-head"><p class="pixel">Миссия: свой бот</p><h2 id="build-title">Листай, и бот соберётся</h2></div>
+      <div class="editor" aria-label="Код Telegram-бота на Python">
+        <div class="term-top"><i></i><i></i><i></i><span>bot.py</span></div>
+        <pre id="code-pre"></pre>
+      </div>
+      <div class="phone" aria-label="Чат с ботом в Telegram">
+        <div class="screen">
+          <div class="chat-top"><span class="ava"><svg aria-hidden="true"><use href="#mark"/></svg></span><div><b>Шаңырақ бот</b><small id="status">не запущен</small></div></div>
+          <div class="msgs">
+            <p class="msg sys" data-at="0.42">Бот запущен</p>
+            <p class="msg me" data-at="0.6">Сколько будет 2 в 10-й степени?</p>
+            <p class="msg bot typing" data-at="0.72" data-until="0.86"><span></span><span></span><span></span></p>
+            <p class="msg bot" data-at="0.86">1024. Это 2, умноженное само на себя десять раз. Проверь: 2⁵ = 32, а 32 × 32 = 1024.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="net-sec wrap">
+      <div class="sec-head"><p class="pixel">Миссия: понять ИИ</p><h2>Как думает нейросеть</h2><p>Она не знает ответа, она угадывает следующее слово по вероятностям. Поэтому ответы ИИ мы учимся проверять.</p></div>
+      <div class="net-wrap">
+        <svg class="net" id="net" viewBox="0 0 640 360" role="img" aria-label="Схема нейросети: слова «кот сидит на» проходят через слои и превращаются в вероятности следующего слова"></svg>
+        <div>
+          <div class="probs">
+            <div class="prob"><span>окне</span><span class="track"><span class="fill" style="--v:.62"></span></span><b>62%</b></div>
+            <div class="prob"><span>столе</span><span class="track"><span class="fill" style="--v:.21"></span></span><b>21%</b></div>
+            <div class="prob"><span>крыше</span><span class="track"><span class="fill" style="--v:.17"></span></span><b>17%</b></div>
+          </div>
+          <p class="net-note">Пример: после слов «кот сидит на» сеть выбирает самое вероятное продолжение. Числа здесь для наглядности.</p>
+          <button class="btn btn--ghost again" id="again" type="button">Прогнать ещё раз</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== 2. Математика ===================== -->
+  <section class="chap chap--math" id="math" aria-labelledby="math-title">
+    <div class="chap-intro">
+      <div>
+        <p class="pixel">Направление 2</p>
+        <h2 id="math-title" aria-label="Математика"><span class="w" aria-hidden="true">Мате-</span><span class="w" aria-hidden="true">матика</span></h2>
+        <p class="chap-lead">Функции, графики и геометрия через задачи и код. Видишь, как работает формула, а не зубришь её.</p>
+        <ul class="chap-list"><li>Функции, уравнения и графики</li><li>Геометрия и логика</li><li>Подготовка к контрольным и олимпиадам</li></ul>
+        <div class="chap-cta"><a class="btn" href="https://wa.me/77055823688?text=%D0%A1%D3%99%D0%BB%D0%B5%D0%BC%21%20%D0%A5%D0%BE%D1%87%D1%83%20%D0%BD%D0%B0%20%D0%B1%D0%B5%D1%81%D0%BF%D0%BB%D0%B0%D1%82%D0%BD%D1%8B%D0%B9%20%D0%BF%D1%80%D0%BE%D0%B1%D0%BD%D1%8B%D0%B9%20%D1%83%D1%80%D0%BE%D0%BA%20%D0%BF%D0%BE%20%D0%BD%D0%B0%D0%BF%D1%80%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D1%8E%20%C2%AB%D0%9C%D0%B0%D1%82%D0%B5%D0%BC%D0%B0%D1%82%D0%B8%D0%BA%D0%B0%C2%BB%20%D0%B2%20%D0%A8%D0%B0%D2%A3%D1%8B%D1%80%D0%B0%D2%9B%20Code." target="_blank" rel="noopener"><svg aria-hidden="true"><use href="#wa"/></svg>Записаться на математику</a></div>
+      </div>
+      <div class="lab">
+        <svg class="plot" id="plot" viewBox="0 0 600 380" role="img" aria-label="График параболы, который меняется ползунками"></svg>
+        <p class="formula" id="formula" aria-live="polite">y = x² − 2x − 1</p>
+        <div class="sliders">
+          <label class="sl"><span>a</span><input id="ka" type="range" min="-2" max="2" step="0.1" value="1"><output id="oa">1,0</output></label>
+          <label class="sl"><span>b</span><input id="kb" type="range" min="-4" max="4" step="0.1" value="-2"><output id="ob">−2,0</output></label>
+          <label class="sl"><span>c</span><input id="kc" type="range" min="-4" max="4" step="0.1" value="-1"><output id="oc">−1,0</output></label>
+        </div>
+        <p class="lab-note">Двигай ползунки: жёлтая точка — вершина, красные — корни уравнения.</p>
+      </div>
+    </div>
+    <div class="pyth" id="pyth" aria-labelledby="pyth-title">
+      <div>
+        <div class="sec-head"><p class="pixel">Задача: Пифагор</p><h2 id="pyth-title">Пифагор без зубрёжки</h2></div>
+        <ol class="steps-text" id="steps">
+          <li>Прямоугольный треугольник со сторонами 3, 4 и 5</li>
+          <li>На катетах квадраты: 9 и 16 клеток</li>
+          <li>Клетки перетекают в квадрат на гипотенузе</li>
+          <li>Их ровно 25: значит, a² + b² = c²</li>
+        </ol>
+        <p class="eq">3² + 4² = <span>5²</span></p>
+      </div>
+      <svg id="pyth-svg" viewBox="40 90 500 500" role="img" aria-label="Треугольник 3-4-5: 9 клеток и 16 клеток перекладываются в квадрат из 25 клеток на гипотенузе"></svg>
+    </div>
+  </section>
+
+  <!-- ===================== 3. Создание игр ===================== -->
+  <section class="chap chap--games" id="games" aria-labelledby="games-title">
+    <div class="chap-intro">
+      <div>
+        <p class="pixel">Направление 3</p>
+        <h2 id="games-title" aria-label="Создание игр"><span class="w" aria-hidden="true">Создание</span><span class="w" aria-hidden="true">игр</span></h2>
+        <p class="chap-lead">Roblox Studio, Godot и 3D-моделирование. Придумываешь механику, строишь уровни и выпускаешь игру, в которую играют друзья.</p>
+        <ul class="chap-list"><li>Roblox Studio и язык Luau</li><li>2D- и 3D-игры на Godot</li><li>3D-модели для своих игр</li></ul>
+        <div class="chap-cta"><a class="btn" href="https://wa.me/77055823688?text=%D0%A1%D3%99%D0%BB%D0%B5%D0%BC%21%20%D0%A5%D0%BE%D1%87%D1%83%20%D0%BD%D0%B0%20%D0%B1%D0%B5%D1%81%D0%BF%D0%BB%D0%B0%D1%82%D0%BD%D1%8B%D0%B9%20%D0%BF%D1%80%D0%BE%D0%B1%D0%BD%D1%8B%D0%B9%20%D1%83%D1%80%D0%BE%D0%BA%20%D0%BF%D0%BE%20%D0%BD%D0%B0%D0%BF%D1%80%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D1%8E%20%C2%AB%D0%A1%D0%BE%D0%B7%D0%B4%D0%B0%D0%BD%D0%B8%D0%B5%20%D0%B8%D0%B3%D1%80%C2%BB%20%D0%B2%20%D0%A8%D0%B0%D2%A3%D1%8B%D1%80%D0%B0%D2%9B%20Code." target="_blank" rel="noopener"><svg aria-hidden="true"><use href="#wa"/></svg>Записаться на игры</a></div>
+      </div>
+      <div class="arcade">
+        <canvas id="game" width="800" height="500" tabindex="0" aria-label="Мини-игра: нажми пробел, кликни или тапни, чтобы прыгать через шипы и собирать монеты"></canvas>
+        <div class="arcade-bar"><span class="pixel" id="score" aria-live="polite">Счёт 0</span><span id="best">Рекорд 0</span></div>
+      </div>
+    </div>
+    <div class="lvl-build" id="lvl" aria-labelledby="lvl-title">
+      <div>
+        <div class="sec-head"><p class="pixel">Миссия: свой уровень</p><h2 id="lvl-title">Листай, и уровень соберётся</h2></div>
+        <ol class="build-steps" id="bsteps"><li>Земля</li><li>Платформы</li><li>Шипы</li><li>Монеты</li><li>Финиш</li><li>Пробег</li></ol>
+      </div>
+      <div class="map" id="map" role="img" aria-label="Уровень платформера собирается из блоков, потом по нему пробегает герой"></div>
+    </div>
+  </section>
+
+  <!-- ===================== Чему мы учим создавать ===================== -->
+  <section class="works" id="works" aria-labelledby="works-title">
+    <div class="wrap">
+      <div class="sec-head">
+        <p class="pixel">Работы</p>
+        <h2 id="works-title">Чему мы учим создавать</h2>
+        <p>Три интерактивных проекта, каждый сделан кодом в одном HTML-файле. Покрути, понажимай: такое ты научишься собирать сам.</p>
+      </div>
+      <div class="works-tabs" role="tablist" aria-label="Работы">
+        <button type="button" role="tab" aria-selected="true" aria-controls="works-panel" data-work="watch">Механические часы</button>
+        <button type="button" role="tab" aria-selected="false" aria-controls="works-panel" data-work="blackhole">Чёрная дыра</button>
+        <button type="button" role="tab" aria-selected="false" aria-controls="works-panel" data-work="forest">Сайт про лес</button>
+      </div>
+      <div class="works-stage" id="works-panel" role="tabpanel">
+        <div class="works-frame"><p class="loading">Загружаем 3D…</p><iframe id="works-iframe" title="Интерактивная работа" loading="lazy"></iframe></div>
+        <div class="works-info" aria-live="polite">
+          <h3 id="w-title"></h3>
+          <p id="w-text"></p>
+          <ul id="w-list"></ul>
+          <div class="tags" id="w-tags"></div>
+          <a class="btn" id="w-open" href="watch.html" target="_blank" rel="noopener">Открыть на весь экран <span aria-hidden="true">↗</span></a>
+        </div>
+      </div>
     </div>
   </section>
 
@@ -250,6 +479,7 @@ p { margin: 0; }
     </ol>
   </section>
 
+
   <a class="start" id="start" href="https://wa.me/77055823688?text=%D0%A1%D3%99%D0%BB%D0%B5%D0%BC%21%20%D0%A5%D0%BE%D1%87%D1%83%20%D0%BD%D0%B0%20%D0%B1%D0%B5%D1%81%D0%BF%D0%BB%D0%B0%D1%82%D0%BD%D1%8B%D0%B9%20%D0%BF%D1%80%D0%BE%D0%B1%D0%BD%D1%8B%D0%B9%20%D1%83%D1%80%D0%BE%D0%BA%20%D0%B2%20%D0%A8%D0%B0%D2%A3%D1%8B%D1%80%D0%B0%D2%9B%20Code." target="_blank" rel="noopener">
     <p>Первый урок бесплатный. Нажми, и заявка откроется в WhatsApp, мы ответим и подберём время.</p>
     <svg viewBox="0 0 48 48" aria-hidden="true"><path d="M12 36L36 12M16 12H36V32" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="square"/></svg>
@@ -265,8 +495,8 @@ p { margin: 0; }
     </div>
     <address>
       <a href="https://wa.me/77055823688">WhatsApp: +7 705 582 36 88</a>
-      <a href="#classes">Три класса на выбор</a>
-      <a href="#level">Уровень 1: юрта</a>
+      <a href="#code">Три направления</a>
+      <a href="#works">Чему мы учим создавать</a>
       <a href="#top">Наверх</a>
     </address>
     <div class="stamp"><img src="assets/sb-kazakh-man-on-horse-with-golden.jpg" width="1800" height="1159" alt="Казах с беркутом на коне, фотография 1911–1914 годов." loading="lazy"></div>
@@ -274,43 +504,503 @@ p { margin: 0; }
   </div>
 </footer>
 
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/gsap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/ScrollTrigger.min.js"></script>
 <script>
 (() => {
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const WA = 'https://wa.me/77055823688?text=';
-  const CLASSES = {"code": {"page": "code.html", "title": "Кодер", "dir": "Программирование и ИИ", "video": "code-ai", "stats": [["Логика", 5], ["Креатив", 3], ["Скорость", 4]], "project": "Telegram-бот с нейросетью, который помогает тебе или друзьям."}, "math": {"page": "math.html", "title": "Математик", "dir": "Математика", "video": "math", "stats": [["Логика", 5], ["Креатив", 3], ["Точность", 5]], "project": "Свой интерактивный график или решатель задач для школы."}, "games": {"page": "games.html", "title": "Геймдизайнер", "dir": "Создание игр", "video": "games", "stats": [["Логика", 3], ["Креатив", 5], ["Скорость", 4]], "project": "Своя игра или плейс в Roblox, открытый для всех игроков."}};
+  const motion = !!(window.gsap && window.ScrollTrigger) && !reduce;
+  if (motion) gsap.registerPlugin(ScrollTrigger);
 
-  // ---------- выбор класса: карточка персонажа, ролик и 3D-эмблема ----------
-  const card = document.querySelector('.card');
-  const video = document.getElementById('card-video');
-  const stats = document.getElementById('card-stats');
-  const btns = [...document.querySelectorAll('.cls-btn')];
-  window.__cls = 'code';
-  const pick = (id, play) => {
-    const c = CLASSES[id];
-    window.__cls = id;
-    btns.forEach(b => b.setAttribute('aria-pressed', String(b.dataset.cls === id)));
-    card.dataset.cls = id;
-    document.getElementById('card-title').textContent = c.title;
-    document.getElementById('card-project').textContent = c.project;
-    const cta = document.getElementById('card-cta');
-    cta.href = c.page;
-    cta.setAttribute('aria-label', `Открыть класс «${c.title}»: ${c.dir}`);
-    stats.innerHTML = c.stats.map(([k, v]) => `<li>${k}<span class="bar" aria-label="${v} из 5">${'<i class="on"></i>'.repeat(v)}${'<i></i>'.repeat(5 - v)}</span></li>`).join('');
-    if (video.dataset.src !== c.video) {
-      video.dataset.src = c.video;
-      video.poster = `assets/${c.video}.jpg`;
-      video.src = `assets/${c.video}.mp4`;
-      if (play && !reduce) video.play().catch(() => {});
+  // ---------- заголовок расшифровывается из случайных символов ----------
+  const h1 = document.querySelector('[data-decode]');
+  const word = h1.dataset.decode.toUpperCase();
+  const POOL = '01{}<>/=+*#$ABCDEFXYZКОДЕР';
+  if (!reduce) {
+    h1.innerHTML = [...word].map(() => '<span class="glyph"></span>').join('');
+    const cells = [...h1.children];
+    const start = performance.now();
+    const tick = now => {
+      const t = now - start;
+      let done = true;
+      cells.forEach((c, i) => {
+        const settle = 380 + i * 140;
+        if (t >= settle) c.textContent = word[i];
+        else { done = false; c.textContent = POOL[(Math.random() * POOL.length) | 0]; }
+      });
+      if (!done) requestAnimationFrame(tick);
+      else h1.textContent = word;
+    };
+    requestAnimationFrame(tick);
+  }
+
+  // ---------- терминал печатает первую программу ----------
+  const term = document.getElementById('term');
+  const script = [
+    ['p', '$ '], ['t', 'python hello.py\n'], ['o', 'Сәлем, әлем!\n\n', 'pause'],
+    ['p', '>>> '], ['t', 'for i in range(1, 4):\n'], ['p', '... '], ['t', '    print("★" * i)\n'],
+    ['o', '★\n★★\n★★★\n\n', 'pause'], ['p', '>>> '], ['t', '2 ** 10\n'], ['o', '1024\n'], ['p', '>>> ']
+  ];
+  const esc = s => s.replace(/&/g, '&amp;').replace(/</g, '&lt;');
+  if (reduce) {
+    term.innerHTML = script.map(([k, s]) => k === 't' ? esc(s) : `<span class="${k}">${esc(s)}</span>`).join('') + '<span class="caret"></span>';
+  } else {
+    let html = '', i = 0;
+    const run = () => {
+      if (i >= script.length) { term.innerHTML = html + '<span class="caret"></span>'; setTimeout(() => { html = ''; i = 0; run(); }, 4200); return; }
+      const [k, s, pause] = script[i++];
+      if (k !== 't') {
+        html += `<span class="${k}">${esc(s)}</span>`;
+        term.innerHTML = html + '<span class="caret"></span>';
+        return setTimeout(run, pause ? 650 : 160);
+      }
+      let j = 0;
+      const type = () => {
+        j++;
+        term.innerHTML = html + esc(s.slice(0, j)) + '<span class="caret"></span>';
+        if (j < s.length) setTimeout(type, 38 + Math.random() * 55);
+        else { html += esc(s); setTimeout(run, 280); }
+      };
+      type();
+    };
+    setTimeout(run, 900);
+  }
+
+  // ---------- миссия 1: код бота пишется прокруткой, телефон оживает ----------
+  const LINES = [
+    [['k', 'from '], ['', 'aiogram '], ['k', 'import '], ['', 'Bot, Dispatcher']],
+    [['k', 'import '], ['', 'ai']],
+    [],
+    [['', 'bot = '], ['f', 'Bot'], ['', '(token='], ['d', 'TOKEN'], ['', ')']],
+    [['', 'dp = '], ['f', 'Dispatcher'], ['', '()']],
+    [],
+    [['f', '@dp.message'], ['', '()']],
+    [['k', 'async def '], ['f', 'reply'], ['', '(msg):']],
+    [['c', '    # спрашиваем нейросеть и проверяем ответ']],
+    [['', '    answer = ai.'], ['f', 'ask'], ['', '(msg.text)']],
+    [['k', '    await '], ['', 'msg.'], ['f', 'answer'], ['', '(answer)']],
+    [],
+    [['', 'dp.'], ['f', 'run_polling'], ['', '(bot)']]
+  ];
+  const total = LINES.reduce((a, l) => a + l.reduce((b, [, s]) => b + s.length, 0) + 1, 0);
+  const code = document.getElementById('code-pre');
+  const status = document.getElementById('status');
+  const msgs = [...document.querySelectorAll('.msg')];
+  const paint = p => {
+    let left = Math.round(p * total);
+    code.innerHTML = LINES.map(l => {
+      if (left <= 0) return '<span class="row"></span>';
+      const parts = l.map(([cls, s]) => { const part = s.slice(0, Math.max(0, left)); left -= s.length; return part ? `<span class="${cls}">${esc(part)}</span>` : ''; }).join('');
+      left -= 1;
+      return `<span class="row">${parts}${left <= 0 && left > -2 && p < 1 ? '<span class="caret"></span>' : ''}</span>`;
+    }).join('');
+    status.textContent = p >= 0.42 ? 'в сети' : 'не запущен';
+    status.classList.toggle('on', p >= 0.42);
+    msgs.forEach(m => {
+      const at = parseFloat(m.dataset.at), until = parseFloat(m.dataset.until || 9);
+      const on = p >= at && p < until;
+      m.classList.toggle('show', on);
+      m.hidden = m.dataset.until ? !on : false;
+    });
+  };
+  const narrow = matchMedia('(max-width: 900px)');
+  if (motion && !narrow.matches) {
+    const st = { p: 0 };
+    paint(0);
+    gsap.to(st, { p: 1, ease: 'none', onUpdate: () => paint(st.p), scrollTrigger: { trigger: '.bot-build', start: 'top top', end: '+=' + Math.round(innerHeight * 1.8), pin: true, scrub: 0.4 } });
+  } else if (motion) {
+    // на телефоне без закрепления: код пишется сам, когда блок на экране
+    paint(0);
+    const st = { p: 0 };
+    ScrollTrigger.create({ trigger: '.editor', start: 'top 75%', once: true, onEnter: () => gsap.to(st, { p: 1, duration: 6, ease: 'none', onUpdate: () => paint(st.p) }) });
+  } else paint(1);
+
+  // ---------- миссия 2: нейросеть, сигналы бегут слой за слоем ----------
+  const svg = document.getElementById('net');
+  const NS = 'http://www.w3.org/2000/svg';
+  const layers = [3, 5, 5, 3];
+  const X = [120, 270, 420, 560];
+  const pos = layers.map((n, li) => Array.from({ length: n }, (_, k) => [X[li], 60 + (k + 0.5) * (240 / n)]));
+  const el = (tag, attrs) => { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); svg.appendChild(e); return e; };
+  const edges = [];
+  for (let li = 0; li < layers.length - 1; li++) pos[li].forEach(a => pos[li + 1].forEach(b => {
+    el('line', { class: 'edge', x1: a[0], y1: a[1], x2: b[0], y2: b[1] });
+    edges.push({ li, a, b, p: el('line', { class: 'pulse', x1: a[0], y1: a[1], x2: b[0], y2: b[1], 'stroke-dasharray': '14 400', 'stroke-dashoffset': 14, opacity: 0 }) });
+  }));
+  const nodes = pos.map(l => l.map(([x, y]) => el('circle', { class: 'node', cx: x, cy: y, r: 13 })));
+  ['кот', 'сидит', 'на'].forEach((w, k) => el('text', { class: 'in', x: 92, y: pos[0][k][1] + 5, 'text-anchor': 'end' }).textContent = w);
+  ['окне', 'столе', 'крыше'].forEach((w, k) => el('text', { x: 588, y: pos[3][k][1] + 5 }).textContent = w);
+  const fills = [...document.querySelectorAll('.prob .fill')];
+  const play = () => {
+    if (!motion) { nodes.flat().forEach(n => n.classList.add('lit')); fills.forEach(f => { f.style.transform = `scaleX(${f.style.getPropertyValue('--v')})`; }); return; }
+    const tl = gsap.timeline();
+    nodes.flat().forEach(n => n.classList.remove('lit'));
+    tl.set(fills, { scaleX: 0 });
+    layers.forEach((_, li) => {
+      tl.call(() => nodes[li].forEach(n => n.classList.add('lit')), null, li * 0.55);
+      if (li < layers.length - 1) {
+        const es = edges.filter(e => e.li === li).map(e => e.p);
+        tl.fromTo(es, { attr: { 'stroke-dashoffset': 14 }, opacity: 1 }, { attr: { 'stroke-dashoffset': -200 }, duration: 0.6, ease: 'power1.in', stagger: { each: 0.008, from: 'random' } }, li * 0.55 + 0.05)
+          .set(es, { opacity: 0 }, li * 0.55 + 0.75);
+      }
+    });
+    fills.forEach(f => tl.to(f, { scaleX: parseFloat(f.style.getPropertyValue('--v')), duration: 0.9, ease: 'expo.out' }, layers.length * 0.55 - 0.2));
+  };
+  if (motion) ScrollTrigger.create({ trigger: svg, start: 'top 70%', once: true, onEnter: play });
+  else play();
+  document.getElementById('again').addEventListener('click', play);
+
+})();
+</script>
+<script>
+(() => {
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const motion = !!(window.gsap && window.ScrollTrigger) && !reduce;
+  if (motion) gsap.registerPlugin(ScrollTrigger);
+  const NS = 'http://www.w3.org/2000/svg';
+  const num = v => (Math.round(v * 10) / 10).toFixed(1).replace('.', ',').replace('-', '−');
+
+  // ---------- заголовок: буквы встают, как точки на графике ----------
+  const h1 = document.getElementById('math-title');
+  if (motion) {
+    h1.querySelectorAll('.w').forEach(w => { w.innerHTML = [...w.textContent].map(c => `<span class="ch">${c}</span>`).join(''); });
+    gsap.from(h1.querySelectorAll('.ch'), { y: i => Math.sin(i * 0.9) * 80 + 40, opacity: 0, duration: 1, ease: 'expo.out', stagger: 0.05, delay: 0.1 });
+  }
+
+  // ---------- живой график параболы ----------
+  const plot = document.getElementById('plot');
+  const W = 600, H = 380, U = 30, OX = 300, OY = 210;
+  const mk = (tag, attrs, parent = plot) => { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); parent.appendChild(e); return e; };
+  for (let x = OX % U; x < W; x += U) mk('line', { class: 'grid', x1: x, y1: 0, x2: x, y2: H });
+  for (let y = OY % U; y < H; y += U) mk('line', { class: 'grid', x1: 0, y1: y, x2: W, y2: y });
+  mk('line', { class: 'axis', x1: 0, y1: OY, x2: W, y2: OY });
+  mk('line', { class: 'axis', x1: OX, y1: 0, x2: OX, y2: H });
+  const curve = mk('path', { class: 'curve' });
+  const r1 = mk('circle', { class: 'root', r: 7 }), r2 = mk('circle', { class: 'root', r: 7 });
+  const vtx = mk('circle', { class: 'vtx', r: 8 });
+  const vlab = mk('text', {});
+  const ins = { a: document.getElementById('ka'), b: document.getElementById('kb'), c: document.getElementById('kc') };
+  const outs = { a: document.getElementById('oa'), b: document.getElementById('ob'), c: document.getElementById('oc') };
+  const formula = document.getElementById('formula');
+  const k = { a: 1, b: -2, c: -1 }, cur = { ...k };
+  let touched = false;
+  const poly = (a, b, c) => {
+    let out = '';
+    [[a, 'x²'], [b, 'x'], [c, '']].forEach(([v, s]) => {
+      if (Math.abs(v) < 0.05) return;
+      const n = Math.abs(v), coef = s && Math.abs(n - 1) < 0.05 ? '' : num(n);
+      out += (out ? (v < 0 ? ' − ' : ' + ') : (v < 0 ? '−' : '')) + coef + s;
+    });
+    return out || '0';
+  };
+  const draw = () => {
+    const { a, b, c } = cur;
+    let d = '';
+    for (let px = 0; px <= W; px += 4) {
+      const x = (px - OX) / U, y = a * x * x + b * x + c, py = OY - y * U;
+      d += (px ? 'L' : 'M') + px + ' ' + Math.max(-400, Math.min(H + 400, py)).toFixed(1);
+    }
+    curve.setAttribute('d', d);
+    const show = (el, x, y, on) => { el.setAttribute('cx', OX + x * U); el.setAttribute('cy', OY - y * U); el.style.opacity = on ? 1 : 0; };
+    if (Math.abs(a) > 0.02) {
+      const vx = -b / (2 * a), vy = a * vx * vx + b * vx + c;
+      show(vtx, vx, vy, true);
+      vlab.setAttribute('x', OX + vx * U + 12); vlab.setAttribute('y', OY - vy * U - 12);
+      vlab.textContent = `(${num(vx)}; ${num(vy)})`;
+      const D = b * b - 4 * a * c;
+      if (D >= 0) { show(r1, (-b - Math.sqrt(D)) / (2 * a), 0, true); show(r2, (-b + Math.sqrt(D)) / (2 * a), 0, true); }
+      else { r1.style.opacity = 0; r2.style.opacity = 0; }
+    } else { vtx.style.opacity = 0; vlab.textContent = ''; r1.style.opacity = 0; r2.style.opacity = 0; }
+    formula.textContent = 'y = ' + poly(a, b, c);
+  };
+  Object.keys(ins).forEach(key => ins[key].addEventListener('input', () => {
+    touched = true;
+    k[key] = parseFloat(ins[key].value);
+    outs[key].textContent = num(k[key]);
+  }));
+  // пока никто не трогал ползунки, парабола сама плавно «дышит»; дальше кривая догоняет ползунки
+  const start = performance.now();
+  const loop = now => {
+    const t = (now - start) / 1000;
+    if (!touched && !reduce) {
+      k.a = 1 + Math.sin(t * 0.7) * 0.6; k.b = -2 + Math.sin(t * 0.45) * 1.6; k.c = -1 + Math.cos(t * 0.6) * 1.2;
+      Object.keys(ins).forEach(key => { ins[key].value = k[key]; outs[key].textContent = num(k[key]); });
+    }
+    const ease = reduce ? 1 : 0.18;
+    for (const key in cur) cur[key] += (k[key] - cur[key]) * ease;
+    draw();
+    requestAnimationFrame(loop);
+  };
+  requestAnimationFrame(loop);
+
+  // ---------- Пифагор: 9 + 16 клеток перетекают в 25 ----------
+  const P = document.getElementById('pyth-svg');
+  const u = 40, C = [200, 400], A = [200, 280], B = [360, 400];
+  const add = (tag, attrs, parent = P) => { const e = document.createElementNS(NS, tag); for (const k2 in attrs) e.setAttribute(k2, attrs[k2]); parent.appendChild(e); return e; };
+  const dAB = [0.8, 0.6], nAB = [0.6, -0.8], ang = Math.atan2(0.6, 0.8) * 180 / Math.PI;
+  const corner = (p, i, j) => [p[0] + dAB[0] * i * u + nAB[0] * j * u, p[1] + dAB[1] * i * u + nAB[1] * j * u];
+  const hq = [A, B, corner(A, 5, 5), corner(A, 0, 5)];
+  add('polygon', { class: 'frame', points: '80,280 200,280 200,400 80,400' });
+  add('polygon', { class: 'frame', points: '200,400 360,400 360,560 200,560' });
+  const hframe = add('polygon', { class: 'frame', points: [hq[0], hq[1], corner(A, 5, 5), hq[3]].map(p => p.join(',')).join(' ') });
+  const tri = add('polygon', { class: 'tri', points: [A, B, C].map(p => p.join(',')).join(' ') });
+  const triLen = 120 + 160 + 200;
+  tri.setAttribute('stroke-dasharray', triLen);
+  const cells = [];
+  // 9 клеток квадрата на катете 3 и 16 — на катете 4; цель каждой — своя клетка квадрата 5×5 на гипотенузе
+  for (let i = 0; i < 3; i++) for (let j = 0; j < 3; j++) cells.push({ from: [80 + (i + 0.5) * u, 280 + (j + 0.5) * u], color: '#3fd3b4' });
+  for (let i = 0; i < 4; i++) for (let j = 0; j < 4; j++) cells.push({ from: [200 + (i + 0.5) * u, 400 + (j + 0.5) * u], color: '#f2b84b' });
+  const targets = [];
+  for (let j = 0; j < 5; j++) for (let i = 0; i < 5; i++) targets.push(corner(A, i + 0.5, j + 0.5));
+  cells.forEach((c, n) => {
+    c.to = targets[n];
+    c.g = add('g', { class: 'cell' });
+    add('rect', { x: -u / 2 + 1, y: -u / 2 + 1, width: u - 2, height: u - 2, rx: 4, fill: c.color }, c.g);
+  });
+  const la = add('text', { class: 'lbl', x: 140, y: 350, 'text-anchor': 'middle' }); la.textContent = '9';
+  const lb = add('text', { class: 'lbl', x: 280, y: 490, 'text-anchor': 'middle' }); lb.textContent = '16';
+  const lc = add('text', { class: 'lbl', 'text-anchor': 'middle', x: corner(A, 2.5, 2.5)[0], y: corner(A, 2.5, 2.5)[1] + 9 }); lc.textContent = '25';
+  const steps = [...document.querySelectorAll('#steps li')];
+  const clamp = v => Math.max(0, Math.min(1, v));
+  const eo = v => 1 - Math.pow(1 - v, 3);
+  const pyth = p => {
+    tri.setAttribute('stroke-dashoffset', triLen * (1 - eo(clamp(p / 0.15))));
+    const pop = clamp((p - 0.15) / 0.22);
+    cells.forEach((c, n) => {
+      const own = clamp(pop * 1.6 - (n / cells.length) * 0.6);
+      const fly = eo(clamp((p - 0.45 - n * 0.012) / 0.28));
+      const x = c.from[0] + (c.to[0] - c.from[0]) * fly, y = c.from[1] + (c.to[1] - c.from[1]) * fly;
+      const lift = Math.sin(fly * Math.PI) * 40;
+      c.g.setAttribute('transform', `translate(${x.toFixed(1)} ${(y - lift).toFixed(1)}) rotate(${(-ang * fly).toFixed(1)}) scale(${(0.2 + 0.8 * eo(own)).toFixed(3)})`);
+      c.g.style.opacity = own > 0 ? 1 : 0;
+    });
+    la.style.opacity = lb.style.opacity = clamp((p - 0.3) / 0.08) * (1 - clamp((p - 0.45) / 0.06));
+    lc.style.opacity = clamp((p - 0.86) / 0.08);
+    hframe.style.opacity = clamp((p - 0.38) / 0.08);
+    steps.forEach((s, i) => s.classList.toggle('on', p >= [0, 0.15, 0.45, 0.86][i]));
+  };
+  if (motion && !matchMedia('(max-width: 900px)').matches) {
+    const st = { p: 0 };
+    pyth(0);
+    gsap.to(st, { p: 1, ease: 'none', onUpdate: () => pyth(st.p), scrollTrigger: { trigger: '.pyth', start: 'top top', end: '+=' + Math.round(innerHeight * 1.8), pin: true, scrub: 0.4 } });
+  } else if (motion) {
+    const st = { p: 0 };
+    pyth(0);
+    ScrollTrigger.create({ trigger: P, start: 'top 75%', once: true, onEnter: () => gsap.to(st, { p: 1, duration: 5, ease: 'none', onUpdate: () => pyth(st.p) }) });
+  } else pyth(1);
+
+})();
+</script>
+<script>
+(() => {
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const motion = !!(window.gsap && window.ScrollTrigger) && !reduce;
+  if (motion) gsap.registerPlugin(ScrollTrigger);
+
+  // ---------- заголовок: буквы прыгают на место, как персонаж на платформу ----------
+  const h1 = document.getElementById('games-title');
+  if (motion) {
+    h1.querySelectorAll('.w').forEach(w => { w.innerHTML = [...w.textContent].map(c => `<span class="ch">${c}</span>`).join(''); });
+    gsap.from(h1.querySelectorAll('.ch'), { y: -120, opacity: 0, duration: 0.9, ease: 'bounce.out', stagger: 0.045, delay: 0.1 });
+  }
+
+  // ---------- мини-игра: прыгай через шипы, собирай монеты ----------
+  const cv = document.getElementById('game');
+  const g = cv.getContext('2d');
+  const W = 800, H = 500, GROUND = 410;
+  const scoreEl = document.getElementById('score'), bestEl = document.getElementById('best');
+  let best = 0;
+  try { best = +localStorage.getItem('shanyrak-best') || 0; } catch (e) { best = 0; }
+  bestEl.textContent = 'Рекорд ' + best;
+  const S = { state: 'ready', x: 150, y: GROUND - 50, vy: 0, t: 0, speed: 6, score: 0, obs: [], coins: [], pops: [], spawn: 0, hills: 0 };
+  const reset = () => Object.assign(S, { state: 'play', y: GROUND - 50, vy: 0, speed: 6, score: 0, obs: [], coins: [], pops: [], spawn: 60 });
+  const jump = () => {
+    if (S.state !== 'play') { reset(); return; }
+    if (S.y >= GROUND - 50 - 0.5) S.vy = -17;
+  };
+  cv.addEventListener('pointerdown', e => { e.preventDefault(); jump(); });
+  addEventListener('keydown', e => {
+    if ((e.code === 'Space' || e.code === 'ArrowUp') && (document.activeElement === cv || document.activeElement === document.body) && cv.getBoundingClientRect().bottom > 0 && cv.getBoundingClientRect().top < innerHeight) { e.preventDefault(); jump(); }
+  });
+  const spike = (x) => { g.beginPath(); g.moveTo(x, GROUND); g.lineTo(x + 20, GROUND - 46); g.lineTo(x + 40, GROUND); g.closePath(); g.fill(); };
+  const drawWorld = () => {
+    g.fillStyle = '#1c1c1c'; g.fillRect(0, 0, W, H);
+    // горы двигаются медленнее земли: глубина
+    g.fillStyle = '#2b2b2b';
+    for (let k = -1; k < 4; k++) { const bx = k * 320 - (S.hills % 320); g.beginPath(); g.moveTo(bx, GROUND); g.lineTo(bx + 160, GROUND - 170); g.lineTo(bx + 320, GROUND); g.fill(); }
+    g.fillStyle = '#e8e8e8';
+    for (let k = -1; k < 4; k++) { const bx = k * 320 - (S.hills % 320); g.beginPath(); g.moveTo(bx + 130, GROUND - 136); g.lineTo(bx + 160, GROUND - 170); g.lineTo(bx + 190, GROUND - 136); g.fill(); }
+    g.fillStyle = '#3fb34f'; g.fillRect(0, GROUND, W, 10);
+    g.fillStyle = '#6b3f1f'; g.fillRect(0, GROUND + 10, W, H - GROUND);
+  };
+  const draw = () => {
+    drawWorld();
+    g.fillStyle = '#f2b84b';
+    S.coins.forEach(c => { g.beginPath(); g.ellipse(c.x, c.y, 13 * Math.abs(Math.cos(S.t * 0.12 + c.x * 0.01)) + 2, 13, 0, 0, Math.PI * 2); g.fill(); });
+    g.fillStyle = '#ff5a4a';
+    S.obs.forEach(o => spike(o.x));
+    // герой: белый кубик с глазом и жёлтым шарфом
+    const squash = S.y >= GROUND - 50 - 0.5 ? 1 + Math.sin(S.t * 0.6) * 0.04 : 1;
+    g.save(); g.translate(S.x + 25, GROUND); g.scale(1 / squash, squash); g.translate(-(S.x + 25), -GROUND);
+    g.fillStyle = '#fff'; g.fillRect(S.x, S.y, 50, 50);
+    g.fillStyle = '#111'; g.fillRect(S.x + 32, S.y + 12, 10, 10);
+    g.fillStyle = '#f2b84b'; g.fillRect(S.x - 8, S.y + 26, 62, 8); g.fillRect(S.x - 22, S.y + 26 + Math.sin(S.t * 0.4) * 4, 16, 6);
+    g.restore();
+    S.pops.forEach(p => { g.globalAlpha = Math.max(0, p.life / 30); g.fillStyle = '#f2b84b'; g.font = '800 22px Tektur, sans-serif'; g.fillText('+10', p.x, p.y); g.globalAlpha = 1; });
+    g.fillStyle = '#fff'; g.font = '16px "Press Start 2P", monospace'; g.textAlign = 'left';
+    g.fillText('СЧЁТ ' + S.score, 20, 36);
+    if (S.state !== 'play') {
+      g.fillStyle = 'rgba(17,17,17,.72)'; g.fillRect(0, 0, W, H);
+      g.fillStyle = '#f2b84b'; g.textAlign = 'center'; g.font = '900 54px Tektur, sans-serif';
+      g.fillText(S.state === 'over' ? 'ЕЩЁ РАЗ?' : 'НАЖМИ СТАРТ', W / 2, H / 2 - 6);
+      g.fillStyle = '#fff'; g.font = '600 20px "Golos Text", sans-serif';
+      g.fillText('Пробел, клик или тап — прыжок', W / 2, H / 2 + 36);
+      g.textAlign = 'left';
     }
   };
-  btns.forEach(b => b.addEventListener('click', () => pick(b.dataset.cls, true)));
-  pick('code', false);
-  if ('IntersectionObserver' in window) new IntersectionObserver(([e]) => {
-    if (e.isIntersecting && !reduce) { video.preload = 'auto'; video.play().catch(() => {}); } else video.pause();
-  }, { rootMargin: '200px 0px' }).observe(video);
+  const step = () => {
+    S.t++;
+    S.hills += S.speed * 0.35;
+    if (S.state === 'play') {
+      S.vy += 0.95; S.y = Math.min(GROUND - 50, S.y + S.vy);
+      S.speed = Math.min(12, 6 + S.score / 120);
+      if (--S.spawn <= 0) {
+        S.obs.push({ x: W + 20 });
+        if (Math.random() < 0.7) S.coins.push({ x: W + 20 + 150 + Math.random() * 60, y: GROUND - 150 - Math.random() * 60 });
+        S.spawn = 70 + Math.random() * 60 - Math.min(30, S.score / 20);
+      }
+      S.obs.forEach(o => { o.x -= S.speed; });
+      S.coins.forEach(c => { c.x -= S.speed; });
+      S.obs = S.obs.filter(o => o.x > -60);
+      S.coins = S.coins.filter(c => {
+        if (Math.abs(c.x - (S.x + 25)) < 34 && Math.abs(c.y - (S.y + 25)) < 40) { S.score += 10; S.pops.push({ x: c.x - 18, y: c.y, life: 30 }); return false; }
+        return c.x > -30;
+      });
+      S.score += 0;
+      if (S.t % 6 === 0) S.score += 1;
+      // столкновение с шипом: прощаем пару пикселей, чтобы было честно
+      if (S.obs.some(o => S.x + 44 > o.x + 8 && S.x + 6 < o.x + 32 && S.y + 50 > GROUND - 38)) {
+        S.state = 'over';
+        if (S.score > best) { best = S.score; try { localStorage.setItem('shanyrak-best', String(best)); } catch (e) {} bestEl.textContent = 'Рекорд ' + best; }
+      }
+      scoreEl.textContent = 'Счёт ' + S.score;
+    }
+    S.pops.forEach(p => { p.life--; p.y -= 1.5; });
+    S.pops = S.pops.filter(p => p.life > 0);
+  };
+  let running = false, last = 0, acc = 0;
+  // игра идёт с постоянной скоростью 60 шагов в секунду на любом экране
+  const loop = now => {
+    if (!running) return;
+    acc += Math.min(100, now - (last || now)); last = now;
+    while (acc >= 1000 / 60) { step(); acc -= 1000 / 60; }
+    draw();
+    requestAnimationFrame(loop);
+  };
+  new IntersectionObserver(([e]) => {
+    if (e.isIntersecting && !running) { running = true; last = 0; requestAnimationFrame(loop); }
+    else if (!e.isIntersecting) running = false;
+  }).observe(cv);
+  draw();
+
+  // ---------- миссия 1: уровень собирается из падающих блоков ----------
+  const map = document.getElementById('map');
+  const COLS = 24, ROWS = 10;
+  // карта уровня: g — трава, d — земля, b — кирпич, s — шип, c — монета, f — финиш
+  const LEVEL = [
+    '........................',
+    '........................',
+    '...........c............',
+    '..........bbb.......c...',
+    '.....c............bbbb..',
+    '....bbb.....c...........',
+    '..........bbbb.........f',
+    '.....................s..',
+    'gggggggg..ggggggs.gggggg',
+    'dddddddd..dddddddddddddd'
+  ];
+  const kindOf = { g: 'ground', d: 'dirt', b: 'brick', s: 'spike', c: 'coin', f: 'flag' };
+  const phaseOf = { d: 0, g: 0, b: 1, s: 2, c: 3, f: 4 };
+  const tiles = [];
+  LEVEL.forEach((row, r) => [...row].forEach((ch, c) => {
+    if (ch === '.') return;
+    const el = document.createElement('div');
+    el.className = 'tile ' + kindOf[ch];
+    map.appendChild(el);
+    tiles.push({ el, r, c, ch, phase: phaseOf[ch], order: Math.random() });
+  }));
+  const hero = document.createElement('div');
+  hero.className = 'hero-sprite';
+  map.appendChild(hero);
+  const bsteps = [...document.querySelectorAll('#bsteps li')];
+  let cw = 0, ch = 0;
+  const measure = () => { cw = map.clientWidth / COLS; ch = map.clientHeight / ROWS; };
+  measure();
+  new ResizeObserver(() => { measure(); paint(lastP); }).observe(map);
+  const clamp = v => Math.max(0, Math.min(1, v));
+  const eb = v => { const n = 7.5625, d = 2.75; if (v < 1 / d) return n * v * v; if (v < 2 / d) return n * (v -= 1.5 / d) * v + 0.75; if (v < 2.5 / d) return n * (v -= 2.25 / d) * v + 0.9375; return n * (v -= 2.625 / d) * v + 0.984375; };
+  // путь героя по клеткам: по земле, прыжки через яму и шип, на финиш
+  const path = [[0, 7], [7, 7], [8.5, 5.4], [10, 7], [15, 7], [16.5, 5.6], [18, 7], [23, 5.9]];
+  const along = k => {
+    const segs = path.length - 1, f = k * segs, i = Math.min(segs - 1, Math.floor(f)), t = f - i;
+    const [x0, y0] = path[i], [x1, y1] = path[i + 1];
+    return [x0 + (x1 - x0) * t, y0 + (y1 - y0) * t - Math.sin(t * Math.PI) * (y1 < y0 || y0 < y1 ? 0.6 : 0)];
+  };
+  let lastP = 0;
+  const paint = p => {
+    lastP = p;
+    tiles.forEach(t => {
+      const start = 0.04 + t.phase * 0.14 + t.order * 0.08;
+      const k = clamp((p - start) / 0.1);
+      const x = t.c * cw, yEnd = t.r * ch, y = -ch * 2 + (yEnd + ch * 2) * eb(k);
+      const inset = t.ch === 'c' ? cw * 0.22 : 1;
+      t.el.style.cssText = `left:${(x + inset).toFixed(1)}px;top:${(y + (t.ch === 'c' ? ch * 0.22 : 1)).toFixed(1)}px;width:${(cw - inset * 2).toFixed(1)}px;height:${(t.ch === 'c' ? ch * 0.56 : ch - 2).toFixed(1)}px;opacity:${k > 0 ? 1 : 0}`;
+    });
+    const run = clamp((p - 0.8) / 0.2);
+    const [hx, hy] = along(run);
+    hero.style.cssText = `left:${(hx * cw + cw * 0.1).toFixed(1)}px;top:${(hy * ch + ch * 0.1).toFixed(1)}px;width:${(cw * 0.8).toFixed(1)}px;height:${(ch * 0.8 * 1).toFixed(1)}px;opacity:${run > 0 || p >= 0.78 ? 1 : 0}`;
+    bsteps.forEach((s, i) => s.classList.toggle('on', p >= [0.04, 0.18, 0.32, 0.46, 0.6, 0.8][i]));
+  };
+  if (motion && !matchMedia('(max-width: 900px)').matches) {
+    const st = { p: 0 };
+    paint(0);
+    gsap.to(st, { p: 1, ease: 'none', onUpdate: () => paint(st.p), scrollTrigger: { trigger: '.lvl-build', start: 'top top', end: '+=' + Math.round(innerHeight * 1.8), pin: true, scrub: 0.4 } });
+  } else if (motion) {
+    const st = { p: 0 };
+    paint(0);
+    ScrollTrigger.create({ trigger: map, start: 'top 75%', once: true, onEnter: () => gsap.to(st, { p: 1, duration: 5, ease: 'none', onUpdate: () => paint(st.p) }) });
+  } else paint(1);
+
+})();
+</script>
+<script>
+(() => {
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // ---------- витрина работ: вкладки переключают живую работу в одном окне ----------
+  const WORKS = {
+    watch: { src: 'watch.html', title: 'Механические часы', text: 'Корпус, стекло, циферблат и механизм внутри: пружина, колёса, баланс с волоском, анкер и рубиновые камни. Баланс качается, секундная стрелка тикает.', list: ['Тяни, чтобы повернуть', 'Кнопка «Разобрать» раскладывает детали слоями с подписями', 'Наведи на деталь, и она расскажет, что делает'], tags: ['Three.js', '3D-моделирование', 'анимация'] },
+    blackhole: { src: 'blackhole.html', title: 'Лаборатория чёрной дыры', text: 'Гравитационное линзирование руками: свет звёзд за чёрной дырой изгибается, а когда звезда точно за ней, замыкается в кольцо Эйнштейна.', list: ['Тяни чёрную дыру по небу', 'Меняй массу и смотри, как растёт кольцо', 'Включи сетку, чтобы увидеть, как гнётся пространство'], tags: ['шейдеры GLSL', 'физика', 'математика'] },
+    forest: { src: 'forest.html', title: '3D-сайт про защиту леса', text: 'Учебный концепт сайта для природоохранной организации: лес вырастает дерево за деревом, пока листаешь, по пути сменяются утро, день и вечер.', list: ['Листай внутри окна, и лес растёт', 'Деревья качаются на ветру, летают светлячки', 'Тексты появляются по ходу прокрутки'], tags: ['Three.js', 'анимация прокрутки', 'веб-дизайн'] }
+  };
+  const iframe = document.getElementById('works-iframe');
+  const tabs = [...document.querySelectorAll('.works-tabs button')];
+  const show = id => {
+    const w = WORKS[id];
+    tabs.forEach(t => t.setAttribute('aria-selected', String(t.dataset.work === id)));
+    document.getElementById('w-title').textContent = w.title;
+    document.getElementById('w-text').textContent = w.text;
+    document.getElementById('w-list').innerHTML = w.list.map(x => `<li>${x}</li>`).join('');
+    document.getElementById('w-tags').innerHTML = w.tags.map(x => `<span>${x}</span>`).join('');
+    document.getElementById('w-open').href = w.src;
+    iframe.dataset.src = w.src + '?embed';
+    if (iframe.dataset.live) iframe.src = iframe.dataset.src;
+  };
+  tabs.forEach(t => t.addEventListener('click', () => show(t.dataset.work)));
+  show('watch');
+  // окно с 3D грузится, только когда до витрины долистали
+  new IntersectionObserver(([e], io) => { if (!e.isIntersecting) return; io.disconnect(); iframe.dataset.live = '1'; iframe.src = iframe.dataset.src; }, { rootMargin: '400px 0px' }).observe(iframe);
 
   // ---------- уровень: прогресс сборки юрты и выполненные квесты ----------
   const level = document.querySelector('.level');
@@ -324,16 +1014,13 @@ p { margin: 0; }
   });
   setQuests(1);
 
+
   if (!window.gsap || !window.ScrollTrigger || reduce) return;
   gsap.registerPlugin(ScrollTrigger);
-
-  // главный момент: строки заголовка поднимаются, ключевая картинка встаёт следом
   gsap.from('.hero h1 .ln > span', { yPercent: 105, duration: 0.95, ease: 'expo.out', stagger: 0.11, delay: 0.1 });
   gsap.from('.hero-band > *', { y: 18, opacity: 0, duration: 0.7, ease: 'expo.out', stagger: 0.08, delay: 0.5 });
-
-  // классы и карточка входят по очереди
-  gsap.from('.cls-list > li', { y: 40, opacity: 0, duration: 0.8, ease: 'expo.out', stagger: 0.08, scrollTrigger: { trigger: '.classes', start: 'top 75%' } });
-  gsap.from('.card', { y: 50, opacity: 0, duration: 0.9, ease: 'expo.out', scrollTrigger: { trigger: '.classes', start: 'top 70%' } });
+  gsap.utils.toArray('.chap-intro').forEach(el => gsap.from(el.children, { y: 50, opacity: 0, duration: 0.9, ease: 'expo.out', stagger: 0.1, scrollTrigger: { trigger: el, start: 'top 70%' } }));
+  gsap.from('.works-stage', { y: 50, opacity: 0, duration: 0.9, ease: 'expo.out', scrollTrigger: { trigger: '.works', start: 'top 70%' } });
 
   // уровень: фото открывается шторкой, сцена закрепляется, юрта собирается и квесты закрываются
   const photo = level.querySelector('.level-photo');
@@ -345,9 +1032,7 @@ p { margin: 0; }
   gsap.to(state, { p: 1, ease: 'none', scrollTrigger: { start: () => pin.start, end: () => pin.end, scrub: 0.5 }, onUpdate: () => setQuests(state.p) });
   gsap.from('.quest', { yPercent: 40, opacity: 0, duration: 0.8, ease: 'expo.out', stagger: 0.07, scrollTrigger: { trigger: level, start: 'top 60%' } });
 
-  // старт: слово въезжает снизу
   gsap.from('.start .word', { yPercent: 60, opacity: 0, duration: 0.9, ease: 'expo.out', scrollTrigger: { trigger: '.start', start: 'top 80%' } });
-  gsap.from('.back', { y: 40, opacity: 0, duration: 0.8, ease: 'expo.out', scrollTrigger: { trigger: '.foot', start: 'top 90%' } });
   addEventListener('load', () => ScrollTrigger.refresh());
 })();
 </script>
@@ -1093,7 +1778,7 @@ function initYurt() {
   startScene(stage, renderer, scene, camera, frame);
 }
 
-whenNear(document.querySelector('.classes'), initIcons);
+
 whenNear(document.querySelector('.level'), initYurt);
 </script>
 

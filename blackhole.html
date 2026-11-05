@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Лаборатория чёрной дыры · Шаңырақ Code</title>
+<meta name="description" content="Интерактивная лаборатория гравитационного линзирования: тяни чёрную дыру, и небо за ней изгибается в дуги и кольцо Эйнштейна. Пример проекта учеников Шаңырақ Code.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Tektur:wght@800;900&family=Golos+Text:wght@400;600&display=swap">
+<style>
+  :root { color-scheme: dark; --ink: #fff; --muted: #b8b2a6; --gold: #f2b84b; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; background: #000; color: var(--ink); font: 400 16px/1.45 "Golos Text", system-ui, sans-serif; overflow: hidden; }
+  canvas { position: fixed; inset: 0; width: 100%; height: 100%; display: block; cursor: grab; touch-action: none; }
+  canvas.drag { cursor: grabbing; }
+  .panel { position: fixed; left: 20px; top: 18px; z-index: 3; max-width: 360px; padding: 16px 18px; border-radius: 18px; background: rgb(10 10 10 / .72); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); }
+  .panel h1 { margin: 0; font: 900 clamp(20px, 2.6vw, 30px)/1 "Tektur", sans-serif; text-transform: uppercase; }
+  .panel p { margin: 8px 0 0; color: var(--muted); font-size: 14px; }
+  .ctrl { display: grid; gap: 10px; margin-top: 14px; }
+  .row { display: grid; grid-template-columns: 5.5rem minmax(0, 1fr); align-items: center; gap: 10px; font-weight: 600; font-size: 14px; }
+  input[type=range] { width: 100%; accent-color: var(--gold); }
+  .btns { display: flex; flex-wrap: wrap; gap: 8px; }
+  button { min-height: 40px; padding: 0 14px; border: 0; border-radius: 12px; background: #262626; color: #fff; font: 600 14px/1 "Golos Text", sans-serif; cursor: pointer; transition: transform 160ms cubic-bezier(.23, 1, .32, 1), background-color 160ms ease; }
+  button:active { transform: scale(.97); }
+  button[aria-pressed="true"], button.primary { background: var(--gold); color: #111; }
+  button:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
+  .ring-badge { position: fixed; left: 50%; bottom: 26px; z-index: 3; transform: translateX(-50%) translateY(10px); padding: 10px 16px; border-radius: 999px; background: var(--gold); color: #111; font: 800 15px/1 "Tektur", sans-serif; text-transform: uppercase; opacity: 0; transition: opacity 240ms ease, transform 300ms cubic-bezier(.23, 1, .32, 1); pointer-events: none; }
+  .ring-badge.on { opacity: 1; transform: translateX(-50%); }
+  .hint { position: fixed; right: 20px; bottom: 20px; z-index: 3; color: var(--muted); font-size: 13px; }
+  body.embed .panel p.long { display: none; }
+  @media (max-width: 640px) { .panel { left: 10px; right: 10px; top: 10px; max-width: none; } .panel p.long { display: none; } .hint { display: none; } }
+</style>
+</head>
+<body>
+<canvas id="c" aria-label="Небо с чёрной дырой: перетаскивай её, чтобы увидеть, как гравитация изгибает свет" role="img"></canvas>
+<div class="panel">
+  <h1>Чёрная дыра</h1>
+  <p class="long">Масса искривляет пространство, и свет далёких звёзд идёт к нам не прямо, а огибая её. Тяни чёрную дыру: небо за ней изгибается в дуги, а если галактика окажется точно позади, свет замкнётся в кольцо.</p>
+  <div class="ctrl">
+    <label class="row">Масса <input id="mass" type="range" min="0.05" max="0.32" step="0.005" value="0.16"></label>
+    <div class="btns">
+      <button id="grid" type="button" aria-pressed="false">Сетка пространства</button>
+      <button id="align" type="button" class="primary">Поставить за галактикой</button>
+    </div>
+  </div>
+</div>
+<div class="ring-badge" id="badge" role="status">Кольцо Эйнштейна</div>
+<div class="hint">Тяни чёрную дыру мышью или пальцем</div>
+
+<script type="module">
+import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.186.0/build/three.module.js';
+
+const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+if (new URLSearchParams(location.search).has('embed')) document.body.classList.add('embed');
+const canvas = document.getElementById('c');
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: false });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 1.75));
+const scene = new THREE.Scene();
+const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+
+// Небо строится в шейдере. Для каждого пикселя считаем, откуда на самом деле пришёл его свет:
+// линза-точка отклоняет луч на θE² / r (приближение тонкой линзы), внутри тени — темнота.
+const uniforms = {
+  uRes: { value: new THREE.Vector2(1, 1) },
+  uBH: { value: new THREE.Vector2(0.25, 0.05) },
+  uMass: { value: 0.16 },
+  uGrid: { value: 0 },
+  uTime: { value: 0 },
+  uSrc: { value: new THREE.Vector2(0.0, 0.0) }
+};
+const material = new THREE.ShaderMaterial({
+  uniforms,
+  vertexShader: 'varying vec2 vUv; void main(){ vUv = uv; gl_Position = vec4(position.xy, 0.0, 1.0); }',
+  fragmentShader: `
+    precision highp float;
+    varying vec2 vUv;
+    uniform vec2 uRes, uBH, uSrc;
+    uniform float uMass, uGrid, uTime;
+
+    float hash(vec2 p){ p = fract(p * vec2(123.34, 456.21)); p += dot(p, p + 45.32); return fract(p.x * p.y); }
+    float noise(vec2 p){ vec2 i = floor(p), f = fract(p); vec2 u = f * f * (3.0 - 2.0 * f);
+      return mix(mix(hash(i), hash(i + vec2(1,0)), u.x), mix(hash(i + vec2(0,1)), hash(i + vec2(1,1)), u.x), u.y); }
+    float fbm(vec2 p){ float v = 0.0, a = 0.5; for (int i = 0; i < 5; i++){ v += a * noise(p); p *= 2.03; a *= 0.5; } return v; }
+
+    // звёзды трёх слоёв: мелкие, средние и редкие яркие
+    vec3 stars(vec2 p){
+      vec3 c = vec3(0.0);
+      for (int L = 0; L < 3; L++){
+        float s = 60.0 + float(L) * 55.0;
+        vec2 g = p * s, id = floor(g), f = fract(g) - 0.5;
+        float h = hash(id + float(L) * 17.0);
+        if (h > 0.93 - float(L) * 0.015){
+          vec2 o = vec2(hash(id + 3.1), hash(id + 7.7)) - 0.5;
+          float d = length(f - o * 0.6);
+          float b = smoothstep(0.08 + float(L) * 0.03, 0.0, d) * (0.6 + 0.4 * sin(uTime * (1.0 + h * 3.0) + h * 40.0));
+          vec3 tint = mix(vec3(1.0, 0.85, 0.65), vec3(0.7, 0.8, 1.0), hash(id + 11.0));
+          c += tint * b * (1.2 - float(L) * 0.3);
+        }
+      }
+      return c;
+    }
+    // галактика-источник: спиральный диск с ядром
+    vec3 galaxy(vec2 p, vec2 c, float size, float rot, vec3 col){
+      vec2 d = p - c;
+      float ca = cos(rot), sa = sin(rot);
+      d = mat2(ca, -sa, sa, ca) * d;
+      d.y *= 2.2;
+      float r = length(d) / size, a = atan(d.y, d.x);
+      float arms = 0.5 + 0.5 * cos(2.0 * a - 5.0 * log(r + 0.02));
+      float disk = exp(-r * 2.6) * (0.35 + 0.65 * arms);
+      float core = exp(-r * r * 30.0);
+      return col * disk * 1.3 + vec3(1.0, 0.92, 0.75) * core * 1.6;
+    }
+    vec3 sky(vec2 p){
+      vec3 c = vec3(0.004, 0.006, 0.014);
+      float n = fbm(p * 2.2 + 3.0);
+      c += vec3(0.05, 0.03, 0.09) * smoothstep(0.45, 0.85, n);
+      c += vec3(0.10, 0.06, 0.02) * smoothstep(0.55, 0.95, fbm(p * 1.4 - 7.0));
+      c += stars(p);
+      c += galaxy(p, uSrc, 0.09, 0.6, vec3(0.95, 0.72, 0.35));
+      c += galaxy(p, vec2(-0.9, 0.42), 0.06, -0.4, vec3(0.55, 0.7, 1.0)) * 0.8;
+      c += galaxy(p, vec2(0.85, -0.38), 0.05, 1.2, vec3(1.0, 0.6, 0.5)) * 0.7;
+      if (uGrid > 0.5){
+        vec2 g = abs(fract(p * 6.0) - 0.5);
+        float line = smoothstep(0.035, 0.0, min(g.x, g.y));
+        c += vec3(0.95, 0.72, 0.29) * line * 0.45;
+      }
+      return c;
+    }
+    void main(){
+      vec2 p = (vUv - 0.5) * vec2(uRes.x / uRes.y, 1.0);
+      vec2 d = p - uBH;
+      float r = length(d);
+      float tE = uMass;
+      float rs = tE * 0.42;          // тень чёрной дыры
+      vec2 beta = p - (tE * tE) * d / max(r * r, 1e-6);
+      vec3 col = sky(beta);
+      // свет вблизи тени усиливается: яркость линзы растёт к радиусу Эйнштейна
+      float mag = 1.0 + 0.35 * smoothstep(tE * 1.6, tE, r);
+      col *= mag;
+      // фотонное кольцо — тонкий золотой ободок на краю тени
+      col += vec3(1.0, 0.78, 0.4) * exp(-pow((r - rs * 1.08) / (rs * 0.07), 2.0)) * 0.9;
+      col *= smoothstep(rs * 0.98, rs * 1.03, r);
+      // мягкий тон и гамма
+      col = col / (1.0 + col);
+      col = pow(col, vec3(0.85));
+      gl_FragColor = vec4(col, 1.0);
+    }`
+});
+scene.add(new THREE.Mesh(new THREE.PlaneGeometry(2, 2), material));
+
+const resize = () => {
+  renderer.setSize(innerWidth, innerHeight, false);
+  uniforms.uRes.value.set(innerWidth, innerHeight);
+};
+addEventListener('resize', resize);
+resize();
+
+// ---------- перетаскивание чёрной дыры ----------
+const toWorld = (x, y) => new THREE.Vector2((x / innerWidth - 0.5) * innerWidth / innerHeight, 0.5 - y / innerHeight);
+const target = uniforms.uBH.value.clone();
+let dragging = false, touched = false;
+canvas.addEventListener('pointerdown', e => { dragging = true; touched = true; canvas.setPointerCapture(e.pointerId); canvas.classList.add('drag'); target.copy(toWorld(e.clientX, e.clientY)); });
+canvas.addEventListener('pointermove', e => { if (dragging) target.copy(toWorld(e.clientX, e.clientY)); });
+const stop = () => { dragging = false; canvas.classList.remove('drag'); };
+canvas.addEventListener('pointerup', stop);
+canvas.addEventListener('pointercancel', stop);
+
+// ---------- управление ----------
+const mass = document.getElementById('mass');
+mass.addEventListener('input', () => { uniforms.uMass.value = parseFloat(mass.value); });
+const gridBtn = document.getElementById('grid');
+gridBtn.addEventListener('click', () => { const on = uniforms.uGrid.value < 0.5; uniforms.uGrid.value = on ? 1 : 0; gridBtn.setAttribute('aria-pressed', String(on)); });
+document.getElementById('align').addEventListener('click', () => { touched = true; target.copy(uniforms.uSrc.value); });
+const badge = document.getElementById('badge');
+// ?align сразу ставит дыру за галактикой (удобно, чтобы показать кольцо)
+const qs = new URLSearchParams(location.search);
+if (qs.has('align')) { touched = true; target.copy(uniforms.uSrc.value); uniforms.uBH.value.copy(uniforms.uSrc.value); }
+if (qs.has('grid')) gridBtn.click();
+
+const t0 = performance.now();
+renderer.setAnimationLoop(() => {
+  const t = (performance.now() - t0) / 1000;
+  uniforms.uTime.value = t;
+  // пока никто не трогал, дыра медленно плывёт и проходит перед галактикой
+  if (!touched && !reduce) target.set(Math.sin(t * 0.25) * 0.42, Math.sin(t * 0.37) * 0.12);
+  const bh = uniforms.uBH.value;
+  bh.lerp(target, reduce ? 1 : dragging ? 0.35 : 0.06);
+  const aligned = bh.distanceTo(uniforms.uSrc.value) < uniforms.uMass.value * 0.18;
+  badge.classList.toggle('on', aligned);
+  renderer.render(scene, camera);
+});
+</script>
+</body>
+</html>
