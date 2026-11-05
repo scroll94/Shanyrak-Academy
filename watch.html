@@ -30,6 +30,8 @@
   .exploded .label { opacity: 1; }
   .label::before { content: ""; display: inline-block; width: 6px; height: 6px; margin-right: 6px; border-radius: 50%; background: var(--yellow); vertical-align: 1px; }
   body.embed .ui p { display: none; }
+  /* на главной часы ведёт прокрутка страницы: свои кнопки и подсказки прячем */
+  body.scroll .ui, body.scroll .hint, body.scroll .tip { display: none; }
   @media (max-width: 600px) { .ui { flex-direction: column; } .hint { font-size: 12px; } }
 </style>
 </head>
@@ -57,6 +59,16 @@ import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const embed = new URLSearchParams(location.search).has('embed');
 if (embed) document.body.classList.add('embed');
+// ?scroll: разборкой управляет страница-родитель через postMessage({ explode: 0..1 })
+const scrollMode = new URLSearchParams(location.search).has('scroll');
+if (scrollMode) document.body.classList.add('scroll');
+let ext = 0, extS = 0, active = true;
+addEventListener('message', ev => {
+  const d = ev.data;
+  if (!d || typeof d !== 'object') return;
+  if (typeof d.explode === 'number') ext = Math.max(0, Math.min(1, d.explode));
+  if (typeof d.active === 'boolean') active = d.active;
+});
 const stage = document.getElementById('stage');
 
 // ---------- сцена, свет, отражения ----------
@@ -436,10 +448,13 @@ addEventListener('resize', resize);
 resize();
 
 renderer.setAnimationLoop(() => {
+  if (!active) return;
   clock.update();
   const t = clock.getElapsed();
   // разборка и сборка плавно, слоями
-  const e = currentE();
+  if (scrollMode) extS += (ext - extS) * (reduce ? 1 : 0.12);
+  const e = scrollMode ? extS : currentE();
+  if (scrollMode) document.body.classList.toggle('exploded', e > 0.6);
   // слои расходятся по диагонали: то, что сверху, уходит вверх и вперёд, механизм — вниз и назад
   parts.forEach(p => {
     const h = p.obj.userData.home, d = p.obj.userData.exZ * e;
@@ -447,7 +462,11 @@ renderer.setAnimationLoop(() => {
   });
   // при разборке камера плавно отходит, чтобы все слои поместились
   // камера уходит на три четверти сбоку, пока посетитель сам её не повернул
-  if (!userMoved && anim && !anim.camDone) {
+  if (scrollMode) {
+    // в узком окне телефона отходим дальше, чтобы разобранные слои влезли целиком
+    const fit = Math.max(1, 1.05 / camera.aspect);
+    camera.position.copy(homeDir).lerp(sideDir, e).normalize().multiplyScalar((10.8 + 5 * e) * fit).add(controls.target);
+  } else if (!userMoved && anim && !anim.camDone) {
     camera.position.copy(homeDir).lerp(sideDir, e).normalize().multiplyScalar(10.8 + 5 * e).add(controls.target);
     if (performance.now() - anim.t0 >= 1200) anim.camDone = true;
   }
