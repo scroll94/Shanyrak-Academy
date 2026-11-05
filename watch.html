@@ -67,12 +67,13 @@ const cardMode = new URLSearchParams(location.search).has('card');
 if (cardMode) { document.body.classList.add('card'); document.documentElement.style.background = 'transparent'; }
 const scrollMode = cardMode || new URLSearchParams(location.search).has('scroll');
 if (scrollMode) document.body.classList.add('scroll');
-let ext = 0, extS = 0, active = true;
+let ext = 0, extS = 0, active = true, hold = null;
 addEventListener('message', ev => {
   const d = ev.data;
   if (!d || typeof d !== 'object') return;
   if (typeof d.explode === 'number') ext = Math.max(0, Math.min(1, d.explode));
   if (typeof d.active === 'boolean') active = d.active;
+  if ('hold' in d) hold = typeof d.hold === 'number' ? d.hold : null;
 });
 const stage = document.getElementById('stage');
 
@@ -461,7 +462,7 @@ renderer.setAnimationLoop(() => {
     // 12 секунд: собраны → разбираются → держим → собираются
     const ph = (t % 12) / 12;
     const sm = x => x * x * (3 - 2 * x);
-    ext = reduce ? 0.6 : ph < 0.15 ? 0 : ph < 0.42 ? sm((ph - 0.15) / 0.27) : ph < 0.65 ? 1 : ph < 0.92 ? 1 - sm((ph - 0.65) / 0.27) : 0;
+    ext = hold !== null ? hold : reduce ? 0.6 : ph < 0.15 ? 0 : ph < 0.42 ? sm((ph - 0.15) / 0.27) : ph < 0.65 ? 1 : ph < 0.92 ? 1 - sm((ph - 0.65) / 0.27) : 0;
   }
   if (scrollMode) extS += (ext - extS) * (reduce ? 1 : 0.12);
   const e = scrollMode ? extS : currentE();

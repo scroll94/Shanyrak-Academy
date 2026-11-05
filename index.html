@@ -308,6 +308,30 @@ h1, h2, h3 { text-wrap: balance; }
 .dir-grid--three .dir { grid-column: auto; }
 .dir-visual--video { padding: 0; height: auto; aspect-ratio: 16 / 10; overflow: hidden; }
 .dir-visual--video video { display: block; width: 100%; height: 100%; object-fit: cover; }
+/* мини-консоль: имя → вывод программы */
+.try-code { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, .85fr); gap: 14px; max-width: 880px; margin-top: 2.4rem; }
+.tc-ed, .tc-out { padding: 0 0 1rem; border-radius: 16px; background: #0a1430; box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--milk) 10%, transparent); overflow: hidden; font: 500 .98rem/1.7 Consolas, "Cascadia Mono", monospace; }
+.tc-top { display: flex; align-items: center; gap: 6px; margin: 0 0 .5rem; padding: .6rem 1rem; background: color-mix(in srgb, var(--milk) 5%, transparent); color: var(--muted); font: 500 .8rem/1 var(--font-body); }
+.tc-top i { width: 9px; height: 9px; border-radius: 50%; background: #ff6b5e; }
+.tc-top i:nth-child(2) { background: #f6c34d; } .tc-top i:nth-child(3) { background: #45c46d; }
+.tc-top span { margin-left: 6px; }
+.tc-line { display: flex; gap: 1rem; margin: 0; padding: 0 1rem; white-space: nowrap; overflow: hidden; }
+.tc-n { width: 1ch; color: color-mix(in srgb, var(--milk) 30%, transparent); }
+.k-v { color: var(--milk); } .k-s { color: #7fe3ad; } .k-f { color: var(--gold); }
+.tc-line input { width: 9ch; min-width: 0; padding: 0 .2rem; border: 0; border-bottom: 2px dashed var(--gold); background: color-mix(in srgb, var(--gold) 10%, transparent); color: #7fe3ad; font: inherit; outline: none; caret-color: var(--gold); }
+.tc-line input:focus { background: color-mix(in srgb, var(--gold) 18%, transparent); border-bottom-style: solid; }
+.tc-out pre { min-height: 5.1em; margin: 0; padding: 0 1rem; color: var(--milk); font: inherit; white-space: pre-wrap; }
+.tc-out pre b { color: var(--gold); font-weight: 600; }
+.tc-hint { margin: .6rem 1rem 0; color: var(--muted); font: 400 .86rem/1.4 var(--font-body); }
+@media (max-width: 760px) { .try-code { grid-template-columns: minmax(0, 1fr); } .tc-ed, .tc-out { font-size: .9rem; } }
+
+/* интерактив в живых сценах */
+.dir[data-id="math"] .dir-visual--live { cursor: ew-resize; touch-action: pan-y; }
+.dir[data-id="code"] .dir-visual--live { cursor: pointer; }
+.yr-step { pointer-events: auto; cursor: pointer; }
+.yr-step:hover b { text-decoration: underline; text-underline-offset: 4px; }
+.yr-step:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+
 /* живые сцены в карточках вместо роликов */
 .dir-visual--live { padding: 0; height: auto; aspect-ratio: 16 / 10; overflow: hidden; container-type: normal; }
 .dir-visual--live .live-frame, .dir-visual--live canvas { position: absolute; inset: 0; display: block; width: 100%; height: 100%; border: 0; pointer-events: none; }
@@ -793,8 +817,6 @@ h1, h2, h3 { text-wrap: balance; }
 <div class="cursor" aria-hidden="true"></div>
 
 <div class="page" lang="ru">
-<div class="side-orn side-orn--l" aria-hidden="true"></div>
-<div class="side-orn side-orn--r" aria-hidden="true"></div>
 
 <header class="nav">
   <div class="nav-in">
@@ -851,6 +873,21 @@ h1, h2, h3 { text-wrap: balance; }
       <p class="sec-lead" data-reveal="up">Три направления под одним шаңыраком. Выбери одно, а на бесплатном уроке поможем понять, с чего начать именно тебе.</p>
     </header>
 
+    <div class="try-code" data-reveal="up">
+      <div class="tc-ed">
+        <p class="tc-top"><i></i><i></i><i></i><span>hello.py</span></p>
+        <label class="tc-line"><span class="tc-n">1</span><span><span class="k-v">name</span> = <span class="k-s">"</span><input id="tc-name" type="text" maxlength="18" autocomplete="off" spellcheck="false" placeholder="твоё имя" aria-label="Напиши своё имя"><span class="k-s">"</span></span></label>
+        <p class="tc-line"><span class="tc-n">2</span><span><span class="k-f">print</span>(<span class="k-s">f"Сәлем, {name}!"</span>)</span></p>
+        <p class="tc-line"><span class="tc-n">3</span><span><span class="k-f">print</span>(<span class="k-s">"Букв:"</span>, <span class="k-f">len</span>(name))</span></p>
+        <p class="tc-line"><span class="tc-n">4</span><span><span class="k-f">print</span>(name[::-1])</span></p>
+      </div>
+      <div class="tc-out" aria-live="polite">
+        <p class="tc-top"><span>вывод программы</span></p>
+        <pre id="tc-out"></pre>
+        <p class="tc-hint">Впиши имя слева: это настоящий Python, так выглядит первый урок.</p>
+      </div>
+    </div>
+
     <div class="dir-grid dir-grid--three">
       <article class="dir" data-id="code" style="--accent: var(--gold)">
         <div class="dir-tilt" data-tilt="0.6">
@@ -876,7 +913,7 @@ h1, h2, h3 { text-wrap: balance; }
           <div class="dir-face">
             <div class="dir-visual dir-visual--live" role="img" aria-label="Золотая спираль: каждая точка повёрнута на 137,5 градуса от предыдущей, как семечки в подсолнухе">
               <canvas class="spiral" aria-hidden="true"></canvas>
-              <p class="live-formula" aria-hidden="true"><span>θ = n · <b data-ang>137,51°</b></span><span>r = c · √n</span><small>Чуть меняем угол, и узор перекручивается</small></p>
+              <p class="live-formula" aria-hidden="true"><span>θ = n · <b data-ang>137,51°</b></span><span>r = c · √n</span><small data-sp-hint>Води по картинке: меняешь угол, и узор перекручивается</small></p>
             </div>
             <div class="dir-body">
               <h3>Математика</h3>
@@ -1168,6 +1205,34 @@ h1, h2, h3 { text-wrap: balance; }
     frames.forEach(f => fio.observe(f));
   } else frames.forEach(f => { f.src = f.dataset.src; });
 
+  // Мини-консоль: программа «выполняется» на каждом нажатии клавиши
+  const tcIn = document.getElementById('tc-name'), tcOut = document.getElementById('tc-out');
+  if (tcIn && tcOut) {
+    const esc = t => t.replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+    const run = () => {
+      const n = tcIn.value.trim();
+      tcIn.style.width = Math.max(9, [...tcIn.value].length + 1) + 'ch';
+      if (!n) { tcOut.innerHTML = '<span style="opacity:.55">Сәлем, !\nБукв: 0\n</span>'; return; }
+      tcOut.innerHTML = `Сәлем, <b>${esc(n)}</b>!\nБукв: <b>${[...n].length}</b>\n<b>${esc([...n].reverse().join(''))}</b>`;
+    };
+    tcIn.addEventListener('input', run);
+    run();
+  }
+
+  // Часы: навёл или нажал — разбираются и держатся разобранными, отпустил — снова сами по кругу
+  const codeVis = document.querySelector('.dir[data-id="code"] .dir-visual--live');
+  const codeFrame = codeVis && codeVis.querySelector('.live-frame');
+  if (codeVis && codeFrame) {
+    let held = false;
+    const hold = v => { try { codeFrame.contentWindow.postMessage({ hold: v }, '*'); } catch (_) {} };
+    codeVis.addEventListener('pointerenter', e => { if (e.pointerType === 'mouse') hold(1); });
+    codeVis.addEventListener('pointerleave', e => { if (e.pointerType === 'mouse') hold(null); });
+    codeVis.addEventListener('click', e => {
+      if (e.target.closest('a')) return;
+      held = !held; hold(held ? 1 : 0);
+    });
+  }
+
   // Математика: золотая спираль. Точка номер n повёрнута на угол θ·n и отодвинута от центра на √n.
   // При θ = 137,5° (золотой угол) точки ложатся как семечки подсолнуха; стоит угол чуть сдвинуть,
   // и узор перекручивается в лучи и рукава.
@@ -1176,12 +1241,20 @@ h1, h2, h3 { text-wrap: balance; }
     const g = sp.getContext('2d'), angEl = document.querySelector('[data-ang]');
     const GA = 137.50776405, N = 560;
     const gold = [232, 182, 74], sky = [60, 198, 220];
-    let W = 0, H = 0, on = false, t0 = 0, raf = 0;
+    let W = 0, H = 0, on = false, t0 = 0, raf = 0, user = null, userA = GA, shown = GA;
+    const vis = sp.closest('.dir-visual');
+    const fromPointer = e => { const r = vis.getBoundingClientRect(); user = GA + ((e.clientX - r.left) / r.width - 0.5) * 4; };
+    vis.addEventListener('pointermove', fromPointer);
+    vis.addEventListener('pointerdown', fromPointer);
+    vis.addEventListener('pointerleave', () => { user = null; });
     const fit = () => { const r = sp.getBoundingClientRect(), d = Math.min(devicePixelRatio, 2); W = r.width; H = r.height; sp.width = Math.round(W * d); sp.height = Math.round(H * d); g.setTransform(d, 0, 0, d, 0, 0); };
     const draw = now => {
       const t = (now - t0) / 1000;
       const grow = reduce ? 1 : Math.min(1, t / 4.5);
-      const ang = reduce ? GA : GA + (t < 5 ? 0 : Math.sin((t - 5) * 0.32) * 0.75);
+      const auto = reduce ? GA : GA + (t < 5 ? 0 : Math.sin((t - 5) * 0.32) * 0.75);
+      // угол плавно догоняет палец, а без него — возвращается к собственному движению
+      shown += ((user ?? auto) - shown) * (reduce ? 1 : 0.12);
+      const ang = shown;
       const rot = reduce ? 0 : t * 0.12;
       const count = Math.floor(N * (1 - Math.pow(1 - grow, 2)));
       g.clearRect(0, 0, W, H);
@@ -1197,6 +1270,7 @@ h1, h2, h3 { text-wrap: balance; }
       if (on && !reduce) raf = requestAnimationFrame(draw);
     };
     addEventListener('resize', () => { fit(); if (!on || reduce) draw(performance.now()); });
+    if (reduce) vis.addEventListener('pointermove', () => draw(performance.now()));
     new IntersectionObserver(([e]) => {
       on = e.isIntersecting;
       cancelAnimationFrame(raf);
@@ -1311,6 +1385,7 @@ h1, h2, h3 { text-wrap: balance; }
   // Стебель тянется вниз вслед за экраном, а қошқар мүйіз, ромбы и листья вырисовываются, когда до них доходит прокрутка
   const rails = (() => {
     const els = [...document.querySelectorAll('.side-orn')];
+    if (!els.length) return null; // ленты по бокам убраны: мешали читать
     const page = document.querySelector('.page');
     const wide = { matches: true };
     let H = 0, W = 0, triggers = [], grow = null;
@@ -1399,6 +1474,18 @@ h1, h2, h3 { text-wrap: balance; }
   const yState = window.__yurt = { p: 1 };
   const yMarks = [0.08, 0.34, 0.58, 0.7];
   const setYurtSteps = p => ySteps.forEach((st, i) => st.classList.toggle('is-on', p >= yMarks[i]));
+  ySteps.forEach((st, i) => {
+    st.tabIndex = 0;
+    st.setAttribute('role', 'button');
+    st.setAttribute('aria-label', 'Показать этап: ' + st.querySelector('b').textContent);
+    const go = () => {
+      if (!yurtPin) return;
+      const y = yurtPin.start + (yurtPin.end - yurtPin.start) * Math.min(1, yMarks[i] + 0.12);
+      if (typeof lenis !== 'undefined' && lenis) lenis.scrollTo(y, { duration: 1.2 }); else scrollTo({ top: y, behavior: 'smooth' });
+    };
+    st.addEventListener('click', go);
+    st.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(); } });
+  });
   let yurtPin = null;
   if (motion) yurtPin = ScrollTrigger.create({ trigger: yurtSec, start: 'top top', end: () => '+=' + Math.round(innerHeight * 2), pin: true, anticipatePin: 1 });
 
