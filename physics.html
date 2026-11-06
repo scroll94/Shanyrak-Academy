@@ -83,7 +83,8 @@ controls.target.set(0, 2, -3);
 controls.enableDamping = true;
 controls.maxPolarAngle = Math.PI * 0.48;
 controls.minDistance = 8; controls.maxDistance = 50;
-if (card) controls.enabled = false;
+// в карточке камерой не управляем; OrbitControls ставит холсту touch-action: none, возвращаем прокрутку страницы пальцем
+if (card) { controls.enabled = false; renderer.domElement.style.touchAction = 'pan-y'; }
 
 scene.add(new THREE.HemisphereLight('#bcd2ff', '#2a1a10', 1.1));
 const sun = new THREE.DirectionalLight('#ffe7bf', 2.4);

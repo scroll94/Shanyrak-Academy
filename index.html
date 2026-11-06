@@ -326,7 +326,6 @@ h1, h2, h3 { text-wrap: balance; }
 @media (max-width: 760px) { .try-code { grid-template-columns: minmax(0, 1fr); } .tc-ed, .tc-out { font-size: .9rem; } }
 
 /* интерактив в живых сценах */
-.dir[data-id="math"] .dir-visual--live { cursor: ew-resize; touch-action: pan-y; }
 .dir[data-id="code"] .dir-visual--live { cursor: pointer; }
 .yr-step { pointer-events: auto; cursor: pointer; }
 .yr-step:hover b { text-decoration: underline; text-underline-offset: 4px; }
@@ -334,7 +333,7 @@ h1, h2, h3 { text-wrap: balance; }
 
 /* вкладки и кнопка «Развернуть» в живых сценах */
 .live-pane { position: absolute; inset: 0; }
-.dir-visual--live .live-frame--play { pointer-events: auto; }
+.dir-visual--live iframe.live-frame--play { pointer-events: auto; } /* мяч бросают прямо в карточке */
 .live-tabs { position: absolute; top: 10px; left: 10px; z-index: 3; display: flex; gap: 4px; padding: 3px; border-radius: 999px; background: rgb(10 20 48 / .82); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); }
 .live-tabs button { min-height: 32px; padding: 0 .8rem; border: 0; border-radius: 999px; background: none; color: var(--muted); font: 600 .8rem/1 var(--font-body); cursor: pointer; transition: background-color .2s, color .2s; }
 .live-tabs button[aria-selected="true"] { background: var(--accent); color: var(--night); }
@@ -349,7 +348,6 @@ h1, h2, h3 { text-wrap: balance; }
 .live-open:hover { filter: brightness(1.08); }
 .live-open:active { transform: scale(.96); }
 .live-tabs button:focus-visible, .live-open:focus-visible { outline: 2px solid var(--milk); outline-offset: 2px; }
-.live-pane--spiral .live-formula { top: auto; bottom: 10px; }
 .viewer { width: 100vw; height: 100dvh; max-width: none; max-height: none; margin: 0; padding: 0; border: 0; background: var(--night); color: var(--milk); }
 .viewer[open] { display: flex; flex-direction: column; animation: vw-in .32s var(--ease-out); }
 .viewer::backdrop { background: rgb(5 10 25 / .7); }
@@ -945,21 +943,16 @@ h1, h2, h3 { text-wrap: balance; }
           <div class="dir-face">
             <div class="dir-visual dir-visual--live">
               <div class="live-tabs" role="tablist" aria-label="Что показать">
-                <button type="button" role="tab" aria-selected="true" data-pane="spiral">Спираль</button>
+                <button type="button" role="tab" aria-selected="true" data-pane="fractal">Фрактал</button>
                 <button type="button" role="tab" aria-selected="false" data-pane="fourier">Фурье</button>
-                <button type="button" role="tab" aria-selected="false" data-pane="fractal">Фрактал</button>
               </div>
-              <div class="live-pane live-pane--spiral" data-pane="spiral" role="img" aria-label="Золотая спираль: каждая точка повёрнута на 137,5 градуса от предыдущей, как семечки в подсолнухе">
-                <canvas class="spiral" aria-hidden="true"></canvas>
-                <p class="live-formula" aria-hidden="true"><span>θ = n · <b data-ang>137,51°</b></span><span>r = c · √n</span><small data-sp-hint>Води по картинке: меняешь угол, и узор перекручивается</small></p>
-              </div>
-              <div class="live-pane" data-pane="fractal" data-open="fractal.html" data-title="Фракталы: приближай множество Мандельброта и Жюлиа" hidden>
+              <div class="live-pane" data-pane="fractal" data-open="fractal.html" data-title="Фракталы: приближай множество Мандельброта и Жюлиа">
                 <iframe class="live-frame" data-src="fractal.html?card" title="Множество Жюлиа: узор из формулы z → z² + c плавно перетекает" tabindex="-1"></iframe>
               </div>
               <div class="live-pane" data-pane="fourier" data-open="fourier.html" data-title="Ряды Фурье: собери волну и рисунок из вращений" hidden>
                 <iframe class="live-frame" data-src="fourier.html?card" title="Ряд Фурье: круги добавляются по одному, и волна становится квадратной" tabindex="-1"></iframe>
               </div>
-              <button class="live-open" type="button" aria-label="Развернуть на весь экран" data-open="fourier.html" data-title="Ряды Фурье: собери волну и рисунок из вращений"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 4h6v6M10 20H4v-6M20 4l-7 7M4 20l7-7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Развернуть</span></button>
+              <button class="live-open" type="button" aria-label="Развернуть на весь экран" data-open="fractal.html" data-title="Фракталы: приближай множество Мандельброта и Жюлиа"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 4h6v6M10 20H4v-6M20 4l-7 7M4 20l7-7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Развернуть</span></button>
             </div>
             <div class="dir-body">
               <h3>Математика</h3>
