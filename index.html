@@ -308,8 +308,13 @@ h1, h2, h3 { text-wrap: balance; }
 .dir-grid--three .dir { grid-column: auto; }
 .dir-visual--video { padding: 0; height: auto; aspect-ratio: 16 / 10; overflow: hidden; }
 .dir-visual--video video { display: block; width: 100%; height: 100%; object-fit: cover; }
+/* подписи в карточках и под ними */
+.dir-sub { margin: .4rem 0 -.3rem; font: 600 .7rem/1 var(--font-display); letter-spacing: .14em; text-transform: uppercase; color: var(--accent); }
+.tc-title { margin: 3.4rem 0 0; font: 700 clamp(1.15rem, 2vw, 1.5rem)/1.2 var(--font-display); }
+.trial-title { margin: 1.6rem 0 0; font-weight: 600; color: var(--milk); }
+.trial-title + .trial { margin-top: .7rem; }
 /* мини-консоль: имя → вывод программы */
-.try-code { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, .85fr); gap: 14px; max-width: 880px; margin-top: 2.4rem; }
+.try-code { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, .85fr); gap: 14px; max-width: 880px; margin-top: 1rem; }
 .tc-ed, .tc-out { padding: 0 0 1rem; border-radius: 16px; background: #0a1430; box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--milk) 10%, transparent); overflow: hidden; font: 500 .98rem/1.7 Consolas, "Cascadia Mono", monospace; }
 .tc-top { display: flex; align-items: center; gap: 6px; margin: 0 0 .5rem; padding: .6rem 1rem; background: color-mix(in srgb, var(--milk) 5%, transparent); color: var(--muted); font: 500 .8rem/1 var(--font-body); }
 .tc-top i { width: 9px; height: 9px; border-radius: 50%; background: #ff6b5e; }
@@ -858,7 +863,6 @@ h1, h2, h3 { text-wrap: balance; }
       <li><a href="#yurt">3D-юрта</a></li>
       <li><a href="#join">Запись</a></li>
     </ul>
-    <a class="btn btn-gold" href="#join">Бесплатный урок</a>
   </div>
   <div class="nav-progress" aria-hidden="true"></div>
 </header>
@@ -870,22 +874,14 @@ h1, h2, h3 { text-wrap: balance; }
   <svg class="hero-fallback" viewBox="0 0 48 48" aria-hidden="true"><use href="#logo"/></svg>
   <div class="hero-in">
     <div class="hero-copy">
-      <p class="kicker" lang="kk" data-in>Сәлем, болашақ инженер!</p>
       <h1 id="hero-title" class="hero-title">Код, математика<br>и <em>свои игры</em></h1>
-      <p class="lead" data-in>Онлайн-школа для подростков 14–18 лет. Три направления: программирование и ИИ, математика, создание игр. В каждом модуле ты делаешь настоящую вещь, а первый урок бесплатный.</p>
+      <p class="lead" data-in>Онлайн-школа для подростков 14–18 лет. Первый урок бесплатный.</p>
       <div class="cta-row" data-in>
         <a class="btn btn-gold" href="#join" data-magnet>Записаться на бесплатный урок
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
         </a>
-        <a class="btn btn-ghost" href="#directions" data-magnet>Смотреть направления</a>
+
       </div>
-      <ul class="hero-facts" data-in>
-        <li><b>14–18</b>лет</li>
-        <li><b>3</b>направления</li>
-        <li><b>Проект</b>в конце каждого модуля</li>
-        <li><b>0 ₸</b>первый урок</li>
-      </ul>
-      <p class="hero-note" data-in>Заявка уходит в WhatsApp, отвечаем и подбираем удобное время.</p>
     </div>
   </div>
   <div class="hero-hint" aria-hidden="true"><i></i>Листай</div>
@@ -897,11 +893,67 @@ h1, h2, h3 { text-wrap: balance; }
   <div class="wrap">
     <canvas id="icons-3d" class="dirs-3d" aria-hidden="true"></canvas>
     <header class="sec-head">
-      <p class="label" lang="kk" data-reveal="up">Бағыттар</p>
-      <h2 id="dirs-title" data-reveal="lines">Выбери, что будешь создавать</h2>
-      <p class="sec-lead" data-reveal="up">Три направления под одним шаңыраком. Выбери одно, а на бесплатном уроке поможем понять, с чего начать именно тебе.</p>
+      <h2 id="dirs-title" data-reveal="lines">Три направления</h2>
+      <p class="sec-lead" data-reveal="up">Выбери одно. На пробном уроке поможем понять, с чего начать.</p>
     </header>
 
+    <div class="dir-grid dir-grid--three">
+      <article class="dir" data-id="code" style="--accent: var(--gold)">
+        <div class="dir-tilt" data-tilt="0.6">
+          <div class="dir-face">
+            <div class="dir-visual dir-visual--live">
+              <iframe class="live-frame" data-src="watch.html?embed&amp;card" title="3D-модель механических часов: сама поворачивается и разбирается на детали" tabindex="-1"></iframe>
+              <span class="live-tag">Такие 3D-сайты учим делать</span>
+              <button class="live-open" type="button" aria-label="Развернуть на весь экран" data-open="watch.html" data-title="Механические часы: разбери и рассмотри каждую деталь"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 4h6v6M10 20H4v-6M20 4l-7 7M4 20l7-7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Развернуть</span></button>
+            </div>
+            <div class="dir-body">
+              <h3>Программирование и ИИ</h3>
+              <p>Пишешь код на Python и делаешь программы, которыми правда пользуются.</p>
+              <p class="dir-sub">На уроках</p>
+              <ul class="learn"><li>Python с нуля</li><li>Свой Telegram-бот и сайт</li><li>Нейросети: как работают и как проверять их ответы</li></ul>
+              <p class="dir-project"><span>В итоге</span>Свой бот с ИИ или сайт</p>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <article class="dir" data-id="math" style="--accent: var(--sky)">
+        <div class="dir-tilt" data-tilt="0.6">
+          <div class="dir-face">
+            <div class="dir-visual dir-visual--live">
+              <iframe class="live-frame" data-src="tesseract.html?card" title="Тессеракт: четырёхмерный куб вращается, и его тень выворачивается наизнанку" tabindex="-1"></iframe>
+              <button class="live-open" type="button" aria-label="Развернуть на весь экран" data-open="tesseract.html" data-title="Тессеракт: четырёхмерный куб, который вращается в 4D"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 4h6v6M10 20H4v-6M20 4l-7 7M4 20l7-7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Развернуть</span></button>
+            </div>
+            <div class="dir-body">
+              <h3>Математика</h3>
+              <p>Школьная математика через графики и задачи, без зубрёжки.</p>
+              <p class="dir-sub">На уроках</p>
+              <ul class="learn"><li>Алгебра, функции и графики</li><li>Геометрия и логика</li><li>Подготовка к контрольным и олимпиадам</li></ul>
+              <p class="dir-project"><span>В итоге</span>Понимаешь формулы и уверенно решаешь задачи</p>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <article class="dir" data-id="games" style="--accent: var(--felt)">
+        <div class="dir-tilt" data-tilt="0.6">
+          <div class="dir-face">
+            <div class="dir-visual dir-visual--live">
+              <iframe class="live-frame live-frame--play" data-src="physics.html?card" title="Песочница с физикой: нажми, чтобы кинуть мяч в башню из кирпичей"></iframe>
+              <button class="live-open" type="button" aria-label="Развернуть на весь экран" data-open="physics.html" data-title="Физика в браузере: хватай кирпичи и стреляй ядрами"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 4h6v6M10 20H4v-6M20 4l-7 7M4 20l7-7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Развернуть</span></button>
+            </div>
+            <div class="dir-body">
+              <h3>Создание игр</h3>
+              <p>Делаешь свою игру: от идеи до запуска.</p>
+              <p class="dir-sub">На уроках</p>
+              <ul class="learn"><li>Roblox Studio и язык Luau</li><li>2D- и 3D-игры на Godot</li><li>Уровни, физика и звук</li></ul>
+              <p class="dir-project"><span>В итоге</span>Своя игра, в которую играют друзья</p>
+            </div>
+          </div>
+        </div>
+      </article>
+    </div>
+    <h3 class="tc-title">Попробуй сам: первая строчка кода</h3>
     <div class="try-code" data-reveal="up">
       <div class="tc-ed">
         <p class="tc-top"><i></i><i></i><i></i><span>hello.py</span></p>
@@ -913,82 +965,8 @@ h1, h2, h3 { text-wrap: balance; }
       <div class="tc-out" aria-live="polite">
         <p class="tc-top"><span>вывод программы</span></p>
         <pre id="tc-out"></pre>
-        <p class="tc-hint">Впиши имя слева: это настоящий Python, так выглядит первый урок.</p>
+        <p class="tc-hint">Впиши имя: это настоящий Python.</p>
       </div>
-    </div>
-
-    <div class="dir-grid dir-grid--three">
-      <article class="dir" data-id="code" style="--accent: var(--gold)">
-        <div class="dir-tilt" data-tilt="0.6">
-          <div class="dir-face">
-            <div class="dir-visual dir-visual--live">
-              <iframe class="live-frame" data-src="watch.html?embed&amp;card" title="3D-модель механических часов: сама поворачивается и разбирается на детали" tabindex="-1"></iframe>
-              <span class="live-tag">3D-часы в коде · такие сайты учим делать</span>
-              <button class="live-open" type="button" aria-label="Развернуть на весь экран" data-open="watch.html" data-title="Механические часы: разбери и рассмотри каждую деталь"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 4h6v6M10 20H4v-6M20 4l-7 7M4 20l7-7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Развернуть</span></button>
-            </div>
-            <div class="dir-body">
-              <h3>Программирование и ИИ</h3>
-              <p>Пишешь код на Python и учишься работать с нейросетями так, чтобы они ускоряли тебя, а не думали за тебя.</p>
-              <ul class="learn"><li>Python с нуля: переменные, циклы, функции</li><li>Свои Telegram-боты и сайты</li><li>Как устроены нейросети и как проверять их ответы</li></ul>
-              <p class="dir-project"><span>Твой проект</span>Telegram-бот с нейросетью, который помогает тебе или друзьям.</p>
-              <ul class="chips"><li>Python</li><li>Telegram</li><li>ChatGPT</li><li>Claude</li></ul>
-              <a class="btn btn-gold dir-cta" href="https://wa.me/77055823688?text=%D0%A1%D3%99%D0%BB%D0%B5%D0%BC%21%20%D0%A5%D0%BE%D1%87%D1%83%20%D0%BD%D0%B0%20%D0%B1%D0%B5%D1%81%D0%BF%D0%BB%D0%B0%D1%82%D0%BD%D1%8B%D0%B9%20%D0%BF%D1%80%D0%BE%D0%B1%D0%BD%D1%8B%D0%B9%20%D1%83%D1%80%D0%BE%D0%BA%20%D0%BF%D0%BE%20%D0%BD%D0%B0%D0%BF%D1%80%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D1%8E%20%C2%AB%D0%9F%D1%80%D0%BE%D0%B3%D1%80%D0%B0%D0%BC%D0%BC%D0%B8%D1%80%D0%BE%D0%B2%D0%B0%D0%BD%D0%B8%D0%B5%20%D0%B8%20%D0%98%D0%98%C2%BB%20%D0%B2%20%D0%A8%D0%B0%D2%A3%D1%8B%D1%80%D0%B0%D2%9B%20Code." target="_blank" rel="noopener">Записаться на бесплатный урок</a>
-            </div>
-          </div>
-        </div>
-      </article>
-
-      <article class="dir" data-id="math" style="--accent: var(--sky)">
-        <div class="dir-tilt" data-tilt="0.6">
-          <div class="dir-face">
-            <div class="dir-visual dir-visual--live">
-              <div class="live-tabs" role="tablist" aria-label="Что показать">
-                <button type="button" role="tab" aria-selected="true" data-pane="fractal">Фрактал</button>
-                <button type="button" role="tab" aria-selected="false" data-pane="fourier">Фурье</button>
-                <button type="button" role="tab" aria-selected="false" data-pane="tess">Тессеракт</button>
-              </div>
-              <div class="live-pane" data-pane="fractal" data-open="fractal.html" data-title="Фракталы: приближай множество Мандельброта и Жюлиа">
-                <iframe class="live-frame" data-src="fractal.html?card" title="Множество Жюлиа: узор из формулы z → z² + c плавно перетекает" tabindex="-1"></iframe>
-              </div>
-              <div class="live-pane" data-pane="tess" data-open="tesseract.html" data-title="Тессеракт: четырёхмерный куб, который вращается в 4D" hidden>
-                <iframe class="live-frame" data-src="tesseract.html?card" title="Тессеракт: четырёхмерный куб вращается, и его тень выворачивается наизнанку" tabindex="-1"></iframe>
-              </div>
-              <div class="live-pane" data-pane="fourier" data-open="fourier.html" data-title="Ряды Фурье: собери волну и рисунок из вращений" hidden>
-                <iframe class="live-frame" data-src="fourier.html?card" title="Ряд Фурье: круги добавляются по одному, и волна становится квадратной" tabindex="-1"></iframe>
-              </div>
-              <button class="live-open" type="button" aria-label="Развернуть на весь экран" data-open="fractal.html" data-title="Фракталы: приближай множество Мандельброта и Жюлиа"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 4h6v6M10 20H4v-6M20 4l-7 7M4 20l7-7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Развернуть</span></button>
-            </div>
-            <div class="dir-body">
-              <h3>Математика</h3>
-              <p>Алгебра и геометрия через графики, задачи и код: видишь, как работает формула, а не просто заучиваешь её.</p>
-              <ul class="learn"><li>Уравнения, функции и графики</li><li>Геометрия и логика на понятных задачах</li><li>Подготовка к контрольным и олимпиадам</li></ul>
-              <p class="dir-project"><span>Твой проект</span>Свой интерактивный график или решатель задач, который можно показать в школе.</p>
-              <ul class="chips"><li>алгебра</li><li>геометрия</li><li>логика</li><li>Desmos</li></ul>
-              <a class="btn btn-gold dir-cta" href="https://wa.me/77055823688?text=%D0%A1%D3%99%D0%BB%D0%B5%D0%BC%21%20%D0%A5%D0%BE%D1%87%D1%83%20%D0%BD%D0%B0%20%D0%B1%D0%B5%D1%81%D0%BF%D0%BB%D0%B0%D1%82%D0%BD%D1%8B%D0%B9%20%D0%BF%D1%80%D0%BE%D0%B1%D0%BD%D1%8B%D0%B9%20%D1%83%D1%80%D0%BE%D0%BA%20%D0%BF%D0%BE%20%D0%BD%D0%B0%D0%BF%D1%80%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D1%8E%20%C2%AB%D0%9C%D0%B0%D1%82%D0%B5%D0%BC%D0%B0%D1%82%D0%B8%D0%BA%D0%B0%C2%BB%20%D0%B2%20%D0%A8%D0%B0%D2%A3%D1%8B%D1%80%D0%B0%D2%9B%20Code." target="_blank" rel="noopener">Записаться на бесплатный урок</a>
-            </div>
-          </div>
-        </div>
-      </article>
-
-      <article class="dir" data-id="games" style="--accent: var(--felt)">
-        <div class="dir-tilt" data-tilt="0.6">
-          <div class="dir-face">
-            <div class="dir-visual dir-visual--live">
-              <iframe class="live-frame live-frame--play" data-src="physics.html?card" title="Песочница с физикой: нажми, чтобы кинуть мяч в башню из кирпичей"></iframe>
-              <span class="live-tag">Сотни кирпичей с настоящей физикой</span>
-              <button class="live-open" type="button" aria-label="Развернуть на весь экран" data-open="physics.html" data-title="Физика в браузере: хватай кирпичи и стреляй ядрами"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 4h6v6M10 20H4v-6M20 4l-7 7M4 20l7-7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Развернуть</span></button>
-            </div>
-            <div class="dir-body">
-              <h3>Создание игр</h3>
-              <p>Придумываешь механику, строишь уровни, программируешь персонажей и выпускаешь игру, в которую играют друзья.</p>
-              <ul class="learn"><li>Игры в Roblox Studio на Luau</li><li>2D- и 3D-игры на Godot</li><li>Уровни, физика, звук и интерфейс</li></ul>
-              <p class="dir-project"><span>Твой проект</span>Готовая игра или плейс в Roblox, открытый для всех игроков.</p>
-              <ul class="chips"><li>Roblox Studio</li><li>Luau</li><li>Godot</li></ul>
-              <a class="btn btn-gold dir-cta" href="https://wa.me/77055823688?text=%D0%A1%D3%99%D0%BB%D0%B5%D0%BC%21%20%D0%A5%D0%BE%D1%87%D1%83%20%D0%BD%D0%B0%20%D0%B1%D0%B5%D1%81%D0%BF%D0%BB%D0%B0%D1%82%D0%BD%D1%8B%D0%B9%20%D0%BF%D1%80%D0%BE%D0%B1%D0%BD%D1%8B%D0%B9%20%D1%83%D1%80%D0%BE%D0%BA%20%D0%BF%D0%BE%20%D0%BD%D0%B0%D0%BF%D1%80%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D1%8E%20%C2%AB%D0%A1%D0%BE%D0%B7%D0%B4%D0%B0%D0%BD%D0%B8%D0%B5%20%D0%B8%D0%B3%D1%80%C2%BB%20%D0%B2%20%D0%A8%D0%B0%D2%A3%D1%8B%D1%80%D0%B0%D2%9B%20Code." target="_blank" rel="noopener">Записаться на бесплатный урок</a>
-            </div>
-          </div>
-        </div>
-      </article>
     </div>
   </div>
 </section>
@@ -997,14 +975,13 @@ h1, h2, h3 { text-wrap: balance; }
   <div class="yr-stage">
     <canvas id="yurt-3d" aria-hidden="true"></canvas>
     <div class="yr-copy">
-      <p class="label" lang="kk">Киіз үй</p>
       <h2 id="yurt-title" data-reveal="lines">Собери юрту в 3D</h2>
-      <p class="yr-lead">Такую 3D-сцену ты научишься собирать на направлении «Создание игр». Каждая деталь здесь отдельная модель, а вместе они складываются в дом.</p>
+      <p class="yr-lead">Листай, и юрта соберётся. Каждая деталь — отдельная 3D-модель.</p>
       <ol class="yr-steps">
-        <li class="yr-step is-on"><i>1</i><b lang="kk">Кереге</b><span>решётчатые стены, которые складываются как гармошка</span></li>
-        <li class="yr-step is-on"><i>2</i><b lang="kk">Уық</b><span>жерди купола, все сходятся в одной точке</span></li>
-        <li class="yr-step is-on"><i>3</i><b lang="kk">Шаңырақ</b><span>венец юрты и символ дома на гербе Казахстана</span></li>
-        <li class="yr-step is-on"><i>4</i><b lang="kk">Киіз</b><span>войлок с орнаментом, который хранит тепло</span></li>
+        <li class="yr-step is-on"><i>1</i><b lang="kk">Кереге</b></li>
+        <li class="yr-step is-on"><i>2</i><b lang="kk">Уық</b></li>
+        <li class="yr-step is-on"><i>3</i><b lang="kk">Шаңырақ</b></li>
+        <li class="yr-step is-on"><i>4</i><b lang="kk">Киіз</b></li>
       </ol>
     </div>
   </div>
@@ -1013,9 +990,9 @@ h1, h2, h3 { text-wrap: balance; }
 <section class="sec join" id="join" aria-labelledby="join-title">
   <div class="wrap join-grid">
     <div>
-      <p class="label" lang="kk" data-reveal="up">Тіркелу</p>
       <h2 id="join-title"><span lang="kk" data-reveal="chars">Есік ашық</span><small>Дверь открыта: первый урок бесплатно</small></h2>
-      <p class="join-lead" data-reveal="up">Заполни три поля, и заявка откроется в WhatsApp. Отправь её, мы ответим и подберём время. Ничего покупать заранее не нужно: приходи, попробуй и реши сам.</p>
+      <p class="join-lead" data-reveal="up">Заполни три поля — заявка откроется в WhatsApp. Мы ответим и подберём время.</p>
+      <p class="trial-title">На пробном уроке:</p>
       <ul class="trial">
         <li data-reveal="up">Знакомимся и узнаём, что тебе интересно</li>
         <li data-reveal="up">Вместе собираем первый мини-проект</li>
@@ -1093,14 +1070,13 @@ h1, h2, h3 { text-wrap: balance; }
       <svg viewBox="0 0 48 48" aria-hidden="true"><use href="#logo"/></svg>
       <span>Шаңырақ Code<small>школа ИИ и программирования для подростков</small></span>
     </a>
-    <p class="foot-prov"><span lang="kk">Білім — таусылмас кен.</span><small>Знание — неисчерпаемый клад.</small></p>
     <ul class="foot-links">
       <li><a href="#directions">Направления</a></li>
       <li><a href="#yurt">3D-юрта</a></li>
       <li><a href="#join">Бесплатный урок</a></li>
       <li><a href="https://wa.me/77055823688">WhatsApp: +7 705 582 36 88</a></li>
     </ul>
-    <p class="copy"><span>© 2026 Шаңырақ Code</span><span>Сделано на HTML, Three.js и GSAP</span></p>
+    <p class="copy"><span>© 2026 Шаңырақ Code</span></p>
   </div>
   <p class="foot-mark" aria-hidden="true" lang="kk">ШАҢЫРАҚ</p>
 </footer>

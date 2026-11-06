@@ -122,7 +122,7 @@ const bricks = [];
 const brickShape = new CANNON.Box(new CANNON.Vec3(BW / 2, BH / 2, BD / 2));
 const addBrick = (x, y, z, rotY, colorIdx) => {
   if (bricks.length >= MAX) return;
-  const b = new CANNON.Body({ mass: 1, shape: brickShape, material: brickMat, sleepSpeedLimit: 0.15, sleepTimeLimit: 0.6 });
+  const b = new CANNON.Body({ mass: 1, shape: brickShape, material: brickMat, sleepSpeedLimit: 0.12, sleepTimeLimit: 1.6 });
   b.position.set(x, y, z);
   b.quaternion.setFromEuler(0, rotY, 0);
   b.sleep();
@@ -149,11 +149,6 @@ const build = () => {
     // пирамида
     const rows = small ? 8 : 11;
     for (let r = 0; r < rows; r++) for (let i = 0; i < rows - r; i++) addBrick(-9 + (i - (rows - r - 1) / 2) * BW * 1.01, BH / 2 + r * BH, -6, 0, 2 + (r % 2));
-    // стена
-    const wl = small ? 10 : 14, wh = small ? 7 : 10;
-    for (let r = 0; r < wh; r++) for (let i = 0; i < wl; i++) addBrick(8 + (i - wl / 2 + (r % 2) * 0.5) * BW * 1.01, BH / 2 + r * BH, -4, 0, 3 + (r % 2) * 2);
-  } else {
-    for (let r = 0; r < 7; r++) for (let i = 0; i < 7 - r; i++) addBrick(-6 + (i - (7 - r - 1) / 2) * BW * 1.01, BH / 2 + r * BH, -2.5, 0, 2 + (r % 2));
   }
   brickMesh.count = bricks.length;
   if (brickMesh.instanceColor) brickMesh.instanceColor.needsUpdate = true;
@@ -164,11 +159,13 @@ const build = () => {
 const balls = [];
 const ballGeo = new THREE.SphereGeometry(0.36, 20, 14), ballMatV = new THREE.MeshStandardMaterial({ color: '#1b1b1b', metalness: 0.6, roughness: 0.35 });
 const ballShape = new CANNON.Sphere(0.36);
+const wakeAll = () => { for (let i = 0; i < bricks.length; i++) bricks[i].wakeUp(); };
 const fire = (origin, dir) => {
   const body = new CANNON.Body({ mass: 9, shape: ballShape, material: ballMat });
   body.position.set(origin.x, origin.y, origin.z);
   body.velocity.set(dir.x * 34, dir.y * 34, dir.z * 34);
   world.addBody(body);
+  body.addEventListener('collide', () => { if (!body.userData) { body.userData = 1; wakeAll(); } });
   const mesh = new THREE.Mesh(ballGeo, ballMatV); mesh.castShadow = true; scene.add(mesh);
   balls.push({ body, mesh, t: 0 });
   if (balls.length > 24) { const o = balls.shift(); world.removeBody(o.body); scene.remove(o.mesh); }
@@ -189,7 +186,7 @@ renderer.domElement.addEventListener('pointerdown', e => {
   const hit = ray.intersectObject(brickMesh)[0];
   if (!hit) return;
   const body = bricks[hit.instanceId];
-  body.wakeUp();
+  wakeAll();
   hand.position.set(hit.point.x, hit.point.y, hit.point.z);
   const local = body.pointToLocalFrame(new CANNON.Vec3(hit.point.x, hit.point.y, hit.point.z));
   const c = new CANNON.PointToPointConstraint(body, local, hand, new CANNON.Vec3(0, 0, 0), 40);
@@ -260,7 +257,7 @@ renderer.setAnimationLoop(now => {
     cardT += dt;
     const a = cardT * 0.15;
     camera.position.set(Math.sin(a) * 13, 7, Math.cos(a) * 13);
-    camera.lookAt(-1, 2, 0);
+    camera.lookAt(0, 1.8, 0);
     // через 12 секунд после последнего броска башни собираются заново, и надпись возвращается
     if (lastThrow >= 0 && cardT - lastThrow > 12) { lastThrow = -1; build(); hint.classList.remove('gone'); }
   } else controls.update();
