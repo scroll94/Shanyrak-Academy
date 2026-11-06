@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Фракталы · Шаңырақ Code</title>
+<meta name="description" content="Множество Мандельброта и множества Жюлиа: одна формула z → z² + c рисует бесконечно сложные узоры. Пример с курса «Математика».">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@600;800&family=Onest:wght@400;600&display=swap">
+<style>
+  :root { color-scheme: dark; --night: #0a1430; --gold: #e8b64a; --sky: #3cc6dc; --milk: #f4ecdf; --muted: #a7b1d1; }
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  html, body { margin: 0; height: 100%; overflow: hidden; background: var(--night); color: var(--milk); font: 400 15px/1.45 "Onest", system-ui, sans-serif; }
+  canvas { position: fixed; inset: 0; display: block; width: 100%; height: 100%; touch-action: none; cursor: grab; }
+  canvas:active { cursor: grabbing; }
+  .ui { position: fixed; left: 16px; right: 16px; top: 14px; z-index: 2; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px 20px; pointer-events: none; }
+  .ui > * { pointer-events: auto; }
+  .intro { max-width: 34rem; padding: 12px 14px; border-radius: 14px; background: rgb(10 20 48 / .72); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); }
+  .ui h1 { margin: 0; font: 800 clamp(20px, 3vw, 30px)/1.1 "Unbounded", sans-serif; }
+  .ui p { margin: 6px 0 0; color: var(--muted); font-size: 14px; }
+  .ui p b { color: var(--gold); font-family: Consolas, monospace; }
+  .ctl { display: grid; gap: 8px; align-content: start; }
+  .seg { display: flex; flex-wrap: wrap; gap: 6px; }
+  .seg button, .ctl > button { min-height: 40px; padding: 0 14px; border: 0; border-radius: 10px; background: rgb(10 20 48 / .8); color: var(--milk); font: 600 14px/1 "Onest", sans-serif; cursor: pointer; transition: background-color 160ms, transform 160ms cubic-bezier(.23, 1, .32, 1); }
+  .seg button[aria-pressed="true"] { background: var(--gold); color: #111; }
+  .seg button:active, .ctl > button:active { transform: scale(.97); }
+  button:focus-visible, input:focus-visible { outline: 3px solid #fff; outline-offset: 2px; }
+  label.ang { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: 10px; padding: 6px 12px; border-radius: 10px; background: rgb(10 20 48 / .8); font-weight: 600; }
+  label.ang input { width: 100%; accent-color: var(--gold); }
+  .info { position: fixed; left: 16px; bottom: 14px; z-index: 2; max-width: calc(100% - 32px); padding: 9px 13px; border-radius: 12px; background: rgb(10 20 48 / .8); font: 600 14px/1.45 Consolas, "Cascadia Mono", monospace; pointer-events: none; }
+  .info span { color: var(--gold); }
+  .info small { display: block; color: var(--muted); font: 400 13px/1.35 "Onest", sans-serif; }
+  body.card .ui { display: none; }
+  body.card canvas { cursor: default; touch-action: pan-y; }
+  body.card .info { left: auto; right: 10px; bottom: 10px; padding: 6px 10px; font-size: 12.5px; }
+  body.card .info small { display: none; }
+</style>
+</head>
+<body>
+<canvas id="c" aria-label="Фрактал: узор, который получается из формулы z → z² + c" role="img"></canvas>
+<div class="ui">
+  <div class="intro">
+    <h1>Фракталы</h1>
+    <p>Одна строчка: <b>z → z² + c</b>. Берём точку, много раз возводим в квадрат и прибавляем c. Если число убегает в бесконечность, точку красим по тому, как быстро оно убежало. Узор повторяется при любом приближении.</p>
+  </div>
+  <div class="ctl">
+    <div class="seg" role="group" aria-label="Какой фрактал">
+      <button type="button" data-mode="1" aria-pressed="true">Жюлиа</button>
+      <button type="button" data-mode="0" aria-pressed="false">Мандельброт</button>
+    </div>
+    <label class="ang" id="ang-wrap"><span>Число c</span><input id="ang" type="range" min="0" max="628" value="0" aria-label="Положение числа c на круге"></label>
+    <button type="button" id="reset">Вернуть вид</button>
+  </div>
+</div>
+<p class="info" id="info"></p>
+
+<script>
+(() => {
+  const qs = new URLSearchParams(location.search);
+  const card = qs.has('card');
+  if (card) document.body.classList.add('card');
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const cv = document.getElementById('c');
+  const gl = cv.getContext('webgl', { antialias: false, preserveDrawingBuffer: false });
+  const info = document.getElementById('info');
+  if (!gl) { info.textContent = 'Браузер не поддерживает WebGL, фрактал не нарисовать.'; return; }
+
+  // ---------- шейдер: для каждого пикселя считаем, как быстро убегает z ----------
+  const VS = 'attribute vec2 p; void main(){ gl_Position = vec4(p, 0.0, 1.0); }';
+  const FS = `precision highp float;
+    uniform vec2 res, center, c; uniform float scale, shift; uniform int mode, maxIt;
+    vec3 pal(float t){
+      // ночь → бирюза → золото → молоко → коралл и снова ночь: цвета сайта
+      t = fract(t);
+      vec3 a = vec3(0.04,0.08,0.19), b = vec3(0.24,0.78,0.86), g = vec3(0.91,0.71,0.29), m = vec3(0.96,0.93,0.87), f = vec3(0.90,0.37,0.26);
+      if (t < 0.25) return mix(a, b, t / 0.25);
+      if (t < 0.5) return mix(b, g, (t - 0.25) / 0.25);
+      if (t < 0.62) return mix(g, m, (t - 0.5) / 0.12);
+      if (t < 0.8) return mix(m, f, (t - 0.62) / 0.18);
+      return mix(f, a, (t - 0.8) / 0.2);
+    }
+    void main(){
+      vec2 uv = (gl_FragCoord.xy - 0.5 * res) / res.y;
+      vec2 pt = center + uv * scale;
+      vec2 z = mode == 1 ? pt : vec2(0.0);
+      vec2 k = mode == 1 ? c : pt;
+      float n = 0.0, trap = 10.0; bool out_ = false;
+      for (int i = 0; i < 600; i++) {
+        if (i >= maxIt) break;
+        z = vec2(z.x * z.x - z.y * z.y, 2.0 * z.x * z.y) + k;
+        trap = min(trap, abs(z.x * z.y) * 6.0 + dot(z, z) * 0.2);
+        if (dot(z, z) > 256.0) { out_ = true; break; }
+        n += 1.0;
+      }
+      // внутри множества: тихий узор по тому, как близко z подходил к осям (орбитальная ловушка)
+      if (!out_) { float k2 = exp(-trap * 3.0); gl_FragColor = vec4(mix(vec3(0.02, 0.04, 0.11), vec3(0.10, 0.36, 0.48), k2) + vec3(0.9, 0.7, 0.3) * pow(k2, 6.0) * 0.6, 1.0); return; }
+      // плавный счёт, чтобы не было ступенек между полосами
+      float sn = n - log2(log2(dot(z, z))) + 4.0;
+      // быстро убежавшие точки почти ночные, у самой границы множества — яркое свечение
+      vec3 base = pal(0.22 * log(sn + 1.0) + shift + 0.08);
+      float glow = pow(1.0 - exp(-sn * 0.06), 1.25);
+      vec3 col = mix(vec3(0.015, 0.03, 0.09), base, glow);
+      gl_FragColor = vec4(col, 1.0);
+    }`;
+  const sh = (type, src) => { const s = gl.createShader(type); gl.shaderSource(s, src); gl.compileShader(s); if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(s)); return s; };
+  const prog = gl.createProgram();
+  gl.attachShader(prog, sh(gl.VERTEX_SHADER, VS)); gl.attachShader(prog, sh(gl.FRAGMENT_SHADER, FS)); gl.linkProgram(prog); gl.useProgram(prog);
+  const buf = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]), gl.STATIC_DRAW);
+  const loc = gl.getAttribLocation(prog, 'p'); gl.enableVertexAttribArray(loc); gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
+  const U = n => gl.getUniformLocation(prog, n);
+  const u = { res: U('res'), center: U('center'), c: U('c'), scale: U('scale'), shift: U('shift'), mode: U('mode'), maxIt: U('maxIt') };
+
+  // ---------- вид ----------
+  const HOME = { 1: { x: 0, y: 0, s: 3.0 }, 0: { x: -0.6, y: 0, s: 2.9 } };
+  let mode = 1, view = { ...HOME[1] }, target = { ...view };
+  let ang = 2.5, autoAng = true, phase = 0;
+  const R = 0.7885; // c бегает по кругу этого радиуса: там самые красивые множества Жюлиа
+  let dpr = 1;
+  const resize = () => { dpr = Math.min(devicePixelRatio, card ? 1.25 : 1.75); cv.width = Math.round(innerWidth * dpr); cv.height = Math.round(innerHeight * dpr); gl.viewport(0, 0, cv.width, cv.height); };
+  addEventListener('resize', resize); resize();
+
+  // ---------- управление: тянуть, крутить колесо, щипок, двойной клик ----------
+  const toPlane = (x, y) => ({ x: view.x + ((x - innerWidth / 2) / innerHeight) * view.s, y: view.y - ((y - innerHeight / 2) / innerHeight) * view.s });
+  const zoomAt = (x, y, k) => {
+    const p = toPlane(x, y);
+    const s = Math.min(4, Math.max(2e-5, target.s * k));
+    const f = s / target.s;
+    target.x = p.x + (target.x - p.x) * f; target.y = p.y + (target.y - p.y) * f; target.s = s;
+  };
+  if (!card) {
+    const ptrs = new Map(); let pinch0 = 0;
+    cv.addEventListener('pointerdown', e => { cv.setPointerCapture(e.pointerId); ptrs.set(e.pointerId, { x: e.clientX, y: e.clientY }); if (ptrs.size === 2) { const [a, b] = [...ptrs.values()]; pinch0 = Math.hypot(a.x - b.x, a.y - b.y); } });
+    cv.addEventListener('pointermove', e => {
+      const prev = ptrs.get(e.pointerId); if (!prev) return;
+      if (ptrs.size === 1) {
+        target.x -= ((e.clientX - prev.x) / innerHeight) * target.s; target.y += ((e.clientY - prev.y) / innerHeight) * target.s;
+        view.x = target.x; view.y = target.y;
+      }
+      ptrs.set(e.pointerId, { x: e.clientX, y: e.clientY });
+      if (ptrs.size === 2) {
+        const [a, b] = [...ptrs.values()], d = Math.hypot(a.x - b.x, a.y - b.y);
+        if (pinch0) zoomAt((a.x + b.x) / 2, (a.y + b.y) / 2, pinch0 / d);
+        pinch0 = d;
+      }
+    });
+    const up = e => { ptrs.delete(e.pointerId); pinch0 = 0; };
+    cv.addEventListener('pointerup', up); cv.addEventListener('pointercancel', up);
+    cv.addEventListener('wheel', e => { e.preventDefault(); zoomAt(e.clientX, e.clientY, Math.exp(e.deltaY * 0.0015)); }, { passive: false });
+    cv.addEventListener('dblclick', e => zoomAt(e.clientX, e.clientY, 0.4));
+    const btns = [...document.querySelectorAll('[data-mode]')];
+    btns.forEach(b => b.addEventListener('click', () => {
+      mode = +b.dataset.mode;
+      btns.forEach(o => o.setAttribute('aria-pressed', String(o === b)));
+      document.getElementById('ang-wrap').hidden = mode !== 1;
+      target = { ...HOME[mode] }; view = { ...target };
+    }));
+    const angIn = document.getElementById('ang');
+    angIn.addEventListener('input', () => { autoAng = false; ang = angIn.value / 100; });
+    document.getElementById('reset').addEventListener('click', () => { target = { ...HOME[mode] }; autoAng = true; });
+    addEventListener('keydown', e => { if (e.key === '+' || e.key === '=') zoomAt(innerWidth / 2, innerHeight / 2, 0.7); if (e.key === '-') zoomAt(innerWidth / 2, innerHeight / 2, 1.4); });
+  }
+
+  // ---------- кадр ----------
+  let active = true, last = performance.now(), t = 0;
+  addEventListener('message', ev => { if (ev.data && typeof ev.data.active === 'boolean') active = ev.data.active; });
+  const fmt = v => (v < 0 ? '−' : '+') + Math.abs(v).toFixed(3).replace('.', ',');
+  const loop = now => {
+    requestAnimationFrame(loop);
+    const dt = Math.min(0.05, (now - last) / 1000); last = now;
+    if (!active) return;
+    t += reduce ? 0 : dt;
+    // c качается по дуге, где множества Жюлиа связные и самые узорчатые
+    if (autoAng && !reduce) { phase += dt * (card ? 0.35 : 0.22); ang = 2.5 + 0.65 * Math.sin(phase); }
+    if (!card && autoAng) document.getElementById('ang').value = Math.round((ang % 6.283) * 100);
+    // приближение плавно догоняет цель
+    view.x += (target.x - view.x) * 0.18; view.y += (target.y - view.y) * 0.18; view.s *= Math.pow(target.s / view.s, 0.18);
+    const cx = R * Math.cos(ang), cy = R * Math.sin(ang);
+    const zoom = HOME[mode].s / view.s;
+    const it = Math.min(600, Math.round((card ? 110 : 160) + Math.log2(Math.max(1, zoom)) * 40));
+    gl.uniform2f(u.res, cv.width, cv.height);
+    gl.uniform2f(u.center, view.x, view.y);
+    gl.uniform2f(u.c, cx, cy);
+    gl.uniform1f(u.scale, view.s);
+    gl.uniform1f(u.shift, reduce ? 0 : t * 0.03);
+    gl.uniform1i(u.mode, mode);
+    gl.uniform1i(u.maxIt, it);
+    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+    info.innerHTML = mode === 1
+      ? `z → z² + c, c = <span>${fmt(cx)} ${fmt(cy)}i</span>` + (card ? '' : `<small>Число c медленно ходит по дуге, и узор перетекает. Тяни, крути колесо или щипай, чтобы приблизить. Приближение ×${zoom < 10 ? zoom.toFixed(1).replace('.', ',') : Math.round(zoom)}</small>`)
+      : `z → z² + c, z начинается с 0` + `<small>Множество Мандельброта: узорчатая середина — это точки c, при которых z не убегает. Приближай край: там бесконечно много маленьких копий. Приближение ×${zoom < 10 ? zoom.toFixed(1).replace('.', ',') : Math.round(zoom)}</small>`;
+  };
+  requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>

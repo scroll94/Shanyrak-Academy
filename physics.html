@@ -24,10 +24,17 @@
   .stat { position: fixed; left: 16px; bottom: 14px; z-index: 2; padding: 8px 12px; border-radius: 10px; background: rgb(0 0 0 / .4); color: var(--muted); font-size: 13px; pointer-events: none; }
   .stat b { color: var(--gold); font-variant-numeric: tabular-nums; }
   body.card .ui, body.card .stat { display: none; }
+  /* в карточке палец листает страницу вверх-вниз, а короткое нажатие бросает мяч */
+  body.card canvas { touch-action: pan-y; cursor: crosshair; }
+  .throw { position: fixed; left: 50%; top: 50%; z-index: 3; display: flex; align-items: center; gap: .55rem; padding: .8rem 1.25rem; border-radius: 999px; background: var(--gold); color: #111; font: 800 clamp(14px, 2.6vw, 18px)/1 "Unbounded", sans-serif; white-space: nowrap; box-shadow: 0 10px 30px rgb(0 0 0 / .4); pointer-events: none; transform: translate(-50%, -50%); transition: opacity .35s ease, transform .45s cubic-bezier(.23, 1, .32, 1); animation: nudge 1.8s ease-in-out infinite; }
+  .throw svg { width: 1.3em; height: 1.3em; flex: none; }
+  .throw.gone { opacity: 0; transform: translate(-50%, -30%) scale(.9); animation: none; }
+  @keyframes nudge { 50% { transform: translate(-50%, -50%) scale(1.06); } }
+  @media (prefers-reduced-motion: reduce) { .throw { animation: none; } }
 </style>
 </head>
 <body>
-<canvas id="c" aria-label="Физическая песочница: башни из кирпичей, их можно хватать и сбивать ядрами" role="img"></canvas>
+<canvas id="c" aria-label="Физическая песочница: башни из кирпичей. Нажми, чтобы кинуть мяч" role="img"></canvas>
 <div class="ui">
   <div>
     <h1>Физика в браузере</h1>
@@ -39,6 +46,7 @@
     <button id="slow" type="button" aria-pressed="false">Замедлить</button>
   </div>
 </div>
+<p class="throw" id="throw" aria-live="polite"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="2.2"/><path d="M5 9.5c4 1.6 10 1.6 14 0M5 14.5c4-1.6 10-1.6 14 0" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>Кинуть мяч</p>
 <p class="stat" aria-live="off">Тел в сцене: <b id="count">0</b> · ядер: <b id="balls">0</b></p>
 
 <script type="importmap">
@@ -174,8 +182,8 @@ world.addBody(hand);
 let grab = null, dragPlane = new THREE.Plane(), downAt = null;
 const setNdc = e => { const r = renderer.domElement.getBoundingClientRect(); ndc.set(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1); ray.setFromCamera(ndc, camera); };
 renderer.domElement.addEventListener('pointerdown', e => {
-  if (card) return;
   downAt = { x: e.clientX, y: e.clientY };
+  if (card) return; // в карточке кирпичи не хватаем, только бросаем
   setNdc(e);
   const hit = ray.intersectObject(brickMesh)[0];
   if (!hit) return;
@@ -202,13 +210,19 @@ const release = e => {
   if (downAt && Math.hypot(e.clientX - downAt.x, e.clientY - downAt.y) < 6) {
     setNdc(e);
     fire(camera.position.clone().add(ray.ray.direction.clone().multiplyScalar(1.5)), ray.ray.direction);
+    thrown();
   }
   downAt = null;
 };
 renderer.domElement.addEventListener('pointerup', release);
 renderer.domElement.addEventListener('pointercancel', () => { if (grab) { world.removeConstraint(grab.c); grab = null; } controls.enabled = !card; downAt = null; });
 
+// надпись «Кинуть мяч» пропадает после первого броска и возвращается, когда башни собраны заново
+const hint = document.getElementById('throw');
+let lastThrow = -1, cardT = 0;
+const thrown = () => { hint.classList.add('gone'); lastThrow = cardT; };
 const volley = () => {
+  thrown();
   for (let i = 0; i < 6; i++) setTimeout(() => {
     const target = new THREE.Vector3((Math.random() - 0.5) * 8, 1 + Math.random() * 4, (Math.random() - 0.5) * 6);
     const from = camera.position.clone();
@@ -217,7 +231,7 @@ const volley = () => {
 };
 const countEl = document.getElementById('count'), ballsEl = document.getElementById('balls');
 document.getElementById('volley').addEventListener('click', volley);
-document.getElementById('rebuild').addEventListener('click', build);
+document.getElementById('rebuild').addEventListener('click', () => { build(); hint.classList.remove('gone'); });
 let slow = false;
 document.getElementById('slow').addEventListener('click', e => { slow = !slow; e.currentTarget.setAttribute('aria-pressed', String(slow)); e.currentTarget.textContent = slow ? 'Обычная скорость' : 'Замедлить'; });
 addEventListener('keydown', e => { if (e.code === 'Space') { e.preventDefault(); volley(); } });
@@ -236,22 +250,18 @@ addEventListener('resize', resize); resize();
 let active = true;
 addEventListener('message', ev => { if (ev.data && typeof ev.data.active === 'boolean') active = ev.data.active; });
 const m4 = new THREE.Matrix4(), pos = new THREE.Vector3(), quat = new THREE.Quaternion(), one = new THREE.Vector3(1, 1, 1);
-let last = performance.now(), cardT = 0, nextShot = 1.5;
+let last = performance.now();
 renderer.setAnimationLoop(now => {
   const dt = Math.min(0.05, (now - last) / 1000); last = now;
   if (!active) return;
   if (card) {
-    // заставка: камера медленно облетает, ядра летят сами, раз в 14 секунд всё собирается заново
+    // в карточке камера медленно облетает башни, а мяч бросает сам посетитель
     cardT += dt;
     const a = cardT * 0.15;
     camera.position.set(Math.sin(a) * 13, 7, Math.cos(a) * 13);
     camera.lookAt(-1, 2, 0);
-    if (!reduce && cardT > nextShot) {
-      nextShot = cardT + 2.2;
-      const target = new THREE.Vector3((Math.random() - 0.5) * 5, 1.5 + Math.random() * 2.5, (Math.random() - 0.5) * 3);
-      fire(camera.position.clone(), target.sub(camera.position).normalize());
-    }
-    if (cardT > 14) { cardT = 0; nextShot = 1.5; build(); }
+    // через 12 секунд после последнего броска башни собираются заново, и надпись возвращается
+    if (lastThrow >= 0 && cardT - lastThrow > 12) { lastThrow = -1; build(); hint.classList.remove('gone'); }
   } else controls.update();
   if (!reduce) world.step(1 / 60, dt * (slow ? 0.25 : 1), 3);
   for (let i = 0; i < bricks.length; i++) {

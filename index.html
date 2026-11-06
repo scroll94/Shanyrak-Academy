@@ -334,6 +334,7 @@ h1, h2, h3 { text-wrap: balance; }
 
 /* вкладки и кнопка «Развернуть» в живых сценах */
 .live-pane { position: absolute; inset: 0; }
+.dir-visual--live .live-frame--play { pointer-events: auto; }
 .live-tabs { position: absolute; top: 10px; left: 10px; z-index: 3; display: flex; gap: 4px; padding: 3px; border-radius: 999px; background: rgb(10 20 48 / .82); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); }
 .live-tabs button { min-height: 32px; padding: 0 .8rem; border: 0; border-radius: 999px; background: none; color: var(--muted); font: 600 .8rem/1 var(--font-body); cursor: pointer; transition: background-color .2s, color .2s; }
 .live-tabs button[aria-selected="true"] { background: var(--accent); color: var(--night); }
@@ -341,6 +342,10 @@ h1, h2, h3 { text-wrap: balance; }
 .live-tabs button[aria-selected="true"]:hover { color: var(--night); }
 .live-open { position: absolute; top: 10px; right: 10px; z-index: 3; display: inline-flex; align-items: center; gap: .4rem; min-height: 36px; padding: 0 .85rem; border: 0; border-radius: 999px; background: var(--accent); color: var(--night); font: 700 .8rem/1 var(--font-body); cursor: pointer; transition: transform .16s var(--ease-out), filter .2s; }
 .live-open svg { width: 15px; height: 15px; }
+/* где есть вкладки, кнопка остаётся значком, чтобы не налезать на них */
+.dir-visual--live:has(.live-tabs) .live-open { width: 38px; padding: 0; justify-content: center; }
+.dir-visual--live:has(.live-tabs) .live-open span { display: none; }
+.dir-visual--live:has(.live-tabs) .live-open svg { width: 17px; height: 17px; }
 .live-open:hover { filter: brightness(1.08); }
 .live-open:active { transform: scale(.96); }
 .live-tabs button:focus-visible, .live-open:focus-visible { outline: 2px solid var(--milk); outline-offset: 2px; }
@@ -921,7 +926,7 @@ h1, h2, h3 { text-wrap: balance; }
             <div class="dir-visual dir-visual--live">
               <iframe class="live-frame" data-src="watch.html?embed&amp;card" title="3D-модель механических часов: сама поворачивается и разбирается на детали" tabindex="-1"></iframe>
               <span class="live-tag">3D-часы в коде · такие сайты учим делать</span>
-              <button class="live-open" type="button" data-open="watch.html" data-title="Механические часы: разбери и рассмотри каждую деталь"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 4h6v6M10 20H4v-6M20 4l-7 7M4 20l7-7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Развернуть</button>
+              <button class="live-open" type="button" aria-label="Развернуть на весь экран" data-open="watch.html" data-title="Механические часы: разбери и рассмотри каждую деталь"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 4h6v6M10 20H4v-6M20 4l-7 7M4 20l7-7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Развернуть</span></button>
             </div>
             <div class="dir-body">
               <h3>Программирование и ИИ</h3>
@@ -941,16 +946,20 @@ h1, h2, h3 { text-wrap: balance; }
             <div class="dir-visual dir-visual--live">
               <div class="live-tabs" role="tablist" aria-label="Что показать">
                 <button type="button" role="tab" aria-selected="true" data-pane="spiral">Спираль</button>
-                <button type="button" role="tab" aria-selected="false" data-pane="fourier">Ряды Фурье</button>
+                <button type="button" role="tab" aria-selected="false" data-pane="fourier">Фурье</button>
+                <button type="button" role="tab" aria-selected="false" data-pane="fractal">Фрактал</button>
               </div>
               <div class="live-pane live-pane--spiral" data-pane="spiral" role="img" aria-label="Золотая спираль: каждая точка повёрнута на 137,5 градуса от предыдущей, как семечки в подсолнухе">
                 <canvas class="spiral" aria-hidden="true"></canvas>
                 <p class="live-formula" aria-hidden="true"><span>θ = n · <b data-ang>137,51°</b></span><span>r = c · √n</span><small data-sp-hint>Води по картинке: меняешь угол, и узор перекручивается</small></p>
               </div>
+              <div class="live-pane" data-pane="fractal" data-open="fractal.html" data-title="Фракталы: приближай множество Мандельброта и Жюлиа" hidden>
+                <iframe class="live-frame" data-src="fractal.html?card" title="Множество Жюлиа: узор из формулы z → z² + c плавно перетекает" tabindex="-1"></iframe>
+              </div>
               <div class="live-pane" data-pane="fourier" data-open="fourier.html" data-title="Ряды Фурье: собери волну и рисунок из вращений" hidden>
                 <iframe class="live-frame" data-src="fourier.html?card" title="Ряд Фурье: круги добавляются по одному, и волна становится квадратной" tabindex="-1"></iframe>
               </div>
-              <button class="live-open" type="button" data-open="fourier.html" data-title="Ряды Фурье: собери волну и рисунок из вращений"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 4h6v6M10 20H4v-6M20 4l-7 7M4 20l7-7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Развернуть</button>
+              <button class="live-open" type="button" aria-label="Развернуть на весь экран" data-open="fourier.html" data-title="Ряды Фурье: собери волну и рисунок из вращений"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 4h6v6M10 20H4v-6M20 4l-7 7M4 20l7-7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Развернуть</span></button>
             </div>
             <div class="dir-body">
               <h3>Математика</h3>
@@ -968,19 +977,9 @@ h1, h2, h3 { text-wrap: balance; }
         <div class="dir-tilt" data-tilt="0.6">
           <div class="dir-face">
             <div class="dir-visual dir-visual--live">
-              <div class="live-tabs" role="tablist" aria-label="Какую игру показать">
-                <button type="button" role="tab" aria-selected="true" data-pane="deep">Бездна</button>
-                <button type="button" role="tab" aria-selected="false" data-pane="phys">Физика</button>
-              </div>
-              <div class="live-pane" data-pane="deep" data-open="deepsea.html" data-title="«Бездна»: глубоководный хоррор, включи звук">
-                <iframe class="live-frame" data-src="deepsea.html?card" title="Заставка игры «Бездна»: подлодка в темноте, сонар находит удильщика" tabindex="-1"></iframe>
-                <span class="live-tag">Хоррор под водой: фонарь, сонар и удильщик</span>
-              </div>
-              <div class="live-pane" data-pane="phys" data-open="physics.html" data-title="Физика в браузере: хватай кирпичи и стреляй ядрами" hidden>
-                <iframe class="live-frame" data-src="physics.html?card" title="Песочница с физикой: ядра сбивают башню из кирпичей" tabindex="-1"></iframe>
-                <span class="live-tag">Сотни кирпичей с настоящей физикой</span>
-              </div>
-              <button class="live-open" type="button" data-open="deepsea.html" data-title="«Бездна»: глубоководный хоррор, включи звук"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 4h6v6M10 20H4v-6M20 4l-7 7M4 20l7-7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Развернуть</button>
+              <iframe class="live-frame live-frame--play" data-src="physics.html?card" title="Песочница с физикой: нажми, чтобы кинуть мяч в башню из кирпичей"></iframe>
+              <span class="live-tag">Сотни кирпичей с настоящей физикой</span>
+              <button class="live-open" type="button" aria-label="Развернуть на весь экран" data-open="physics.html" data-title="Физика в браузере: хватай кирпичи и стреляй ядрами"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 4h6v6M10 20H4v-6M20 4l-7 7M4 20l7-7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Развернуть</span></button>
             </div>
             <div class="dir-body">
               <h3>Создание игр</h3>
