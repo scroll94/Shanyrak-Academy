@@ -95,7 +95,7 @@ camera.position.set(4.2, 3.2, 9.5);
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
 controls.minDistance = 3.2;
-controls.maxDistance = 26;
+controls.maxDistance = 80;
 // во встроенном окне колесо мыши листает страницу, а не приближает часы
 if (embed) { controls.enableZoom = false; document.getElementById('hint').textContent = 'Тяни, чтобы повернуть · на весь экран можно приблизить'; }
 controls.target.set(0, 0, -1.4);
@@ -449,6 +449,8 @@ const resize = () => {
   labelRenderer.setSize(w, h);
   camera.aspect = w / h;
   camera.updateProjectionMatrix();
+  // на узком экране часы целиком: камера отходит, пока посетитель сам её не трогал
+  if (!scrollMode && !userMoved && !anim) camera.position.sub(controls.target).setLength(10.8 * Math.max(1, 1.05 / camera.aspect)).add(controls.target);
 };
 addEventListener('resize', resize);
 resize();
@@ -476,12 +478,12 @@ renderer.setAnimationLoop(() => {
   // камера уходит на три четверти сбоку, пока посетитель сам её не повернул
   if (scrollMode) {
     // в узком окне телефона отходим дальше, чтобы разобранные слои влезли целиком
-    const fit = Math.max(1, 1.05 / camera.aspect);
+    const fit = Math.max(1, (1.05 + 0.25 * e) / camera.aspect);
     camera.position.copy(homeDir).lerp(sideDir, e).normalize().multiplyScalar((10.8 + 5 * e) * fit);
     if (cardMode && !reduce) camera.position.applyAxisAngle(new THREE.Vector3(0, 1, 0), Math.sin(t * 0.25) * 0.35);
     camera.position.add(controls.target);
   } else if (!userMoved && anim && !anim.camDone) {
-    camera.position.copy(homeDir).lerp(sideDir, e).normalize().multiplyScalar(10.8 + 5 * e).add(controls.target);
+    camera.position.copy(homeDir).lerp(sideDir, e).normalize().multiplyScalar((10.8 + 5 * e) * Math.max(1, (1.05 + 0.25 * e) / camera.aspect)).add(controls.target);
     if (performance.now() - anim.t0 >= 1200) anim.camDone = true;
   }
 

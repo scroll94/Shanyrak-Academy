@@ -332,6 +332,32 @@ h1, h2, h3 { text-wrap: balance; }
 .yr-step:hover b { text-decoration: underline; text-underline-offset: 4px; }
 .yr-step:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
 
+/* вкладки и кнопка «Развернуть» в живых сценах */
+.live-pane { position: absolute; inset: 0; }
+.live-tabs { position: absolute; top: 10px; left: 10px; z-index: 3; display: flex; gap: 4px; padding: 3px; border-radius: 999px; background: rgb(10 20 48 / .82); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); }
+.live-tabs button { min-height: 32px; padding: 0 .8rem; border: 0; border-radius: 999px; background: none; color: var(--muted); font: 600 .8rem/1 var(--font-body); cursor: pointer; transition: background-color .2s, color .2s; }
+.live-tabs button[aria-selected="true"] { background: var(--accent); color: var(--night); }
+.live-tabs button:hover { color: var(--milk); }
+.live-tabs button[aria-selected="true"]:hover { color: var(--night); }
+.live-open { position: absolute; top: 10px; right: 10px; z-index: 3; display: inline-flex; align-items: center; gap: .4rem; min-height: 36px; padding: 0 .85rem; border: 0; border-radius: 999px; background: var(--accent); color: var(--night); font: 700 .8rem/1 var(--font-body); cursor: pointer; transition: transform .16s var(--ease-out), filter .2s; }
+.live-open svg { width: 15px; height: 15px; }
+.live-open:hover { filter: brightness(1.08); }
+.live-open:active { transform: scale(.96); }
+.live-tabs button:focus-visible, .live-open:focus-visible { outline: 2px solid var(--milk); outline-offset: 2px; }
+.live-pane--spiral .live-formula { top: auto; bottom: 10px; }
+.viewer { width: 100vw; height: 100dvh; max-width: none; max-height: none; margin: 0; padding: 0; border: 0; background: var(--night); color: var(--milk); }
+.viewer[open] { display: flex; flex-direction: column; animation: vw-in .32s var(--ease-out); }
+.viewer::backdrop { background: rgb(5 10 25 / .7); }
+@keyframes vw-in { from { opacity: 0; transform: scale(.97); } }
+.vw-bar { display: flex; align-items: center; gap: 1rem; padding: .6rem .8rem .6rem 1.1rem; padding-top: max(.6rem, env(safe-area-inset-top, 0px)); border-bottom: 1px solid color-mix(in srgb, var(--milk) 10%, transparent); }
+.vw-bar b { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: 700 1rem/1.2 var(--font-display); }
+.vw-bar a { color: var(--muted); font-size: .9rem; white-space: nowrap; }
+.vw-close { flex: none; width: 44px; height: 44px; border: 0; border-radius: 12px; background: color-mix(in srgb, var(--milk) 10%, transparent); color: var(--milk); font-size: 1.15rem; cursor: pointer; }
+.vw-close:hover { background: color-mix(in srgb, var(--milk) 18%, transparent); }
+#vw-frame { flex: 1; width: 100%; border: 0; background: #000; }
+@media (max-width: 560px) { .vw-bar a { display: none; } .live-open { padding: 0 .65rem; } .live-tabs button { padding: 0 .6rem; } }
+@media (prefers-reduced-motion: reduce) { .viewer[open] { animation: none; } }
+
 /* живые сцены в карточках вместо роликов */
 .dir-visual--live { padding: 0; height: auto; aspect-ratio: 16 / 10; overflow: hidden; container-type: normal; }
 .dir-visual--live .live-frame, .dir-visual--live canvas { position: absolute; inset: 0; display: block; width: 100%; height: 100%; border: 0; pointer-events: none; }
@@ -894,7 +920,8 @@ h1, h2, h3 { text-wrap: balance; }
           <div class="dir-face">
             <div class="dir-visual dir-visual--live">
               <iframe class="live-frame" data-src="watch.html?embed&amp;card" title="3D-модель механических часов: сама поворачивается и разбирается на детали" tabindex="-1"></iframe>
-              <a class="live-tag" href="watch.html" target="_blank" rel="noopener">3D-часы в коде · такие сайты учим делать ↗</a>
+              <span class="live-tag">3D-часы в коде · такие сайты учим делать</span>
+              <button class="live-open" type="button" data-open="watch.html" data-title="Механические часы: разбери и рассмотри каждую деталь"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 4h6v6M10 20H4v-6M20 4l-7 7M4 20l7-7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Развернуть</button>
             </div>
             <div class="dir-body">
               <h3>Программирование и ИИ</h3>
@@ -911,9 +938,19 @@ h1, h2, h3 { text-wrap: balance; }
       <article class="dir" data-id="math" style="--accent: var(--sky)">
         <div class="dir-tilt" data-tilt="0.6">
           <div class="dir-face">
-            <div class="dir-visual dir-visual--live" role="img" aria-label="Золотая спираль: каждая точка повёрнута на 137,5 градуса от предыдущей, как семечки в подсолнухе">
-              <canvas class="spiral" aria-hidden="true"></canvas>
-              <p class="live-formula" aria-hidden="true"><span>θ = n · <b data-ang>137,51°</b></span><span>r = c · √n</span><small data-sp-hint>Води по картинке: меняешь угол, и узор перекручивается</small></p>
+            <div class="dir-visual dir-visual--live">
+              <div class="live-tabs" role="tablist" aria-label="Что показать">
+                <button type="button" role="tab" aria-selected="true" data-pane="spiral">Спираль</button>
+                <button type="button" role="tab" aria-selected="false" data-pane="fourier">Ряды Фурье</button>
+              </div>
+              <div class="live-pane live-pane--spiral" data-pane="spiral" role="img" aria-label="Золотая спираль: каждая точка повёрнута на 137,5 градуса от предыдущей, как семечки в подсолнухе">
+                <canvas class="spiral" aria-hidden="true"></canvas>
+                <p class="live-formula" aria-hidden="true"><span>θ = n · <b data-ang>137,51°</b></span><span>r = c · √n</span><small data-sp-hint>Води по картинке: меняешь угол, и узор перекручивается</small></p>
+              </div>
+              <div class="live-pane" data-pane="fourier" data-open="fourier.html" data-title="Ряды Фурье: собери волну и рисунок из вращений" hidden>
+                <iframe class="live-frame" data-src="fourier.html?card" title="Ряд Фурье: круги добавляются по одному, и волна становится квадратной" tabindex="-1"></iframe>
+              </div>
+              <button class="live-open" type="button" data-open="fourier.html" data-title="Ряды Фурье: собери волну и рисунок из вращений"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 4h6v6M10 20H4v-6M20 4l-7 7M4 20l7-7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Развернуть</button>
             </div>
             <div class="dir-body">
               <h3>Математика</h3>
@@ -931,8 +968,19 @@ h1, h2, h3 { text-wrap: balance; }
         <div class="dir-tilt" data-tilt="0.6">
           <div class="dir-face">
             <div class="dir-visual dir-visual--live">
-              <iframe class="live-frame" data-src="deepsea.html?card" title="Заставка игры «Бездна»: подлодка в темноте, сонар находит удильщика" tabindex="-1"></iframe>
-              <a class="live-tag" href="deepsea.html" target="_blank" rel="noopener">Сыграть в «Бездну» ↗</a>
+              <div class="live-tabs" role="tablist" aria-label="Какую игру показать">
+                <button type="button" role="tab" aria-selected="true" data-pane="deep">Бездна</button>
+                <button type="button" role="tab" aria-selected="false" data-pane="phys">Физика</button>
+              </div>
+              <div class="live-pane" data-pane="deep" data-open="deepsea.html" data-title="«Бездна»: глубоководный хоррор, включи звук">
+                <iframe class="live-frame" data-src="deepsea.html?card" title="Заставка игры «Бездна»: подлодка в темноте, сонар находит удильщика" tabindex="-1"></iframe>
+                <span class="live-tag">Хоррор под водой: фонарь, сонар и удильщик</span>
+              </div>
+              <div class="live-pane" data-pane="phys" data-open="physics.html" data-title="Физика в браузере: хватай кирпичи и стреляй ядрами" hidden>
+                <iframe class="live-frame" data-src="physics.html?card" title="Песочница с физикой: ядра сбивают башню из кирпичей" tabindex="-1"></iframe>
+                <span class="live-tag">Сотни кирпичей с настоящей физикой</span>
+              </div>
+              <button class="live-open" type="button" data-open="deepsea.html" data-title="«Бездна»: глубоководный хоррор, включи звук"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 4h6v6M10 20H4v-6M20 4l-7 7M4 20l7-7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Развернуть</button>
             </div>
             <div class="dir-body">
               <h3>Создание игр</h3>
@@ -1030,6 +1078,15 @@ h1, h2, h3 { text-wrap: balance; }
 </section>
 
 </main>
+
+<dialog class="viewer" id="viewer" aria-labelledby="vw-title">
+  <div class="vw-bar">
+    <b id="vw-title"></b>
+    <a id="vw-new" href="#" target="_blank" rel="noopener">В новой вкладке ↗</a>
+    <button type="button" class="vw-close" id="vw-close" aria-label="Закрыть">✕</button>
+  </div>
+  <iframe id="vw-frame" title="Полноэкранный просмотр" allow="autoplay; fullscreen"></iframe>
+</dialog>
 
 <a class="wa-float" href="https://wa.me/77055823688?text=Сәлем!%20Хочу%20на%20бесплатный%20пробный%20урок%20в%20Шаңырақ%20Code." target="_blank" rel="noopener" aria-label="Записаться на бесплатный урок через WhatsApp"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#wa"/></svg>Бесплатный урок</a>
 
@@ -1205,6 +1262,53 @@ h1, h2, h3 { text-wrap: balance; }
     frames.forEach(f => fio.observe(f));
   } else frames.forEach(f => { f.src = f.dataset.src; });
 
+  // Вкладки в живых сценах: переключают окно, кнопка «Развернуть» открывает то, что сейчас показано
+  document.querySelectorAll('.dir-visual--live').forEach(vis => {
+    const tabs = [...vis.querySelectorAll('.live-tabs [data-pane]')];
+    const panes = [...vis.querySelectorAll('.live-pane')];
+    const open = vis.querySelector('.live-open');
+    if (!tabs.length) return;
+    const sync = pane => {
+      if (!open) return;
+      open.hidden = !pane.dataset.open;
+      if (pane.dataset.open) { open.dataset.open = pane.dataset.open; open.dataset.title = pane.dataset.title; }
+    };
+    tabs.forEach(t => t.addEventListener('click', e => {
+      e.stopPropagation();
+      tabs.forEach(o => o.setAttribute('aria-selected', String(o === t)));
+      panes.forEach(pn => { pn.hidden = pn.dataset.pane !== t.dataset.pane; });
+      const pane = panes.find(pn => !pn.hidden);
+      const f = pane.querySelector('.live-frame');
+      if (f && !f.src) f.src = f.dataset.src;
+      sync(pane);
+    }));
+    sync(panes.find(pn => !pn.hidden));
+  });
+
+  // Окно на весь экран: часы, игры и Фурье открываются прямо на странице
+  const viewer = document.getElementById('viewer');
+  if (viewer && viewer.showModal) {
+    const vwFrame = document.getElementById('vw-frame'), vwTitle = document.getElementById('vw-title'), vwNew = document.getElementById('vw-new');
+    const scroller = () => (typeof lenis !== 'undefined' ? lenis : null);
+    document.querySelectorAll('.live-open').forEach(b => b.addEventListener('click', e => {
+      e.stopPropagation();
+      vwTitle.textContent = b.dataset.title;
+      vwFrame.title = b.dataset.title;
+      vwNew.href = b.dataset.open;
+      vwFrame.src = b.dataset.open;
+      viewer.showModal();
+      document.documentElement.style.overflow = 'hidden';
+      if (scroller()) scroller().stop();
+      setTimeout(() => vwFrame.focus(), 60);
+    }));
+    document.getElementById('vw-close').addEventListener('click', () => viewer.close());
+    viewer.addEventListener('close', () => {
+      vwFrame.src = 'about:blank';
+      document.documentElement.style.overflow = '';
+      if (scroller()) scroller().start();
+    });
+  } else document.querySelectorAll('.live-open').forEach(b => b.addEventListener('click', () => window.open(b.dataset.open, '_blank', 'noopener')));
+
   // Мини-консоль: программа «выполняется» на каждом нажатии клавиши
   const tcIn = document.getElementById('tc-name'), tcOut = document.getElementById('tc-out');
   if (tcIn && tcOut) {
@@ -1228,7 +1332,7 @@ h1, h2, h3 { text-wrap: balance; }
     codeVis.addEventListener('pointerenter', e => { if (e.pointerType === 'mouse') hold(1); });
     codeVis.addEventListener('pointerleave', e => { if (e.pointerType === 'mouse') hold(null); });
     codeVis.addEventListener('click', e => {
-      if (e.target.closest('a')) return;
+      if (e.target.closest('a, button')) return;
       held = !held; hold(held ? 1 : 0);
     });
   }
@@ -1242,7 +1346,7 @@ h1, h2, h3 { text-wrap: balance; }
     const GA = 137.50776405, N = 560;
     const gold = [232, 182, 74], sky = [60, 198, 220];
     let W = 0, H = 0, on = false, t0 = 0, raf = 0, user = null, userA = GA, shown = GA;
-    const vis = sp.closest('.dir-visual');
+    const vis = sp.closest('.live-pane') || sp.closest('.dir-visual');
     const fromPointer = e => { const r = vis.getBoundingClientRect(); user = GA + ((e.clientX - r.left) / r.width - 0.5) * 4; };
     vis.addEventListener('pointermove', fromPointer);
     vis.addEventListener('pointerdown', fromPointer);
