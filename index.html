@@ -164,6 +164,11 @@ h1, h2, h3 { text-wrap: balance; }
 .hero.has-3d .hero-fallback { display: none; }
 .hero-in { width: 100%; max-width: 1240px; margin-inline: auto; padding: 120px var(--gutter-r) 90px var(--gutter-l); }
 .hero-copy { max-width: 40rem; }
+/* плашка под текстом: тёмное стекло, чтобы буквы не спорили с лучами, 3D и узорами */
+.read-panel { position: relative; padding: clamp(1.15rem, 2.6vw, 2rem); border-radius: 22px; background: rgb(9 18 44 / .66); -webkit-backdrop-filter: blur(14px) saturate(1.15); backdrop-filter: blur(14px) saturate(1.15); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--milk) 9%, transparent), 0 24px 60px -28px rgb(0 0 0 / .7); }
+.hero-copy.read-panel { width: fit-content; max-width: 38rem; }
+.hero .lead { margin-bottom: 1.6rem; }
+.lead, .sec-lead, .yr-lead, .join-lead { color: color-mix(in srgb, var(--milk) 80%, var(--muted)); }
 .kicker { margin: 0 0 1rem; font: italic 600 clamp(1.3rem, 2vw, 1.6rem)/1.2 var(--font-wise); color: var(--gold-soft); }
 .hero h1 { margin: 0; font: 700 clamp(2.05rem, 4.3vw, 3.9rem)/1.04 var(--font-display); letter-spacing: -.03em; }
 .hero h1 em { font-style: normal; color: var(--gold); }
@@ -601,7 +606,7 @@ h1, h2, h3 { text-wrap: balance; }
   display: flex; flex-direction: column; justify-content: center;
   pointer-events: none;
 }
-.yr-copy > * { max-width: 30rem; }
+.yr-copy > * { max-width: 31rem; }
 .yr-copy h2 { margin: 0; font: 700 clamp(1.9rem, 3.8vw, 3.2rem)/1.08 var(--font-display); letter-spacing: -.02em; }
 .yr-lead { margin: 1rem 0 0; color: var(--muted); }
 .yr-steps { display: grid; gap: .1rem; margin: 2rem 0 0; padding: 0; list-style: none; }
@@ -626,7 +631,7 @@ h1, h2, h3 { text-wrap: balance; }
 /* 3D-иконки рядом с заголовком направлений */
 .dirs-3d { position: absolute; top: -50px; right: 0; width: 46%; max-width: 580px; height: 400px; pointer-events: none; }
 .dirs .sec-head, .dir-grid { position: relative; z-index: 1; }
-.dirs .sec-head { max-width: 40rem; }
+.dirs .sec-head { max-width: 40rem; width: fit-content; }
 @media (max-width: 1060px) { .dirs-3d { display: none; } }
 
 /* ---------- Как учимся ---------- */
@@ -761,6 +766,10 @@ h1, h2, h3 { text-wrap: balance; }
 .field.is-bad input, .field.is-bad select { border-color: var(--err); }
 .field.is-bad .field-err { display: block; }
 .form .btn { grid-column: 1 / -1; width: 100%; margin-top: .4rem; }
+.check { display: flex; align-items: flex-start; gap: .75rem; font-size: .88rem; line-height: 1.45; color: var(--muted); cursor: pointer; }
+.field .check input { flex: none; width: 22px; height: 22px; min-height: 0; margin: .05rem 0 0; padding: 0; accent-color: var(--gold); cursor: pointer; }
+.check a { color: var(--gold-soft); }
+.field.is-bad .check { color: var(--err); }
 .form-note { grid-column: 1 / -1; margin: 0; font-size: .82rem; color: var(--muted); }
 .form-note a { color: var(--gold-soft); }
 .btn-wa svg { width: 20px; height: 20px; flex: none; }
@@ -800,6 +809,9 @@ h1, h2, h3 { text-wrap: balance; }
 .foot-links { display: grid; gap: .55rem; margin: 0; padding: 0; list-style: none; }
 .foot-links a { color: var(--muted); text-decoration: none; transition: color .25s; }
 .foot-links a:hover { color: var(--milk); }
+.legal-links { display: flex; flex-wrap: wrap; gap: .5rem 1.4rem; }
+.legal-links a { color: var(--muted); text-underline-offset: 3px; }
+.legal-links a:hover { color: var(--milk); }
 .copy { grid-column: 1 / -1; display: flex; flex-wrap: wrap; justify-content: space-between; gap: .6rem 1.5rem; margin: .5rem 0 0; padding-top: 1.6rem; border-top: 1px solid color-mix(in srgb, var(--milk) 10%, transparent); font-size: .84rem; color: var(--muted); }
 .foot-mark {
   overflow: hidden; margin: 0; padding: 0 var(--gutter-r) .05em var(--gutter-l);
@@ -873,7 +885,7 @@ h1, h2, h3 { text-wrap: balance; }
   <canvas id="sky" aria-hidden="true"></canvas>
   <svg class="hero-fallback" viewBox="0 0 48 48" aria-hidden="true"><use href="#logo"/></svg>
   <div class="hero-in">
-    <div class="hero-copy">
+    <div class="hero-copy read-panel">
       <h1 id="hero-title" class="hero-title">Код, математика<br>и <em>свои игры</em></h1>
       <p class="lead" data-in>Онлайн-школа для подростков 14–18 лет. Первый урок бесплатный.</p>
       <div class="cta-row" data-in>
@@ -892,7 +904,7 @@ h1, h2, h3 { text-wrap: balance; }
 <section class="sec dirs" id="directions" aria-labelledby="dirs-title">
   <div class="wrap">
     <canvas id="icons-3d" class="dirs-3d" aria-hidden="true"></canvas>
-    <header class="sec-head">
+    <header class="sec-head read-panel">
       <h2 id="dirs-title" data-reveal="lines">Три направления</h2>
       <p class="sec-lead" data-reveal="up">Выбери одно. На пробном уроке поможем понять, с чего начать.</p>
     </header>
@@ -975,6 +987,7 @@ h1, h2, h3 { text-wrap: balance; }
   <div class="yr-stage">
     <canvas id="yurt-3d" aria-hidden="true"></canvas>
     <div class="yr-copy">
+      <div class="yr-panel read-panel">
       <h2 id="yurt-title" data-reveal="lines">Собери юрту в 3D</h2>
       <p class="yr-lead">Листай, и юрта соберётся. Каждая деталь — отдельная 3D-модель.</p>
       <ol class="yr-steps">
@@ -983,13 +996,14 @@ h1, h2, h3 { text-wrap: balance; }
         <li class="yr-step is-on"><i>3</i><b lang="kk">Шаңырақ</b></li>
         <li class="yr-step is-on"><i>4</i><b lang="kk">Киіз</b></li>
       </ol>
+      </div>
     </div>
   </div>
 </section>
 
 <section class="sec join" id="join" aria-labelledby="join-title">
   <div class="wrap join-grid">
-    <div>
+    <div class="read-panel join-copy">
       <h2 id="join-title"><span lang="kk" data-reveal="chars">Есік ашық</span><small>Дверь открыта: первый урок бесплатно</small></h2>
       <p class="join-lead" data-reveal="up">Заполни три поля — заявка откроется в WhatsApp. Мы ответим и подберём время.</p>
       <p class="trial-title">На пробном уроке:</p>
@@ -1032,8 +1046,12 @@ h1, h2, h3 { text-wrap: balance; }
             <option>Создание игр</option>
           </select>
         </div>
+        <div class="field field--full">
+          <label class="check"><input id="f-ok" name="ok" type="checkbox" required aria-describedby="f-ok-err"><span>Согласен(на) на обработку персональных данных и с <a href="legal.html#privacy" target="_blank" rel="noopener">политикой конфиденциальности</a></span></label>
+          <p class="field-err" id="f-ok-err">Отметь согласие, чтобы мы могли ответить на заявку</p>
+        </div>
         <button class="btn btn-gold btn-wa" type="submit"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#wa"/></svg>Отправить заявку в WhatsApp</button>
-        <p class="form-note">Если тебе нет 16 лет, заполни заявку вместе с родителями. Номер школы: <a href="https://wa.me/77055823688">+7 705 582 36 88</a>.</p>
+        <p class="form-note">Если тебе меньше 18 лет, заполни заявку вместе с родителем: согласие на обработку данных даёт он. Данные уходят только в WhatsApp школы и нужны, чтобы договориться о пробном уроке.</p>
       </form>
 
       <div class="done" id="join-done" hidden>
@@ -1076,7 +1094,7 @@ h1, h2, h3 { text-wrap: balance; }
       <li><a href="#join">Бесплатный урок</a></li>
       <li><a href="https://wa.me/77055823688">WhatsApp: +7 705 582 36 88</a></li>
     </ul>
-    <p class="copy"><span>© 2026 Шаңырақ Code</span></p>
+    <p class="copy"><span>© 2026 Шаңырақ Code</span><span class="legal-links"><a href="legal.html#privacy">Политика конфиденциальности</a><a href="legal.html#consent">Согласие на обработку данных</a><a href="legal.html#terms">Пользовательское соглашение</a></span></p>
   </div>
   <p class="foot-mark" aria-hidden="true" lang="kk">ШАҢЫРАҚ</p>
 </footer>
@@ -1396,7 +1414,7 @@ h1, h2, h3 { text-wrap: balance; }
     e.preventDefault();
     let first = null;
     form.querySelectorAll('[required]').forEach(f => {
-      const bad = !f.value.trim();
+      const bad = f.type === 'checkbox' ? !f.checked : !f.value.trim();
       f.closest('.field').classList.toggle('is-bad', bad);
       f.setAttribute('aria-invalid', String(bad));
       if (bad && !first) first = f;
@@ -1420,7 +1438,7 @@ h1, h2, h3 { text-wrap: balance; }
   });
   form.addEventListener('input', e => {
     const f = e.target.closest('.field');
-    if (f && f.classList.contains('is-bad') && e.target.value.trim()) {
+    if (f && f.classList.contains('is-bad') && (e.target.type === 'checkbox' ? e.target.checked : e.target.value.trim())) {
       f.classList.remove('is-bad');
       e.target.setAttribute('aria-invalid', 'false');
     }
