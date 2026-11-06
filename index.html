@@ -945,9 +945,13 @@ h1, h2, h3 { text-wrap: balance; }
               <div class="live-tabs" role="tablist" aria-label="Что показать">
                 <button type="button" role="tab" aria-selected="true" data-pane="fractal">Фрактал</button>
                 <button type="button" role="tab" aria-selected="false" data-pane="fourier">Фурье</button>
+                <button type="button" role="tab" aria-selected="false" data-pane="tess">Тессеракт</button>
               </div>
               <div class="live-pane" data-pane="fractal" data-open="fractal.html" data-title="Фракталы: приближай множество Мандельброта и Жюлиа">
                 <iframe class="live-frame" data-src="fractal.html?card" title="Множество Жюлиа: узор из формулы z → z² + c плавно перетекает" tabindex="-1"></iframe>
+              </div>
+              <div class="live-pane" data-pane="tess" data-open="tesseract.html" data-title="Тессеракт: четырёхмерный куб, который вращается в 4D" hidden>
+                <iframe class="live-frame" data-src="tesseract.html?card" title="Тессеракт: четырёхмерный куб вращается, и его тень выворачивается наизнанку" tabindex="-1"></iframe>
               </div>
               <div class="live-pane" data-pane="fourier" data-open="fourier.html" data-title="Ряды Фурье: собери волну и рисунок из вращений" hidden>
                 <iframe class="live-frame" data-src="fourier.html?card" title="Ряд Фурье: круги добавляются по одному, и волна становится квадратной" tabindex="-1"></iframe>
