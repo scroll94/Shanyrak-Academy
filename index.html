@@ -335,6 +335,7 @@ h1, h2, h3 { text-wrap: balance; }
 .pg-num::before { content: ""; position: absolute; width: 30px; height: 30px; background: var(--gold); transform: rotate(45deg); border-radius: 5px; z-index: 0; }
 .pg-num { position: relative; } .pg-num { isolation: isolate; }
 .pg-num::before { z-index: -1; }
+.pg-kick { margin: .1rem 0 -.3rem; font: 700 .7rem/1 var(--font-display); letter-spacing: .14em; text-transform: uppercase; color: var(--gold); }
 .pg-step h4 { margin: .2rem 0 0; font: 700 1.08rem/1.25 var(--font-display); }
 .pg-step > p { margin: 0; color: color-mix(in srgb, var(--milk) 82%, var(--muted)); font-size: .95rem; line-height: 1.5; }
 .pg-step .pg-ai { display: flex; gap: .5rem; align-items: flex-start; margin-top: auto; padding-top: .7rem; border-top: 1px dashed color-mix(in srgb, var(--sky) 35%, transparent); color: var(--sky); font-size: .88rem; }
@@ -354,8 +355,19 @@ h1, h2, h3 { text-wrap: balance; }
 @media (max-width: 1000px) { .pg-steps { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (max-width: 640px) {
   .pg-steps, .pg-rules ol { grid-template-columns: minmax(0, 1fr); }
-  .pg-tabs { display: flex; }
+  .pg-steps { gap: 10px; }
+  /* вкладки едут вместе с экраном: переключиться можно из любого места программы */
+  .pg-tabs { display: flex; position: sticky; top: calc(72px + env(safe-area-inset-top, 0px)); z-index: 5; background: rgb(9 18 44 / .92); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); }
   .pg-tabs button { flex: 1; padding: 0 .8rem; font-size: .88rem; }
+  /* шаг: номер слева, текст справа, без лишней высоты */
+  .pg-step { display: grid; grid-template-columns: 34px minmax(0, 1fr); column-gap: .85rem; row-gap: .4rem; align-items: start; padding: 1rem 1rem .95rem; }
+  .pg-step > * { grid-column: 2; }
+  .pg-step .pg-num { grid-column: 1; grid-row: 1 / span 4; width: 34px; height: 34px; font-size: .9rem; }
+  .pg-step .pg-num::before { width: 25px; height: 25px; }
+  .pg-step h4 { margin: 0; font-size: 1.02rem; }
+  .pg-kick { margin: .2rem 0 0; }
+  .pg-step > p { font-size: .93rem; }
+  .pg-step .pg-ai { padding-top: .55rem; font-size: .85rem; }
 }
 @media (prefers-reduced-motion: reduce) { .pg-panel.is-on .pg-step, .pg-panel.is-on .pg-final { animation: none; } }
 
@@ -1028,10 +1040,11 @@ h1, h2, h3 { text-wrap: balance; }
 <section class="sec program" id="program" aria-labelledby="program-title">
   <div class="wrap">
     <header class="sec-head read-panel">
-      <h2 id="program-title">Чему научится ваш ребёнок</h2>
-      <p class="sec-lead">Шаг за шагом: от первой странички до своего проекта. Искусственный интеллект на уроках помогает, но думает и делает ребёнок сам.</p>
+      <h2 id="program-title">Чему мы научим</h2>
+      <p class="sec-lead">Шаг за шагом, от первого урока до своего проекта. Искусственный интеллект на занятиях помогает, но думает и делает ребёнок сам.</p>
     </header>
 
+    <div class="pg-box">
     <div class="pg-tabs" role="tablist" aria-label="Программа обучения">
       <button type="button" role="tab" id="pg-tab-web" aria-controls="pg-web" aria-selected="true">Сайты и ИИ</button>
       <button type="button" role="tab" id="pg-tab-games" aria-controls="pg-games" aria-selected="false" tabindex="-1">Игры и 3D</button>
@@ -1042,45 +1055,46 @@ h1, h2, h3 { text-wrap: balance; }
       <ol class="pg-steps">
           <li class="pg-step" style="--i:1">
             <span class="pg-num" aria-hidden="true">1</span>
-            <h4>Первая страница</h4>
-            <p>Поймёт, как устроены сайты, и в первый же день сделает свою первую страничку.</p>
-            <p class="pg-ai"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5l1.9 5.6 5.6 1.9-5.6 1.9L12 17.5l-1.9-5.6L4.5 10l5.6-1.9z" fill="currentColor"/><path d="M19 15.5l.8 2.2 2.2.8-2.2.8-.8 2.2-.8-2.2-2.2-.8 2.2-.8z" fill="currentColor" opacity=".7"/></svg><span>ИИ объясняет непонятные слова простым языком.</span></p>
+            <p class="pg-kick">Первый урок</p>
+            <h4>Что такое сайты и ИИ</h4>
+            <p>Расскажем, как устроены сайты и что такое искусственный интеллект. Ребёнок напишет свой первый код и сразу увидит результат на экране.</p>
+            <p class="pg-ai"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5l1.9 5.6 5.6 1.9-5.6 1.9L12 17.5l-1.9-5.6L4.5 10l5.6-1.9z" fill="currentColor"/><path d="M19 15.5l.8 2.2 2.2.8-2.2.8-.8 2.2-.8-2.2-2.2-.8 2.2-.8z" fill="currentColor" opacity=".7"/></svg><span>ИИ объясняет новые слова простым языком.</span></p>
           </li>
           <li class="pg-step" style="--i:2">
             <span class="pg-num" aria-hidden="true">2</span>
-            <h4>Красивое оформление</h4>
-            <p>Научится оформлять сайт: цвета, шрифты, картинки. Сайт будет хорошо выглядеть и на компьютере, и на телефоне.</p>
-            <p class="pg-ai"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5l1.9 5.6 5.6 1.9-5.6 1.9L12 17.5l-1.9-5.6L4.5 10l5.6-1.9z" fill="currentColor"/><path d="M19 15.5l.8 2.2 2.2.8-2.2.8-.8 2.2-.8-2.2-2.2-.8 2.2-.8z" fill="currentColor" opacity=".7"/></svg><span>Если что-то «поехало», ИИ подскажет причину, а исправит ребёнок сам.</span></p>
+            <h4>Алгоритмы и логика</h4>
+            <p>Разберём, что такое алгоритм: как разложить любую задачу на простые шаги. На этом строится всё программирование.</p>
+            <p class="pg-ai"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5l1.9 5.6 5.6 1.9-5.6 1.9L12 17.5l-1.9-5.6L4.5 10l5.6-1.9z" fill="currentColor"/><path d="M19 15.5l.8 2.2 2.2.8-2.2.8-.8 2.2-.8-2.2-2.2-.8 2.2-.8z" fill="currentColor" opacity=".7"/></svg><span>ИИ помогает проверить, правильно ли задача разбита на шаги.</span></p>
           </li>
           <li class="pg-step" style="--i:3">
             <span class="pg-num" aria-hidden="true">3</span>
-            <h4>Кнопки и анимации</h4>
-            <p>Начнёт программировать: сайт будет откликаться на нажатия, появятся кнопки, формы и движение.</p>
-            <p class="pg-ai"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5l1.9 5.6 5.6 1.9-5.6 1.9L12 17.5l-1.9-5.6L4.5 10l5.6-1.9z" fill="currentColor"/><path d="M19 15.5l.8 2.2 2.2.8-2.2.8-.8 2.2-.8-2.2-2.2-.8 2.2-.8z" fill="currentColor" opacity=".7"/></svg><span>ИИ помогает найти ошибку, но не пишет код вместо ребёнка.</span></p>
+            <h4>Свой сайт с нуля</h4>
+            <p>Научим делать страницы: текст, картинки, цвета, кнопки. Сайт будет хорошо смотреться и на компьютере, и на телефоне.</p>
+            <p class="pg-ai"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5l1.9 5.6 5.6 1.9-5.6 1.9L12 17.5l-1.9-5.6L4.5 10l5.6-1.9z" fill="currentColor"/><path d="M19 15.5l.8 2.2 2.2.8-2.2.8-.8 2.2-.8-2.2-2.2-.8 2.2-.8z" fill="currentColor" opacity=".7"/></svg><span>Если что-то «поехало», ИИ подскажет причину, а исправит ребёнок сам.</span></p>
           </li>
           <li class="pg-step" style="--i:4">
             <span class="pg-num" aria-hidden="true">4</span>
-            <h4>Правильная работа с ИИ</h4>
-            <p>Научится грамотно пользоваться ИИ: чётко ставить задачу, проверять ответы и не списывать бездумно. Этот навык пригодится в любой профессии.</p>
-            <p class="pg-ai"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5l1.9 5.6 5.6 1.9-5.6 1.9L12 17.5l-1.9-5.6L4.5 10l5.6-1.9z" fill="currentColor"/><path d="M19 15.5l.8 2.2 2.2.8-2.2.8-.8 2.2-.8-2.2-2.2-.8 2.2-.8z" fill="currentColor" opacity=".7"/></svg><span>Главный урок: ИИ тоже ошибается, и это нужно уметь замечать.</span></p>
+            <h4>Сайт оживает</h4>
+            <p>Добавим программирование: сайт начнёт откликаться на нажатия, появятся формы, анимации и 3D.</p>
+            <p class="pg-ai"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5l1.9 5.6 5.6 1.9-5.6 1.9L12 17.5l-1.9-5.6L4.5 10l5.6-1.9z" fill="currentColor"/><path d="M19 15.5l.8 2.2 2.2.8-2.2.8-.8 2.2-.8-2.2-2.2-.8 2.2-.8z" fill="currentColor" opacity=".7"/></svg><span>ИИ помогает найти ошибку, но не пишет код вместо ребёнка.</span></p>
           </li>
           <li class="pg-step" style="--i:5">
             <span class="pg-num" aria-hidden="true">5</span>
-            <h4>Дизайн и 3D</h4>
-            <p>Научится делать сайты с анимацией и объёмной 3D-графикой, как часы в начале страницы.</p>
-            <p class="pg-ai"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5l1.9 5.6 5.6 1.9-5.6 1.9L12 17.5l-1.9-5.6L4.5 10l5.6-1.9z" fill="currentColor"/><path d="M19 15.5l.8 2.2 2.2.8-2.2.8-.8 2.2-.8-2.2-2.2-.8 2.2-.8z" fill="currentColor" opacity=".7"/></svg><span>ИИ предлагает идеи, а ребёнок выбирает лучшую и доводит до ума.</span></p>
+            <h4>Как правильно работать с ИИ</h4>
+            <p>Научим ставить ИИ понятные задачи, проверять его ответы и не списывать бездумно. Ребёнок поймёт, где ИИ помогает, а где ошибается.</p>
+            <p class="pg-ai"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5l1.9 5.6 5.6 1.9-5.6 1.9L12 17.5l-1.9-5.6L4.5 10l5.6-1.9z" fill="currentColor"/><path d="M19 15.5l.8 2.2 2.2.8-2.2.8-.8 2.2-.8-2.2-2.2-.8 2.2-.8z" fill="currentColor" opacity=".7"/></svg><span>Главный урок: ИИ тоже ошибается, и это нужно уметь замечать.</span></p>
           </li>
           <li class="pg-step" style="--i:6">
             <span class="pg-num" aria-hidden="true">6</span>
-            <h4>Сайт в интернете</h4>
-            <p>Выложит сайт в интернет по своей ссылке, которую можно отправить друзьям и родным.</p>
-            <p class="pg-ai"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5l1.9 5.6 5.6 1.9-5.6 1.9L12 17.5l-1.9-5.6L4.5 10l5.6-1.9z" fill="currentColor"/><path d="M19 15.5l.8 2.2 2.2.8-2.2.8-.8 2.2-.8-2.2-2.2-.8 2.2-.8z" fill="currentColor" opacity=".7"/></svg><span>ИИ помогает разобраться с настройками публикации.</span></p>
+            <h4>Выбор темы проекта</h4>
+            <p>Ребёнок сам выбирает тему: хобби, спорт, музыка, любимая игра или идея для бизнеса. Вместе составим план будущего сайта.</p>
+            <p class="pg-ai"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5l1.9 5.6 5.6 1.9-5.6 1.9L12 17.5l-1.9-5.6L4.5 10l5.6-1.9z" fill="currentColor"/><path d="M19 15.5l.8 2.2 2.2.8-2.2.8-.8 2.2-.8-2.2-2.2-.8 2.2-.8z" fill="currentColor" opacity=".7"/></svg><span>ИИ подкидывает идеи, а решает ребёнок.</span></p>
           </li>
       </ol>
       <div class="pg-final">
         <p class="pg-final-k">Финальный проект</p>
-        <h3>Свой сайт на любую тему</h3>
-        <p>Тему ребёнок выбирает сам: хобби, спорт, музыка, любимая игра или идея для бизнеса. Делает сайт от начала до конца с помощью ИИ, а в конце показывает его и рассказывает, как всё устроено.</p>
+        <h3>Свой сайт на выбранную тему</h3>
+        <p>Ребёнок делает сайт от начала до конца, а ИИ помогает как напарник. Выкладываем сайт в интернет по своей ссылке, и ребёнок рассказывает, как всё устроено.</p>
       </div>
     </div>
 
@@ -1088,48 +1102,50 @@ h1, h2, h3 { text-wrap: balance; }
       <ol class="pg-steps">
           <li class="pg-step" style="--i:1">
             <span class="pg-num" aria-hidden="true">1</span>
-            <h4>Первая 3D-модель</h4>
-            <p>Освоит Blender, программу для 3D-моделирования, и сделает свою первую модель.</p>
+            <p class="pg-kick">Первый урок</p>
+            <h4>Что такое 3D и игры</h4>
+            <p>Расскажем, как делают игры и 3D-графику. Ребёнок откроет Blender и сделает свою первую 3D-модель.</p>
             <p class="pg-ai"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5l1.9 5.6 5.6 1.9-5.6 1.9L12 17.5l-1.9-5.6L4.5 10l5.6-1.9z" fill="currentColor"/><path d="M19 15.5l.8 2.2 2.2.8-2.2.8-.8 2.2-.8-2.2-2.2-.8 2.2-.8z" fill="currentColor" opacity=".7"/></svg><span>ИИ подсказывает, что нажимать и в каком порядке.</span></p>
           </li>
           <li class="pg-step" style="--i:2">
             <span class="pg-num" aria-hidden="true">2</span>
-            <h4>Цвет и свет</h4>
-            <p>Научится раскрашивать модели и ставить свет, чтобы они выглядели как в настоящей игре.</p>
+            <h4>Модели, цвет и свет</h4>
+            <p>Научим собирать модели посложнее, раскрашивать их и ставить свет, чтобы они выглядели как в настоящей игре.</p>
             <p class="pg-ai"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5l1.9 5.6 5.6 1.9-5.6 1.9L12 17.5l-1.9-5.6L4.5 10l5.6-1.9z" fill="currentColor"/><path d="M19 15.5l.8 2.2 2.2.8-2.2.8-.8 2.2-.8-2.2-2.2-.8 2.2-.8z" fill="currentColor" opacity=".7"/></svg><span>Если что-то выглядит криво, ИИ поможет найти причину.</span></p>
           </li>
           <li class="pg-step" style="--i:3">
             <span class="pg-num" aria-hidden="true">3</span>
             <h4>Свой мир в Roblox</h4>
-            <p>Построит свой игровой мир в Roblox Studio и поставит туда модели, которые сделал сам.</p>
+            <p>Ребёнок построит свой игровой мир в Roblox Studio и поставит туда модели, которые сделал сам.</p>
             <p class="pg-ai"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5l1.9 5.6 5.6 1.9-5.6 1.9L12 17.5l-1.9-5.6L4.5 10l5.6-1.9z" fill="currentColor"/><path d="M19 15.5l.8 2.2 2.2.8-2.2.8-.8 2.2-.8-2.2-2.2-.8 2.2-.8z" fill="currentColor" opacity=".7"/></svg><span>ИИ подкидывает идеи для уровней, а строит ребёнок сам.</span></p>
           </li>
           <li class="pg-step" style="--i:4">
             <span class="pg-num" aria-hidden="true">4</span>
             <h4>Игра оживает</h4>
-            <p>Научится писать скрипты: двери открываются, монеты собираются, очки считаются.</p>
+            <p>Научим писать скрипты: двери открываются, монеты собираются, очки считаются. Здесь пригодятся алгоритмы и логика.</p>
             <p class="pg-ai"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5l1.9 5.6 5.6 1.9-5.6 1.9L12 17.5l-1.9-5.6L4.5 10l5.6-1.9z" fill="currentColor"/><path d="M19 15.5l.8 2.2 2.2.8-2.2.8-.8 2.2-.8-2.2-2.2-.8 2.2-.8z" fill="currentColor" opacity=".7"/></svg><span>ИИ объясняет ошибки, но не делает игру за ребёнка.</span></p>
           </li>
           <li class="pg-step" style="--i:5">
             <span class="pg-num" aria-hidden="true">5</span>
-            <h4>Своя игра на Godot</h4>
-            <p>Сделает игру на профессиональном движке Godot: персонаж, уровни, меню.</p>
+            <h4>Настоящий движок Godot</h4>
+            <p>Сделаем игру на профессиональном движке Godot: персонаж, уровни, меню, звук и музыка.</p>
             <p class="pg-ai"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5l1.9 5.6 5.6 1.9-5.6 1.9L12 17.5l-1.9-5.6L4.5 10l5.6-1.9z" fill="currentColor"/><path d="M19 15.5l.8 2.2 2.2.8-2.2.8-.8 2.2-.8-2.2-2.2-.8 2.2-.8z" fill="currentColor" opacity=".7"/></svg><span>ИИ помогает разобраться в коде и инструкциях.</span></p>
           </li>
           <li class="pg-step" style="--i:6">
             <span class="pg-num" aria-hidden="true">6</span>
-            <h4>Звук и проверка</h4>
-            <p>Добавит звуки и музыку, даст поиграть друзьям и исправит найденные ошибки.</p>
-            <p class="pg-ai"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5l1.9 5.6 5.6 1.9-5.6 1.9L12 17.5l-1.9-5.6L4.5 10l5.6-1.9z" fill="currentColor"/><path d="M19 15.5l.8 2.2 2.2.8-2.2.8-.8 2.2-.8-2.2-2.2-.8 2.2-.8z" fill="currentColor" opacity=".7"/></svg><span>ИИ помогает собрать отзывы и составить план правок.</span></p>
+            <h4>Выбор идеи игры</h4>
+            <p>Ребёнок сам придумывает, какую игру хочет сделать. Вместе составим план: герой, правила, уровни.</p>
+            <p class="pg-ai"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5l1.9 5.6 5.6 1.9-5.6 1.9L12 17.5l-1.9-5.6L4.5 10l5.6-1.9z" fill="currentColor"/><path d="M19 15.5l.8 2.2 2.2.8-2.2.8-.8 2.2-.8-2.2-2.2-.8 2.2-.8z" fill="currentColor" opacity=".7"/></svg><span>ИИ помогает расписать идею по шагам.</span></p>
           </li>
       </ol>
       <div class="pg-final">
         <p class="pg-final-k">Финальный проект</p>
-        <h3>Своя игра со своими 3D-моделями</h3>
-        <p>Игра в Roblox или Godot, где персонажи и предметы сделаны самим ребёнком в Blender. Готовой игрой можно поделиться с друзьями.</p>
+        <h3>Своя игра по своей идее</h3>
+        <p>Ребёнок делает игру в Roblox или Godot со своими моделями из Blender, а ИИ помогает как напарник. Даёт поиграть друзьям и исправляет найденные ошибки.</p>
       </div>
     </div>
 
+    </div>
     </div>
 
     <div class="pg-rules">
@@ -1299,6 +1315,9 @@ h1, h2, h3 { text-wrap: balance; }
 
   // Плавная прокрутка
   let lenis = null;
+  // CSS-плавность мешает ScrollTrigger: при пересчёте он прыгает наверх, а браузер «доезжает» плавно,
+  // и все позиции сдвигаются на величину прокрутки. Плавность здесь даёт Lenis.
+  if (motion) document.documentElement.style.scrollBehavior = 'auto';
   if (motion && window.Lenis) {
     lenis = new Lenis({ lerp: 0.1 });
     lenis.on('scroll', ScrollTrigger.update);
@@ -1472,6 +1491,8 @@ h1, h2, h3 { text-wrap: balance; }
       panel.toggleAttribute('inert', !on);
       panel.setAttribute('aria-hidden', String(!on));
     });
+           const box = document.querySelector('.pg-panels').getBoundingClientRect(), bar = document.querySelector('.pg-tabs').getBoundingClientRect();
+           if (box.top < bar.bottom - 2) { const y = scrollY + box.top - bar.bottom - 12; if (typeof lenis !== 'undefined' && lenis) lenis.scrollTo(y, { duration: .6 }); else scrollTo({ top: y, behavior: 'smooth' }); }
   };
   pgTabs.forEach((t, i) => {
     t.addEventListener('click', () => pgShow(t));
@@ -1764,7 +1785,20 @@ h1, h2, h3 { text-wrap: balance; }
     st.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(); } });
   });
   let yurtPin = null;
-  if (motion) yurtPin = ScrollTrigger.create({ trigger: yurtSec, start: 'top top', end: () => '+=' + Math.round(innerHeight * 2), pin: true, anticipatePin: 1 });
+  // На телефоне и планшете юрта не прилипает к экрану: собирается, пока секция проезжает снизу вверх.
+  // Прилипание на телефоне сбивалось от прыжков адресной строки и наезжало на программу.
+  const yurtPinned = matchMedia('(min-width: 900px) and (min-aspect-ratio: 1/1) and (hover: hover)').matches;
+  if (motion) {
+    ScrollTrigger.config({ ignoreMobileResize: true });
+    yurtPin = yurtPinned
+      ? ScrollTrigger.create({ trigger: yurtSec, start: 'top top', end: () => '+=' + Math.round(innerHeight * 2), pin: true, anticipatePin: 1 })
+      : ScrollTrigger.create({ trigger: yurtSec, start: 'top 80%', end: 'top 8%' });
+    // высота страницы над юртой может измениться позже (шрифты, консоль, картинки) — пересчитываем позиции
+    let lastH = document.body.scrollHeight, rt = 0;
+    const reflow = () => { clearTimeout(rt); rt = setTimeout(() => { const h = document.body.scrollHeight, moved = Math.abs(h - lastH) > 4; lastH = h; if (moved) { ScrollTrigger.refresh(); lastH = document.body.scrollHeight; } }, 250); };
+    new ResizeObserver(reflow).observe(document.body);
+    if (document.fonts) document.fonts.ready.then(() => ScrollTrigger.refresh());
+  }
 
   if (!motion) return;
 
